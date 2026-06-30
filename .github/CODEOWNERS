@@ -1,0 +1,16 @@
+# Code owners for @thkruz/materialize
+#
+# Listed owners are automatically requested for review on any pull request that
+# changes a matching path. The last matching pattern takes precedence.
+# Docs: https://docs.github.com/articles/about-code-owners
+
+# Default owner for everything in the repository.
+*                       @thkruz
+
+# CI / release pipeline and repo automation.
+/.github/               @thkruz
+
+# Build & publish configuration.
+/rollup.config.ts       @thkruz
+/compress.mjs           @thkruz
+/package.json           @thkruz
