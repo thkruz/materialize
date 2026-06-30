@@ -1,13 +1,16 @@
 {
-  "name": "@materializecss/materialize",
+  "name": "@thkruz/materialize",
   "description": "The responsive front-end library based on Material Design from Google.",
   "author": "The Materialize Team",
-  "homepage": "https://materializeweb.com",
+  "homepage": "https://github.com/thkruz/materialize#readme",
   "version": "2.3.3",
   "style": "dist/css/materialize.css",
   "sass": "sass/materialize.scss",
   "typings": "dist/js/materialize.d.ts",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/js/materialize.js",
   "module": "./dist/js/materialize.mjs",
   "exports": {
@@ -21,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/materializecss/materialize.git"
+    "url": "git+https://github.com/thkruz/materialize.git"
   },
   "bugs": {
-    "url": "https://github.com/materializecss/materialize/issues"
+    "url": "https://github.com/thkruz/materialize/issues"
   },
   "funding": [
     {
@@ -42,6 +45,7 @@
     "test": "jasmine-browser-runner runSpecs --config=jasmine.json",
     "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "release": "npm run lint && npm run build -- --environment BUILD:release && node compress.mjs",
+    "prepublishOnly": "npm run release",
     "preversion": "npm run lint && npm test",
     "version": "npm run build -- --environment BUILD:release && node compress.mjs && git add .",
     "storybook": "storybook dev -p 6006",

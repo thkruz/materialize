@@ -28,7 +28,8 @@ node_modules/
 # Ignore lock
 yarn.lock
 
-dist/*.zip
+# Build output — generated, not committed; built fresh on publish via prepublishOnly
+dist/
 
 *storybook.log
 storybook-static
