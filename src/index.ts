@@ -57,7 +57,8 @@ export {
   Range
 };
 
-export const version = '2.3.3';
+// `__MZ_VERSION__` is replaced with package.json's version at build time (see rollup.config.ts).
+export const version: string = '__MZ_VERSION__';
 
 export interface AutoInitOptions {
   Autocomplete?: Partial<AutocompleteOptions>;
