@@ -1,4 +1,4 @@
-import type { RollupOptions } from 'rollup';
+import type { Plugin, RollupOptions } from 'rollup';
 
 import typescriptPlugin from '@rollup/plugin-typescript';
 import terserPlugin from '@rollup/plugin-terser';
@@ -15,6 +15,16 @@ const outputPath = 'dist/js/materialize';
 
 const version = packageJson.version;
 
+// Inject the package.json version into src/index.ts at build time, replacing the
+// `__MZ_VERSION__` placeholder. This keeps the version out of the tracked source.
+const injectVersion = (): Plugin => ({
+  name: 'inject-version',
+  transform(code, id) {
+    if (!id.replace(/\\/g, '/').endsWith('src/index.ts')) return null;
+    return { code: code.replace(/__MZ_VERSION__/g, version), map: null };
+  }
+});
+
 const bannerText = `/*!
 * Materialize v${version} (https://materializeweb.com)
 * Copyright 2014-${new Date().getFullYear()} Materialize
@@ -22,35 +32,10 @@ const bannerText = `/*!
 */`;
 
 const config: RollupOptions[] = [
-  //--- Replace version in index.ts
-  {
-    input: 'empty',
-    plugins: [
-      copy({
-        targets: [
-          {
-            src: `src/index.ts`,
-            dest: `src`,
-            transform: (contents) =>
-              contents
-                .toString()
-                .replace(
-                  new RegExp(/export const version = '.*/),
-                  `export const version = '${version}';`
-                )
-          }
-        ]
-      })
-    ],
-    onwarn: (warning, defaultHandler) => {
-      if (warning.code !== 'EMPTY_BUNDLE') defaultHandler(warning);
-    }
-  },
-
   //--- JS
   {
     input: 'src/index.ts',
-    plugins: [typescriptPlugin()],
+    plugins: [injectVersion(), typescriptPlugin()],
     output: [
       {
         file: `${outputPath}.cjs.js`,
@@ -61,7 +46,7 @@ const config: RollupOptions[] = [
   },
   {
     input: 'src/index.ts',
-    plugins: [typescriptPlugin()],
+    plugins: [injectVersion(), typescriptPlugin()],
     output: [
       {
         file: `${outputPath}.mjs`,
@@ -72,7 +57,7 @@ const config: RollupOptions[] = [
   },
   {
     input: 'src/index.ts',
-    plugins: [typescriptPlugin()],
+    plugins: [injectVersion(), typescriptPlugin()],
     output: [
       {
         name: 'M',
