@@ -2,13 +2,12 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
 
-# Cancel superseded runs on the same ref — but never cancel a tag (release) run.
+# Cancel superseded runs on the same ref — but never cancel a main (release) run.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: write   # needed to create GitHub Releases
@@ -80,29 +79,32 @@ jobs:
       run: npm run test
 
     # ---------------------------------------------------------------------
-    # Release — only when a v* tag is pushed. Reaching here means every
-    # validation step above passed.
+    # Release — only on a push to main. The version-bump gate above guarantees
+    # this commit carries a new version, so it's safe to tag, release, publish.
+    # Creating the tag here does NOT re-trigger CI (tags no longer trigger it).
     # ---------------------------------------------------------------------
 
     - name: Build release artifacts
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
         npm run build -- --environment BUILD:release
         node compress.mjs
 
     - name: Publish GitHub Release
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create "$GITHUB_REF_NAME" \
+        VERSION=$(jq -r .version package.json)
+        gh release create "v$VERSION" \
           dist/materialize-v*.zip \
           dist/materialize-src-v*.zip \
-          --title "$GITHUB_REF_NAME" \
+          --target "$GITHUB_SHA" \
+          --title "v$VERSION" \
           --generate-notes
 
     - name: Publish to npm
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       # dist/ was just freshly built above, so skip the prepublishOnly rebuild.
       run: npm publish --ignore-scripts
       env:
