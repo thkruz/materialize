@@ -1,26 +1,66 @@
-// TODO: Make better structure
+@use '../../sass/mixins.module.scss' as *;
+
+// Material 3 Badges — https://m3.material.io/components/badges/specs
+//
+// Two forms:
+//   * Small "dot" badge   — 6dp diameter, no label (.badge.dot)
+//   * Large numeric badge — min 16dp height, 4dp horizontal padding, corner full
+//
+// Color: `error` container with `on-error` label. Label uses `label-small`.
+// The badge is positioned at the top-trailing edge of its host element.
 :root {
-  --bagde-height: 22px;
+  // Large numeric badge: min 16dp tall, corner full, 4dp horizontal padding.
+  --badge-height: 16px;
+  --badge-padding: 4px;
+  // Small dot badge: 6dp diameter.
+  --badge-dot-size: 6px;
 }
 
 span.badge {
-  min-width: 3rem;
-  padding: 0 6px;
+  // M3 label-small typescale.
+  font-family: var(--md-sys-typescale-label-small-font-family-name);
+  font-weight: var(--md-sys-typescale-label-small-font-weight);
+  font-size: var(--md-sys-typescale-label-small-font-size);
+  letter-spacing: var(--md-sys-typescale-label-small-letter-spacing);
+  line-height: var(--md-sys-typescale-label-small-line-height);
+
+  // Large numeric badge geometry: min 16dp height, 4dp horizontal padding, full corner.
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--badge-height);
+  min-height: var(--badge-height);
+  height: var(--badge-height);
+  padding: 0 var(--badge-padding);
   margin-left: 14px;
   text-align: center;
-  font-size: 1rem;
-  line-height: var(--bagde-height);
-  height: var(--bagde-height);
-  color: var(--md-sys-color-on-surface-variant);
-  float: right;
+  border-radius: var(--md-sys-shape-corner-full);
   box-sizing: border-box;
+  float: right;
+
+  // M3 error container: `error` background with `on-error` label.
+  color: var(--md-sys-color-on-error);
+  background-color: var(--md-sys-color-error);
+
+  // Small dot badge — 6dp diameter, no label, fully rounded, error colored.
+  &.dot {
+    min-width: var(--badge-dot-size);
+    min-height: var(--badge-dot-size);
+    width: var(--badge-dot-size);
+    height: var(--badge-dot-size);
+    padding: 0;
+    border-radius: var(--md-sys-shape-corner-full);
+    background-color: var(--md-sys-color-error);
+    overflow: hidden;
+    // A dot carries no label; hide any incidental text content.
+    font-size: 0;
+    line-height: 0;
+  }
 
   &.new {
-    font-weight: 300;
-    font-size: 0.8rem;
-    color: var(--md-sys-color-on-primary);
-    background-color: var(--md-sys-color-primary);
-    border-radius: 2px;
+    color: var(--md-sys-color-on-error);
+    background-color: var(--md-sys-color-error);
+    border-radius: var(--md-sys-shape-corner-full);
   }
   &.new:after {
     content: ' new';
@@ -32,23 +72,22 @@ span.badge {
 }
 
 .active span.badge {
-  color: var(--md-sys-color-on-primary);
+  color: var(--md-sys-color-on-error);
 }
 
 // Special cases
 
 .navbar ul a span.badge {
-  display: inline-block;
+  display: inline-flex;
   float: none;
   margin-left: 4px;
-  line-height: var(--bagde-height);
-  height: var(--bagde-height);
+  height: var(--badge-height);
   -webkit-font-smoothing: auto;
 }
 
 // Line height centering
 .collection-item span.badge {
-  margin-top: calc(calc(1.5rem * 0.5) - calc(var(--bagde-height) * 0.5));
+  margin-top: calc(calc(1.5rem * 0.5) - calc(var(--badge-height) * 0.5));
 }
 
 .collapsible span.badge {
@@ -61,15 +100,15 @@ span.badge {
 }
 
 .collapsible .active span.badge:not(.new) {
-  color: var(--md-sys-color-on-surface-variant);
+  color: var(--md-sys-color-on-error);
 }
 
 .sidenav span.badge {
-  margin-top: calc(calc(var(--sidenav-line-height) * 0.5) - calc(22px * 0.5));
+  margin-top: calc(calc(var(--sidenav-line-height) * 0.5) - calc(var(--badge-height) * 0.5));
 }
 
 table span.badge {
-  display: inline-block;
+  display: inline-flex;
   float: none;
   margin-left: auto;
 }
