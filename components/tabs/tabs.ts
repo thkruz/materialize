@@ -11,7 +11,7 @@ export interface TabsOptions extends BaseOptions {
    * Callback for when a new tab content is shown.
    * @default null
    */
-  onShow: (newContent: Element) => void;
+  onShow: ((newContent: Element) => void) | null;
   /**
    * Set to true to enable swipeable tabs.
    * This also uses the responsiveThreshold option.
@@ -212,7 +212,7 @@ export class Tabs extends Component<TabsOptions> {
     // If the location.hash matches one of the links, use that as the active tab.
     this._activeTabLink = Array.from(this._tabLinks).find(
       (a: HTMLAnchorElement) => a.getAttribute('href') === location.hash
-    );
+    ) as HTMLAnchorElement;
     // If no match is found, use the first link or any with class 'active' as the initial active tab.
     if (!this._activeTabLink) {
       let activeTabLink = this.el.querySelector('li.tab a.active');
@@ -235,12 +235,12 @@ export class Tabs extends Component<TabsOptions> {
     // Change swipeable according to responsive threshold
     if (window.innerWidth > this.options.responsiveThreshold) this.options.swipeable = false;
 
-    const tabsContent = [];
+    const tabsContent: HTMLElement[] = [];
     this._tabLinks.forEach((a) => {
       if (a.hash) {
-        const currContent = document.querySelector(a.hash);
+        const currContent = document.querySelector<HTMLElement>(a.hash);
         currContent!.classList.add('carousel-item');
-        tabsContent.push(currContent);
+        tabsContent.push(currContent!);
       }
     });
 
@@ -249,7 +249,7 @@ export class Tabs extends Component<TabsOptions> {
     tabsWrapper.classList.add('tabs-content', 'carousel', 'carousel-slider');
 
     // Wrap around
-    tabsContent[0].parentElement.insertBefore(tabsWrapper, tabsContent[0]);
+    tabsContent[0].parentElement!.insertBefore(tabsWrapper, tabsContent[0]);
     tabsContent.forEach((tabContent) => {
       tabsWrapper.appendChild(tabContent);
       tabContent.style.display = '';
@@ -257,7 +257,7 @@ export class Tabs extends Component<TabsOptions> {
 
     // Keep active tab index to set initial carousel slide
     const tab = this._activeTabLink.parentElement;
-    const activeTabIndex = Array.from(tab!.parentNode!.children).indexOf(tab);
+    const activeTabIndex = Array.from(tab!.parentNode!.children).indexOf(tab!);
 
     this._tabsCarousel = Carousel.init(tabsWrapper, {
       fullWidth: true,
@@ -281,7 +281,7 @@ export class Tabs extends Component<TabsOptions> {
     const tabsWrapper = this._tabsCarousel.el;
     this._tabsCarousel.destroy();
     // Unwrap
-    tabsWrapper.append(tabsWrapper.parentElement);
+    tabsWrapper.append(tabsWrapper.parentElement!);
     tabsWrapper.remove();
   }
 

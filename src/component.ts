@@ -96,7 +96,7 @@ export class Component<O extends BaseOptions> {
     options: Partial<O>,
     classDef: ComponentType<C, O>
   ): C | C[] {
-    let instances = null;
+    let instances: C | C[] | null = null;
     if (els instanceof Element) {
       instances = new classDef(<HTMLElement>els, options);
     } else if (!!els && els.length) {
@@ -105,7 +105,7 @@ export class Component<O extends BaseOptions> {
         instances.push(new classDef(<HTMLElement>els[i], options));
       }
     }
-    return instances;
+    return instances as C | C[];
   }
 
   /**

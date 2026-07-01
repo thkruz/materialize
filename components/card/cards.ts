@@ -2,8 +2,8 @@ import { Utils } from '../../src/utils';
 import { Component, BaseOptions, InitElements, MElement, Openable } from '../../src/component';
 
 interface CardsOptions extends BaseOptions {
-  onOpen: (el: Element) => void;
-  onClose: (el: Element) => void;
+  onOpen: ((el: Element) => void) | null;
+  onClose: ((el: Element) => void) | null;
   inDuration: number;
   outDuration: number;
 }
@@ -67,7 +67,7 @@ class Cards extends Component<CardsOptions> implements Openable {
    */
   static init(
     els: HTMLElement | InitElements<MElement>,
-    options?: Partial<CardsOptions>
+    options: Partial<CardsOptions> = {}
   ): Cards | Cards[] {
     return super.init(els, options, Cards);
   }
@@ -144,7 +144,7 @@ class Cards extends Component<CardsOptions> implements Openable {
       this.#cardReveal!.style.transform = 'translateY(-100%)';
     }, 1);
     if (typeof this.options.onOpen === 'function') {
-      this.options.onOpen.call(this);
+      this.options.onOpen.call(this, this.el);
     }
     this.#setupRevealCloseEventHandlers();
   };
@@ -165,7 +165,7 @@ class Cards extends Component<CardsOptions> implements Openable {
       this.el.style.overflow = this.#initialOverflow;
     }, this.options.inDuration);
     if (typeof this.options.onClose === 'function') {
-      this.options.onClose.call(this);
+      this.options.onClose.call(this, this.el);
     }
     this.#removeRevealCloseEventHandlers();
   };

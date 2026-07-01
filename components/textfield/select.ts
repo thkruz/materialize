@@ -46,7 +46,7 @@ export class FormSelect extends Component<FormSelectOptions> {
   private _values!: ValueStruct[];
   nativeTabIndex!: number;
 
-  constructor(el: HTMLSelectElement, options: FormSelectOptions) {
+  constructor(el: HTMLElement, options: Partial<FormSelectOptions>) {
     super(el, options, FormSelect);
     if (this.el.classList.contains('browser-default')) return;
     this.el['M_FormSelect'] = this;
@@ -108,8 +108,9 @@ export class FormSelect extends Component<FormSelectOptions> {
   _setupEventHandlers() {
     this.dropdownOptions.querySelectorAll('li:not(.optgroup)').forEach((el) => {
       el.addEventListener('click', this._handleOptionClick);
-      el.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === ' ' || e.key === 'Enter') this._handleOptionClick(e);
+      el.addEventListener('keydown', (e: Event) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === ' ' || ke.key === 'Enter') this._handleOptionClick(ke);
       });
     });
     this.el.addEventListener('change', this._handleSelectChange);
@@ -128,10 +129,10 @@ export class FormSelect extends Component<FormSelectOptions> {
     this._setValueToInput();
   };
 
-  _handleOptionClick = (e: MouseEvent | KeyboardEvent) => {
+  _handleOptionClick = (e: Event) => {
     e.preventDefault();
     const virtualOption = (e.target as HTMLLIElement).closest('li');
-    this._selectOptionElement(virtualOption);
+    this._selectOptionElement(virtualOption!);
     e.stopPropagation();
   };
 
@@ -148,7 +149,7 @@ export class FormSelect extends Component<FormSelectOptions> {
       !virtualOption.classList.contains('disabled') &&
       !virtualOption.classList.contains('optgroup')
     ) {
-      const value = this._values.find((value) => value.optionEl === virtualOption);
+      const value = this._values.find((value) => value.optionEl === virtualOption)!;
       const previousSelectedValues = this.getSelectedValues();
       if (this.isMultiple) {
         // Multi-Select
@@ -232,7 +233,7 @@ export class FormSelect extends Component<FormSelectOptions> {
           )}</span>`;
           this.dropdownOptions.append(groupParent);
 
-          const groupChildren = [];
+          const groupChildren: string[] = [];
           const selectOptions = <HTMLOptionElement[]>(
             Array.from(realOption.children).filter((el) => el.tagName === 'OPTION')
           );
@@ -352,7 +353,7 @@ export class FormSelect extends Component<FormSelectOptions> {
 
   _createAndAppendOptionWithIcon(
     realOption: HTMLOptionElement | HTMLOptGroupElement,
-    type: string
+    type?: string
   ) {
     const li = document.createElement('li');
     li.setAttribute('role', 'option');

@@ -24,7 +24,7 @@ export interface PushpinOptions extends BaseOptions {
    * You are provided with a position string.
    * @default null
    */
-  onPositionChange: (position: 'pinned' | 'pin-top' | 'pin-bottom') => void;
+  onPositionChange: ((position: 'pinned' | 'pin-top' | 'pin-bottom') => void) | null;
 }
 
 const _defaults = {
@@ -86,7 +86,8 @@ export class Pushpin extends Component<PushpinOptions> {
   }
 
   destroy() {
-    (this.el as HTMLElement).style.top = null;
+    // Assigning null clears the property (CSSOM coerces null to empty string).
+    (this.el as HTMLElement).style.top = null as unknown as string;
     this._removePinClasses();
     // Remove pushpin Inst
     const index = Pushpin._pushpins.indexOf(this);

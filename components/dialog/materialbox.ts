@@ -16,22 +16,22 @@ export interface MaterialboxOptions extends BaseOptions {
    * Callback function called before materialbox is opened.
    * @default null
    */
-  onOpenStart: (el: Element) => void;
+  onOpenStart: ((el: Element) => void) | null;
   /**
    * Callback function called after materialbox is opened.
    * @default null
    */
-  onOpenEnd: (el: Element) => void;
+  onOpenEnd: ((el: Element) => void) | null;
   /**
    * Callback function called before materialbox is closed.
    * @default null
    */
-  onCloseStart: (el: Element) => void;
+  onCloseStart: ((el: Element) => void) | null;
   /**
    * Callback function called after materialbox is closed.
    * @default null
    */
-  onCloseEnd: (el: Element) => void;
+  onCloseEnd: ((el: Element) => void) | null;
 }
 
 const _defaults: MaterialboxOptions = {

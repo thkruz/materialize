@@ -39,7 +39,7 @@ export interface SliderOptions extends BaseOptions {
    * @returns a string to be used as label indicator.
    * @default null
    */
-  indicatorLabelFunc: (index: number, current: boolean) => string;
+  indicatorLabelFunc: ((index: number, current: boolean) => string) | null;
 }
 
 const _defaults: SliderOptions = {
@@ -55,11 +55,11 @@ const _defaults: SliderOptions = {
 export class Slider extends Component<SliderOptions> {
   /** Index of current slide. */
   activeIndex: number;
-  interval: string | number | NodeJS.Timeout;
+  interval: string | number | NodeJS.Timeout | null;
   eventPause: boolean;
   _slider: HTMLUListElement;
   _slides: HTMLLIElement[];
-  _activeSlide: HTMLLIElement;
+  _activeSlide!: HTMLLIElement;
   _indicators!: HTMLLIElement[];
   _hovered: boolean;
   _focused: boolean;
@@ -216,7 +216,7 @@ export class Slider extends Component<SliderOptions> {
 
   private _handleIndicatorClick = (e: MouseEvent) => {
     const el = (<HTMLElement>e.target).parentElement;
-    const currIndex = [...el!.parentNode!.children].indexOf(el);
+    const currIndex = [...el!.parentNode!.children].indexOf(el!);
     this._focusCurrent = true;
     this.set(currIndex);
   };
@@ -251,7 +251,7 @@ export class Slider extends Component<SliderOptions> {
 
   private _handleInterval = () => {
     const activeElem = this._slider.querySelector('.active');
-    let newActiveIndex = [...activeElem!.parentNode!.children].indexOf(activeElem);
+    let newActiveIndex = [...activeElem!.parentNode!.children].indexOf(activeElem!);
     if (this._slides.length === newActiveIndex + 1) newActiveIndex = 0; // loop to start
     else newActiveIndex += 1;
     this.set(newActiveIndex);
@@ -302,7 +302,7 @@ export class Slider extends Component<SliderOptions> {
       const ul = document.createElement('ul');
       ul.classList.add('indicators');
 
-      const arrLi = [];
+      const arrLi: HTMLLIElement[] = [];
       this._slides.forEach((el, i) => {
         const label = this.options.indicatorLabelFunc
           ? this.options.indicatorLabelFunc.call(this, i + 1, i === 0)
@@ -383,7 +383,7 @@ export class Slider extends Component<SliderOptions> {
   }
 
   _pause(fromEvent: boolean) {
-    clearInterval(this.interval);
+    clearInterval(this.interval ?? undefined);
     this.eventPause = fromEvent;
     this.interval = null;
   }
@@ -399,7 +399,7 @@ export class Slider extends Component<SliderOptions> {
    * Start slider autoslide.
    */
   start = () => {
-    clearInterval(this.interval);
+    clearInterval(this.interval ?? undefined);
     this.interval = setInterval(
       this._handleInterval,
       this.options.duration + this.options.interval

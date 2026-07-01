@@ -50,7 +50,7 @@ export class DockedDisplayPlugin {
   constructor(
     el: HTMLElement,
     container: HTMLElement,
-    options: Partial<DockedDisplayPluginOptions>
+    options: Partial<DockedDisplayPluginOptions> = {}
   ) {
     this.el = el;
     this.options = {
@@ -95,8 +95,8 @@ export class DockedDisplayPlugin {
       this.el,
       this.container,
       'bottom',
-      this.options.margin,
-      this.options.transition,
+      this.options.margin!,
+      this.options.transition!,
       this.options.align
     );
 

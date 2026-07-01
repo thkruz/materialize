@@ -6,12 +6,12 @@ export interface TapTargetOptions extends BaseOptions {
    * Callback function called when Tap Target is opened.
    * @default null
    */
-  onOpen: (origin: HTMLElement) => void;
+  onOpen: ((origin: HTMLElement) => void) | null;
   /**
    * Callback function called when Tap Target is closed.
    * @default null
    */
-  onClose: (origin: HTMLElement) => void;
+  onClose: ((origin: HTMLElement) => void) | null;
 }
 
 const _defaults: TapTargetOptions = {
@@ -109,7 +109,9 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
     window.removeEventListener('resize', this._handleThrottledResize);
   }
 
-  _handleThrottledResize = (): void => Utils.throttle(this._handleResize, 200).bind(this);
+  _handleThrottledResize = (): void => {
+    Utils.throttle(this._handleResize, 200).bind(this);
+  };
 
   _handleKeyboardInteraction = (e: KeyboardEvent) => {
     if (Utils.keys.ENTER.includes(e.key)) {

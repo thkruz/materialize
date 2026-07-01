@@ -153,12 +153,12 @@ export class Tooltip extends Component<TooltipOptions> {
     const tooltipContentEl = this.options.tooltipId
       ? document.getElementById(this.options.tooltipId)
       : document.createElement('div');
-    this.tooltipEl.append(tooltipContentEl);
+    this.tooltipEl.append(tooltipContentEl!);
     tooltipContentEl!.style.display = '';
 
     tooltipContentEl!.classList.add('tooltip-content');
-    this._setTooltipContent(tooltipContentEl);
-    this.tooltipEl.appendChild(tooltipContentEl);
+    this._setTooltipContent(tooltipContentEl!);
+    this.tooltipEl.appendChild(tooltipContentEl!);
     document.body.appendChild(this.tooltipEl);
   }
 
@@ -168,7 +168,7 @@ export class Tooltip extends Component<TooltipOptions> {
   }
 
   _updateTooltipContent() {
-    this._setTooltipContent(this.tooltipEl.querySelector('.tooltip-content'));
+    this._setTooltipContent(this.tooltipEl.querySelector('.tooltip-content')!);
   }
 
   _setupEventHandlers() {
@@ -188,7 +188,7 @@ export class Tooltip extends Component<TooltipOptions> {
   /**
    * Show tooltip.
    */
-  open = (isManual: boolean) => {
+  open = (isManual: boolean | undefined) => {
     if (this.isOpen) return;
     isManual = isManual === undefined ? true : undefined; // Default value true
     this.isOpen = true;
@@ -217,7 +217,7 @@ export class Tooltip extends Component<TooltipOptions> {
     }, this.options.exitDelay);
   }
 
-  _setEnterDelayTimeout(isManual: boolean) {
+  _setEnterDelayTimeout(isManual: boolean | undefined) {
     clearTimeout(this._enterDelayTimeout);
     this._enterDelayTimeout = setTimeout(() => {
       if (!this.isHovered && !this.isFocused && !isManual) return;

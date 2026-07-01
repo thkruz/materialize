@@ -35,19 +35,19 @@ export interface SidenavOptions extends BaseOptions {
   /**
    * Function called when sidenav starts entering.
    */
-  onOpenStart: (elem: HTMLElement) => void;
+  onOpenStart: ((elem: HTMLElement) => void) | null;
   /**
    * Function called when sidenav finishes entering.
    */
-  onOpenEnd: (elem: HTMLElement) => void;
+  onOpenEnd: ((elem: HTMLElement) => void) | null;
   /**
    * Function called when sidenav starts exiting.
    */
-  onCloseStart: (elem: HTMLElement) => void;
+  onCloseStart: ((elem: HTMLElement) => void) | null;
   /**
    * Function called when sidenav finishes exiting.
    */
-  onCloseEnd: (elem: HTMLElement) => void;
+  onCloseEnd: ((elem: HTMLElement) => void) | null;
 }
 
 const _defaults: SidenavOptions = {
@@ -166,7 +166,10 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     if (Sidenav._sidenavs.length === 0) {
       document.body.addEventListener('click', this._handleTriggerClick);
     }
-    const passiveIfSupported: boolean = null;
+    // Typed as the addEventListener options union so the original `null` value is preserved
+    // at runtime (browsers treat it as no options) while satisfying strict typing.
+    const passiveIfSupported: boolean | AddEventListenerOptions | undefined =
+      null as unknown as undefined;
     this.dragTarget.addEventListener('touchmove', this._handleDragTargetDrag, passiveIfSupported);
     this.dragTarget.addEventListener('touchend', this._handleDragTargetRelease);
     this._overlay.addEventListener('touchmove', this._handleCloseDrag, passiveIfSupported);
@@ -201,10 +204,10 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     }
   }
 
-  private _handleTriggerClick(e) {
-    const trigger = e.target.closest('.sidenav-trigger');
+  private _handleTriggerClick(e: MouseEvent) {
+    const trigger = (e.target as HTMLElement).closest('.sidenav-trigger');
     if (e.target && trigger) {
-      const sidenavId = Utils.getIdFromTrigger(trigger);
+      const sidenavId = Utils.getIdFromTrigger(trigger as HTMLElement);
       const sidenavInstance = document.getElementById(sidenavId)!['M_Sidenav'];
       if (sidenavInstance) {
         sidenavInstance.open();
@@ -324,8 +327,8 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
   };
 
   // Handles closing of Sidenav when element with class .sidenav-close
-  private _handleCloseTriggerClick = (e) => {
-    const closeTrigger = e.target.closest('.sidenav-close');
+  private _handleCloseTriggerClick = (e: MouseEvent) => {
+    const closeTrigger = (e.target as HTMLElement).closest('.sidenav-close');
     if (closeTrigger && !this._isCurrentlyFixed()) {
       this.close();
     }
@@ -531,12 +534,12 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     const navLinks = document.querySelectorAll('.nav-wrapper ul li a');
     const sideNavLinks = document.querySelectorAll('.sidenav li a');
     if (navLinks)
-      navLinks.forEach((navLink: HTMLAnchorElement) => {
-        navLink.tabIndex = this.isOpen ? -1 : 0;
+      navLinks.forEach((navLink) => {
+        (navLink as HTMLAnchorElement).tabIndex = this.isOpen ? -1 : 0;
       });
     if (sideNavLinks)
-      sideNavLinks.forEach((sideNavLink: HTMLAnchorElement) => {
-        sideNavLink.tabIndex = this.isOpen ? 0 : -1;
+      sideNavLinks.forEach((sideNavLink) => {
+        (sideNavLink as HTMLAnchorElement).tabIndex = this.isOpen ? 0 : -1;
       });
   };
 

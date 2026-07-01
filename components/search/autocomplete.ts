@@ -37,7 +37,7 @@ export interface AutocompleteOptions extends BaseOptions {
   /**
    * Callback for when autocompleted.
    */
-  onAutocomplete: (entries: AutocompleteData[]) => void;
+  onAutocomplete: ((entries: AutocompleteData[]) => void) | null;
   /**
    * Minimum number of characters before autocomplete starts.
    * @default 1
@@ -106,18 +106,18 @@ export class Autocomplete extends Component<AutocompleteOptions> {
   count: number;
   /** Index of the current selected option. */
   activeIndex: number;
-  private oldVal: string;
+  private oldVal: string | null;
   private $active: HTMLElement | null;
   private _mousedown: boolean;
   container!: HTMLElement;
   /** Instance of the dropdown plugin for this autocomplete. */
   dropdown!: Dropdown;
   static _keydown: boolean;
-  selectedValues: AutocompleteData[];
+  selectedValues!: AutocompleteData[];
   menuItems: AutocompleteData[];
   data: AutocompleteData[];
 
-  constructor(el: HTMLInputElement, options: Partial<AutocompleteOptions>) {
+  constructor(el: HTMLElement, options: Partial<AutocompleteOptions>) {
     super(el, options, Autocomplete);
     this.el['M_Autocomplete'] = this;
 
@@ -239,10 +239,10 @@ export class Autocomplete extends Component<AutocompleteOptions> {
     dropdownOptions.onItemClick = (li) => {
       if (!li) return;
       const entryID = li.getAttribute('data-id');
-      this.selectOption(entryID);
+      this.selectOption(entryID!);
       // Handle user declared onItemClick if needed
       if (userOnItemClick && typeof userOnItemClick === 'function')
-        userOnItemClick.call(this.dropdown, this.el);
+        userOnItemClick.call(this.dropdown, this.el as unknown as HTMLLIElement);
     };
     this.dropdown = Dropdown.init(this.el, dropdownOptions);
 
@@ -257,7 +257,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
       const selectedValue = this.menuItems.filter(
         (value) => value.id === this.selectedValues[0].id
       );
-      this.el.value = selectedValue[0].text;
+      this.el.value = selectedValue[0].text as string;
     }
     // Set Value if already set in HTML
     if (this.el.value) this.selectOption(this.el.value);
@@ -328,7 +328,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
     if (Utils.keys.ENTER.includes(e.key) && this.activeIndex >= 0) {
       const liElement = this.container.querySelectorAll('li')[this.activeIndex];
       if (liElement) {
-        this.selectOption(liElement.getAttribute('data-id'));
+        this.selectOption(liElement.getAttribute('data-id')!);
         e.preventDefault();
       }
       return;
@@ -541,7 +541,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
    */
   setMenuItems(
     menuItems: AutocompleteData[],
-    selected: number[] | string[] = null,
+    selected: number[] | string[] | null = null,
     open: boolean = true,
     initial: boolean = false,
   ) {

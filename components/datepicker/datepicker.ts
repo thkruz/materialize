@@ -183,17 +183,17 @@ export interface DatepickerOptions extends BaseOptions {
   /** Field used for internal calculations DO NOT CHANGE IT */
   maxMonth?: number;
   /** Field used for internal calculations DO NOT CHANGE IT */
-  startRange?: Date;
+  startRange?: Date | null;
   /** Field used for internal calculations DO NOT CHANGE IT */
-  endRange?: Date;
+  endRange?: Date | null;
   /**
    * Display plugin
    */
-  displayPlugin: string;
+  displayPlugin: string | null;
   /**
    * Configurable display plugin options
    */
-  displayPluginOptions: object;
+  displayPluginOptions: object | null;
 }
 
 const _defaults: DatepickerOptions = {
@@ -318,7 +318,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   date!: Date;
   endDate!: null | Date;
   dates!: Date[];
-  formats!: object;
+  formats!: { [key: string]: (date: Date) => string | number };
   calendars!: [{ month: number; year: number }];
   private _y!: number;
   private _m!: number;
@@ -326,7 +326,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   private footer!: HTMLElement;
   static _template: string;
 
-  constructor(el: HTMLInputElement, options: Partial<DatepickerOptions>) {
+  constructor(el: HTMLElement, options: Partial<DatepickerOptions>) {
     super(el, options, Datepicker);
     this.el['M_Datepicker'] = this;
 
@@ -384,8 +384,8 @@ export class Datepicker extends Component<DatepickerOptions> {
     return super.init(els, options, Datepicker);
   }
 
-  static _isDate(obj) {
-    return /Date/.test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
+  static _isDate(obj: unknown): obj is Date {
+    return /Date/.test(Object.prototype.toString.call(obj)) && !isNaN((obj as Date).getTime());
   }
 
   static _isWeekend(date: Date) {
@@ -475,7 +475,7 @@ export class Datepicker extends Component<DatepickerOptions> {
 
     Utils.createButton(
       this.footer,
-      this.options.i18n.clear,
+      this.options.i18n.clear!,
       ['datepicker-clear'],
       this.options.showClearBtn,
       this._handleClearClick
@@ -484,8 +484,8 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (!this.options.autoSubmit) {
       Utils.createConfirmationContainer(
         this.footer,
-        this.options.i18n.done,
-        this.options.i18n.cancel,
+        this.options.i18n.done!,
+        this.options.i18n.cancel!,
         this._confirm,
         this._cancel
       );
@@ -512,7 +512,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Gets a string representation of the given date.
    */
-  toString(date: Date = this.date, format: string | ((d: Date) => string) = null): string {
+  toString(date: Date = this.date, format: string | ((d: Date) => string) | null = null): string {
     format = format || this.options.format;
     if (typeof format === 'function') return format(date);
     if (!Datepicker._isDate(date)) return '';
@@ -546,7 +546,7 @@ export class Datepicker extends Component<DatepickerOptions> {
    * @param fromUserInput
    */
   setDate(
-    date: Date = null,
+    date: Date | null = null,
     preventOnSelect: boolean = false,
     isEndDate: boolean = false,
     fromUserInput: boolean = false
@@ -564,7 +564,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
   }
 
-  validateDate(date: Date) {
+  validateDate(date: Date | null) {
     if (!date) {
       this._renderDateDisplay(date);
       return this.draw();
@@ -617,7 +617,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Sets the data-date attribute on the date input field
    */
-  setDataDate(el, date: Date) {
+  setDataDate(el: HTMLInputElement, date: Date) {
     el.setAttribute('data-date', this.toString(date));
   }
 
@@ -628,7 +628,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (!this.options?.isMultipleSelection) {
       this.setInputValue(this.el, this.date);
       if (this.options?.isDateRange) {
-        this.setInputValue(this.endDateEl, this.endDate);
+        this.setInputValue(this.endDateEl, this.endDate!);
       }
       return;
     }
@@ -657,7 +657,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Sets given date as the input value on the given element.
    */
-  setInputValue(el: HTMLInputElement, date) {
+  setInputValue(el: HTMLInputElement, date: Date) {
     if (el.type == 'date') {
       this.setDataDate(el, date);
       el.value = this.formatDate(date, 'yyyy-mm-dd');
@@ -682,13 +682,13 @@ export class Datepicker extends Component<DatepickerOptions> {
       ...this.options.displayPluginOptions,
       ...{
         onOpen: () => {
-          document.querySelectorAll('.select-dropdown').forEach((e: HTMLInputElement) => {
-            e.tabIndex = 0;
+          document.querySelectorAll('.select-dropdown').forEach((e) => {
+            (e as HTMLElement).tabIndex = 0;
           });
         },
         onClose: () => {
-          document.querySelectorAll('.select-dropdown').forEach((e: HTMLInputElement) => {
-            e.tabIndex = -1;
+          document.querySelectorAll('.select-dropdown').forEach((e) => {
+            (e as HTMLElement).tabIndex = -1;
           });
         }
       }
@@ -714,7 +714,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Renders the date in the modal head section.
    */
-  _renderDateDisplay(date: Date, endDate: Date = null) {
+  _renderDateDisplay(date: Date | null, endDate: Date | null = null) {
     const displayDate = Datepicker._isDate(date) ? date : new Date();
     // this.yearTextEl.innerHTML = displayDate.getFullYear().toString();
     // @todo should we include an option for date formatting by component options?
@@ -733,7 +733,7 @@ export class Datepicker extends Component<DatepickerOptions> {
    * Change date view to a specific date on the datepicker.
    * @param date Date to show on the datepicker.
    */
-  gotoDate(date: Date) {
+  gotoDate(date: Date | null) {
     let newCalendar = true;
     if (!Datepicker._isDate(date)) {
       return;
@@ -906,7 +906,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     return this.renderTable(this.options, data, randId);
   }
 
-  renderDay(opts) {
+  renderDay(opts: Record<string, unknown>) {
     const classMap = {
         isDisabled: 'is-disabled',
         isToday: 'is-today',
@@ -1084,15 +1084,15 @@ export class Datepicker extends Component<DatepickerOptions> {
     let html = '';
 
     if (this._y <= minYear!) {
-      this._y = minYear;
-      if (!isNaN(minMonth) && this._m < minMonth!) {
-        this._m = minMonth;
+      this._y = minYear!;
+      if (!isNaN(minMonth!) && this._m < minMonth!) {
+        this._m = minMonth!;
       }
     }
     if (this._y >= maxYear!) {
-      this._y = maxYear;
-      if (!isNaN(maxMonth) && this._m > maxMonth!) {
-        this._m = maxMonth;
+      this._y = maxYear!;
+      if (!isNaN(maxMonth!) && this._m > maxMonth!) {
+        this._m = maxMonth!;
       }
     }
 
@@ -1270,7 +1270,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
   };
 
-  _handleCalendarClick = (e) => {
+  _handleCalendarClick = (e: Event) => {
     const target = <HTMLElement>e.target;
     if (!target.classList.contains('is-disabled')) {
       if (
@@ -1278,10 +1278,12 @@ export class Datepicker extends Component<DatepickerOptions> {
         !target.classList.contains('is-empty') &&
         !target.parentElement!.classList.contains('is-disabled')
       ) {
+        // getAttribute returns string values which the Date constructor coerces;
+        // cast to satisfy the numeric Date overload without altering runtime behavior.
         const selectedDate = new Date(
-          e.target.getAttribute('data-year'),
-          e.target.getAttribute('data-month'),
-          e.target.getAttribute('data-day')
+          target.getAttribute('data-year') as unknown as number,
+          target.getAttribute('data-month') as unknown as number,
+          target.getAttribute('data-day') as unknown as number
         );
 
         if (!this.multiple || (this.multiple && this.options.isMultipleSelection)) {
@@ -1326,30 +1328,30 @@ export class Datepicker extends Component<DatepickerOptions> {
   };
 
   _clearDates = () => {
-    this.date = null;
+    this.date = null!;
     this.endDate = null;
     this.draw();
   };
 
-  _handleMonthChange = (e) => {
-    this.gotoMonth(e.target.value);
+  _handleMonthChange = (e: Event) => {
+    this.gotoMonth((e.target as HTMLSelectElement).value);
   };
 
-  _handleYearChange = (e) => {
-    this.gotoYear(e.target.value);
+  _handleYearChange = (e: Event) => {
+    this.gotoYear((e.target as HTMLSelectElement).value);
   };
 
   // change view to a specific month (zero-index, e.g. 0: January)
-  gotoMonth(month) {
-    if (!isNaN(month)) {
+  gotoMonth(month: string) {
+    if (!isNaN(month as unknown as number)) {
       this.calendars[0].month = parseInt(month, 10);
       this.adjustCalendars();
     }
   }
 
   // change view to a specific full year (e.g. "2012")
-  gotoYear(year) {
-    if (!isNaN(year)) {
+  gotoYear(year: string) {
+    if (!isNaN(year as unknown as number)) {
       this.calendars[0].year = parseInt(year, 10);
       this.adjustCalendars();
     }
@@ -1359,7 +1361,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     let date;
     const el = e.target as HTMLElement;
     // Prevent change event from being fired when triggered by the plugin
-    if (e['detail']?.firedBy === this) return;
+    if ((e as CustomEvent)['detail']?.firedBy === this) return;
     // Prevent change event from being fired if an end date is set without a start date
     if (el == this.endDateEl && !this.date) return;
     if (this.options.parse) {
@@ -1375,7 +1377,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (Datepicker._isDate(date)) {
       this.setDate(date, false, el == this.endDateEl, true);
       if (e.type == 'date') {
-        this.setDataDate(e, date);
+        this.setDataDate(e as unknown as HTMLInputElement, date);
         this.setInputValues();
       }
     }

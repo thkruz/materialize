@@ -35,7 +35,7 @@ export interface ToastOptions extends BaseOptions {
    * Callback function called when toast is dismissed.
    * @default null
    */
-  completeCallback: () => void;
+  completeCallback: (() => void) | null;
   /**
    * The percentage of the toast's width it takes fora drag
    * to dismiss a Toast.
@@ -78,7 +78,7 @@ export class Toast {
 
   static _toasts: Toast[];
   private static _container: HTMLElement | null;
-  static _draggedToast: Toast;
+  static _draggedToast: Toast | null;
 
   constructor(options: Partial<ToastOptions>) {
     this.options = {

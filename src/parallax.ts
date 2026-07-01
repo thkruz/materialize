@@ -17,8 +17,8 @@ export class Parallax extends Component<ParallaxOptions> {
   private _enabled: boolean;
   private _img: HTMLImageElement;
   static _parallaxes: Parallax[] = [];
-  static _handleScrollThrottled: () => Utils;
-  static _handleWindowResizeThrottled: () => Utils;
+  static _handleScrollThrottled: (...args: unknown[]) => unknown;
+  static _handleWindowResizeThrottled: (...args: unknown[]) => unknown;
 
   constructor(el: HTMLElement, options: Partial<ParallaxOptions>) {
     super(el, options, Parallax);

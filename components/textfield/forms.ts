@@ -13,7 +13,7 @@ export class Forms {
     }
 
     const hasLength = textfield.getAttribute('data-length') !== null;
-    const lenAttr = parseInt(textfield.getAttribute('data-length'));
+    const lenAttr = parseInt(textfield.getAttribute('data-length') ?? '');
     const len = textfield.value.length;
 
     if (
@@ -95,8 +95,8 @@ export class Forms {
 
     // Resize if the new height is greater than the
     // original height of the textarea
-    const originalHeight = parseInt(textarea.getAttribute('original-height'));
-    const prevLength = parseInt(textarea.getAttribute('previous-length'));
+    const originalHeight = parseInt(textarea.getAttribute('original-height') ?? '');
+    const prevLength = parseInt(textarea.getAttribute('previous-length') ?? '');
     if (isNaN(originalHeight)) return;
     if (originalHeight <= hiddenDiv.clientHeight) {
       textarea.style.height = hiddenDiv.clientHeight + 'px'; //css('height', hiddenDiv.innerHeight() + 'px');
@@ -112,7 +112,7 @@ export class Forms {
   static Init() {
     if (typeof document !== 'undefined')
       document?.addEventListener('DOMContentLoaded', () => {
-        document.addEventListener('change', (e: KeyboardEvent) => {
+        document.addEventListener('change', (e: Event) => {
           const target = <HTMLInputElement>e.target;
           if (target instanceof HTMLInputElement) {
             if (target.value.length !== 0 || target.getAttribute('placeholder') !== null) {
@@ -141,14 +141,14 @@ export class Forms {
         });
 
         document
-          .querySelectorAll('.materialize-textarea')
+          .querySelectorAll<HTMLTextAreaElement>('.materialize-textarea')
           .forEach((textArea: HTMLTextAreaElement) => {
             Forms.InitTextarea(textArea);
           });
 
         // File Input Path
         document
-          .querySelectorAll('.file-field input[type="file"]')
+          .querySelectorAll<HTMLInputElement>('.file-field input[type="file"]')
           .forEach((fileInput: HTMLInputElement) => {
             Forms.InitFileInputPath(fileInput);
           });
@@ -160,8 +160,8 @@ export class Forms {
     textarea.setAttribute('original-height', textarea.getBoundingClientRect().height.toString());
     textarea.setAttribute('previous-length', (textarea.value || '').length.toString());
     Forms.textareaAutoResize(textarea);
-    textarea.addEventListener('keyup', (e) => Forms.textareaAutoResize(e.target));
-    textarea.addEventListener('keydown', (e) => Forms.textareaAutoResize(e.target));
+    textarea.addEventListener('keyup', (e) => Forms.textareaAutoResize(e.target!));
+    textarea.addEventListener('keydown', (e) => Forms.textareaAutoResize(e.target!));
   }
 
   static InitFileInputPath(fileInput: HTMLInputElement) {

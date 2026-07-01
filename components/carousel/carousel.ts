@@ -46,7 +46,7 @@ export interface CarouselOptions extends BaseOptions {
    * Callback for when a new slide is cycled to.
    * @default null
    */
-  onCycleTo: (current: Element, dragged: boolean) => void;
+  onCycleTo: ((current: Element, dragged: boolean) => void) | null;
 }
 
 const _defaults: CarouselOptions = {
@@ -90,7 +90,7 @@ export class Carousel extends Component<CarouselOptions> {
   center: number = 0;
   imageHeight!: number;
   scrollingTimeout!: number | NodeJS.Timeout;
-  oneTimeCallback!: (current: Element, dragged: boolean) => void | null;
+  oneTimeCallback!: ((current: Element, dragged: boolean) => void) | null;
 
   constructor(el: HTMLElement, options: Partial<CarouselOptions>) {
     super(el, options, Carousel);
@@ -128,8 +128,8 @@ export class Carousel extends Component<CarouselOptions> {
     this._indicators = document.createElement('ul');
     this._indicators.classList.add('indicators');
 
-    this.el.querySelectorAll('.carousel-item').forEach((item: HTMLElement, i) => {
-      this.images.push(item);
+    this.el.querySelectorAll('.carousel-item').forEach((item: Element, i) => {
+      this.images.push(item as HTMLElement);
       if (this.showIndicators) {
         const indicator = document.createElement('li');
         indicator.classList.add('indicator-item');
@@ -152,7 +152,7 @@ export class Carousel extends Component<CarouselOptions> {
     this.xform = 'transform';
     ['webkit', 'Moz', 'O', 'ms'].every((prefix) => {
       const e = prefix + 'Transform';
-      if (typeof document.body.style[e] !== 'undefined') {
+      if (typeof document.body.style[e as keyof CSSStyleDeclaration] !== 'undefined') {
         this.xform = e;
         return false;
       }
@@ -214,7 +214,7 @@ export class Carousel extends Component<CarouselOptions> {
     if (this.showIndicators && this._indicators) {
       this._indicators.querySelectorAll('.indicator-item').forEach((el) => {
         el.addEventListener('click', this._handleIndicatorClick);
-        el.addEventListener('keypress', this._handleIndicatorKeyPress);
+        el.addEventListener('keypress', this._handleIndicatorKeyPress as EventListener);
       });
     }
     // Resize
@@ -240,7 +240,9 @@ export class Carousel extends Component<CarouselOptions> {
     window.removeEventListener('resize', this._handleThrottledResize);
   }
 
-  _handleThrottledResize = (): void => Utils.throttle(this._handleResize, 200, null).bind(this);
+  _handleThrottledResize = (): void => {
+    Utils.throttle(this._handleResize, 200).bind(this);
+  };
 
   _handleCarouselTap = (e: MouseEvent | TouchEvent) => {
     // Fixes firefox draggable image bug
@@ -438,7 +440,7 @@ export class Carousel extends Component<CarouselOptions> {
     return (e as MouseEvent).clientY;
   }
 
-  _wrap(x: number) {
+  _wrap(x: number): number {
     return x >= this.count ? x % this.count : x < 0 ? this._wrap(this.count + (x % this.count)) : x;
   }
 
@@ -520,7 +522,7 @@ export class Carousel extends Component<CarouselOptions> {
       const diff = this.center % this.count;
       const activeIndicator = this._indicators.querySelector('.indicator-item.active');
       const activeIndicatorIndex = [...activeIndicator!.parentNode!.children].indexOf(
-        activeIndicator
+        activeIndicator!
       );
       if (activeIndicatorIndex !== diff) {
         activeIndicator!.classList.remove('active');
@@ -541,7 +543,7 @@ export class Carousel extends Component<CarouselOptions> {
       }
 
       const transformString = `${alignment} translateX(${-delta / 2}px) translateX(${
-        dir * this.options.shift * tween * i
+        dir * this.options.shift * tween * i!
       }px) translateZ(${this.options.dist * tween}px)`;
       this._updateItemStyle(el, centerTweenedOpacity, 0, transformString);
     }
@@ -603,7 +605,7 @@ export class Carousel extends Component<CarouselOptions> {
   }
 
   _updateItemStyle(el: HTMLElement, opacity: number, zIndex: number, transform: string) {
-    el.style[this.xform] = transform;
+    (el.style as unknown as Record<string, string>)[this.xform] = transform;
     el.style.zIndex = zIndex.toString();
     el.style.opacity = opacity.toString();
     el.style.visibility = 'visible';

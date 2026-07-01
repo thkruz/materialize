@@ -31,7 +31,7 @@ export class ModalDisplayPlugin {
   private visible!: boolean;
   footer: HTMLElement;
 
-  constructor(el: HTMLElement, container: HTMLElement, options: Partial<ModalDisplayPluginOptions>) {
+  constructor(el: HTMLElement, container: HTMLElement, options: Partial<ModalDisplayPluginOptions> = {}) {
     this.el = el;
     this.options = {
       ..._defaults,

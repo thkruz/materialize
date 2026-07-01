@@ -36,7 +36,11 @@ export const Basic: StoryObj = {
       cell.innerText = btnStype;
       for (const size in BTN_SIZES) {
         const cell = row.insertCell();
-        const classes = [...BTN_STYLES[btnStype], ...BTN_SIZES[size], ...(args.classes ?? [])];
+        const classes = [
+          ...BTN_STYLES[btnStype as keyof typeof BTN_STYLES],
+          ...BTN_SIZES[size as keyof typeof BTN_SIZES],
+          ...(args.classes ?? [])
+        ];
         const disabled = classes.includes('disabled') ? 'disabled="disabled"' : '';
         let iconHtml = '';
         if (args.icon) {
