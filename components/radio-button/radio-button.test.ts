@@ -12,7 +12,7 @@ import { rulesMatching, declValues, hasDecl, declText } from '../../test/helpers
 describe('M3 Radio button', () => {
   it('sizes the icon at 20dp', () => {
     // The ring/dot pseudo-elements are sized to the --icon-size token.
-    expect(declValues(/\[type=radio\]$/, '--icon-size')).toContain('20px');
+    expect(declValues(/\[type=radio\] \+ span$/, '--icon-size')).toContain('20px');
     expect(hasDecl(/\[type=radio\] \+ span:before/, 'width', /--icon-size|20px/)).toBe(true);
     expect(hasDecl(/\[type=radio\] \+ span:before/, 'height', /--icon-size|20px/)).toBe(true);
   });
@@ -22,43 +22,44 @@ describe('M3 Radio button', () => {
   });
 
   it('draws an unselected 2dp on-surface-variant ring', () => {
-    const unchecked = /\[type=radio\]:not\(:checked\) \+ span:before/;
-    expect(hasDecl(unchecked, 'border', /--ring-border|2px/)).toBe(true);
+    const ring = /\[type=radio\] \+ span:before$/;
+    expect(hasDecl(ring, 'border', /--ring-border|2px/)).toBe(true);
     // The ring color token resolves to on-surface-variant by default.
-    expect(hasDecl(unchecked, 'border', /--ring-color/)).toBe(true);
-    expect(declValues(/\[type=radio\]$/, '--ring-color')).toContain(
+    expect(hasDecl(ring, 'border', /--ring-color/)).toBe(true);
+    expect(declValues(/\[type=radio\] \+ span$/, '--ring-color')).toContain(
       'var(--md-sys-color-on-surface-variant)'
     );
   });
 
   it('draws a selected 2dp primary ring', () => {
-    const checkedRing = /\[type=radio\]:checked \+ span:before,\n\[type=radio\].with-gap:checked \+ span:before/;
-    // .with-gap keeps a visible ring; standard checked ring is transparent with
-    // the dot supplying the primary color. Assert the primary dot/ring token.
-    expect(declValues(/\[type=radio\]$/, '--dot-color')).toContain('var(--md-sys-color-primary)');
-    expect(
-      hasDecl(/\[type=radio\].with-gap:checked \+ span:before/, 'border', /--dot-color/)
-    ).toBe(true);
-    // touch the compiled with-gap ring rule so the regex is exercised.
-    void checkedRing;
+    expect(declValues(/\[type=radio\] \+ span$/, '--dot-color')).toContain('var(--md-sys-color-primary)');
+    expect(hasDecl(/\[type=radio\]:checked \+ span:before/, 'border-color', /--dot-color/)).toBe(true);
+    // `.with-gap` is a legacy alias — ring + gapped dot IS the M3 selected
+    // style, so it shares the checked rule.
+    expect(hasDecl(/\[type=radio\].with-gap:checked \+ span:before/, 'border-color', /--dot-color/)).toBe(
+      true
+    );
   });
 
   it('renders a 10dp primary inner dot when selected', () => {
-    // Dot color is primary via the token.
-    expect(hasDecl(/\[type=radio\]:checked \+ span:after/, 'background-color', /--dot-color/)).toBe(true);
-    // Dot diameter is 10dp (icon 20dp scaled by dot/icon).
-    expect(declValues(/\[type=radio\]$/, '--dot-size')).toContain('10px');
+    // The dot is a radial-gradient on the ring pseudo-element (::after is
+    // reserved for the touch target), grown from 0 to 10dp when checked.
+    expect(
+      hasDecl(/\[type=radio\] \+ span:before$/, 'background-image', /radial-gradient.*--dot-color/)
+    ).toBe(true);
+    expect(hasDecl(/\[type=radio\] \+ span:before$/, 'background-size', /^0 0$/)).toBe(true);
+    expect(declValues(/\[type=radio\] \+ span$/, '--dot-size')).toContain('10px');
     expect(
       hasDecl(
-        /\[type=radio\]:checked \+ span:after$/,
-        'transform',
-        /scale\(calc\(var\(--dot-size\) \/ var\(--icon-size\)\)\)/
+        /\[type=radio\]:checked \+ span:before/,
+        'background-size',
+        /var\(--dot-size\) var\(--dot-size\)/
       )
     ).toBe(true);
   });
 
   it('provides a 40dp circular state layer', () => {
-    expect(declValues(/\[type=radio\]$/, '--state-layer-size')).toContain('40px');
+    expect(declValues(/\[type=radio\] \+ span$/, '--state-layer-size')).toContain('40px');
     // The state layer is drawn as a box-shadow spread on the ring.
     expect(
       hasDecl(/\[type=radio\]:not\(:disabled\):hover \+ span:before/, 'box-shadow', /--state-layer-spread/)
@@ -66,7 +67,7 @@ describe('M3 Radio button', () => {
   });
 
   it('tints the state layer on-surface unselected and primary selected', () => {
-    expect(declValues(/\[type=radio\]$/, '--state-layer-color')).toContain(
+    expect(declValues(/\[type=radio\] \+ span$/, '--state-layer-color')).toContain(
       'var(--md-sys-color-on-surface)'
     );
     expect(hasDecl(/\[type=radio\]:checked \+ span$/, '--state-layer-color', /--md-sys-color-primary/)).toBe(
@@ -110,17 +111,11 @@ describe('M3 Radio button', () => {
   });
 
   it('dims the disabled radio to on-surface at 38%', () => {
-    expect(hasDecl(/\[type=radio\]:disabled \+ span$/, 'color', /on-surface\) 38%/)).toBe(true);
-    expect(
-      hasDecl(
-        /\[type=radio\]:disabled:not\(:checked\) \+ span:before/,
-        'border-color',
-        /on-surface\) 38%/
-      )
-    ).toBe(true);
-    expect(
-      hasDecl(/\[type=radio\]:disabled:checked \+ span:after/, 'background-color', /on-surface\) 38%/)
-    ).toBe(true);
+    const disabled = /\[type=radio\]:disabled \+ span$/;
+    expect(hasDecl(disabled, 'color', /on-surface\) 38%/)).toBe(true);
+    // Ring and dot dim through their color tokens.
+    expect(hasDecl(disabled, '--ring-color', /on-surface\) 38%/)).toBe(true);
+    expect(hasDecl(disabled, '--dot-color', /on-surface\) 38%/)).toBe(true);
   });
 
   it('guarantees a 48dp minimum touch target', () => {

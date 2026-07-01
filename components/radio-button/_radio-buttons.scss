@@ -7,15 +7,21 @@
 //   - Error:      `error` ring/dot; disabled `on-surface` at 38%.
 //   - State layer (behind the ring): hover 8% / focus 10% / pressed 10%,
 //     tinted on-surface when unselected and primary when selected. It is
-//     drawn as a spread `box-shadow` on the ring (:before) so it needs no
-//     extra pseudo-element — the span's :before/:after are the ring + dot.
+//     drawn as a spread `box-shadow` on the ring (:before).
 // Markup contract (unchanged): label > input[type=radio] + span
-//   :before = ring, :after = inner dot, plus `.with-gap` variant.
+//   :before = ring + inner dot (the dot is a centered radial-gradient that
+//   grows via background-size, so one pseudo-element draws both), leaving
+//   ::after free for the min-touch-target pseudo-element.
+//   `.with-gap` is a legacy alias: ring + gapped dot IS the M3 selected
+//   style, so it renders identically to a plain checked radio.
 // =====================================================================
 
 @use '../../sass/mixins.module.scss' as *;
 
-[type="radio"] {
+// Tokens live on the span (the visible control): custom properties inherit
+// down the tree only, and the span is the input's *sibling*, so anything
+// declared on the input itself would never reach `+ span:before`.
+[type="radio"] + span {
   --icon-size: 20px;
   --icon-inset: 4px; // (48dp target - 20dp icon - 20dp label leading) ≈ centering
   --dot-size: 10px;
@@ -48,11 +54,13 @@
   transition: color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   user-select: none;
   // Guarantee the M3 minimum 48x48dp touch target around the control.
+  // (Draws on ::after — which is why the ring AND dot share :before.)
   @include min-touch-target(48px);
 }
 
-[type="radio"] + span:before,
-[type="radio"] + span:after {
+/* Ring + dot — one pseudo-element. The ring is the border; the dot is a
+   radial-gradient kept at background-size 0 until the radio is checked. */
+[type="radio"] + span:before {
   content: '';
   position: absolute;
   left: 0;
@@ -61,57 +69,22 @@
   width: var(--icon-size);
   height: var(--icon-size);
   z-index: 0;
-  transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
-    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
-    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+  border-radius: var(--md-sys-shape-corner-full);
+  border: var(--ring-border) solid var(--ring-color);
+  background-image: radial-gradient(circle closest-side, var(--dot-color) 96%, transparent);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0 0;
+  transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    background-size var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
     box-shadow var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 }
 
-/* Circular shapes */
-[type="radio"]:not(:checked) + span:before,
-[type="radio"]:not(:checked) + span:after,
+/* Checked — 2dp primary ring + 10dp primary inner dot (M3 selected). */
 [type="radio"]:checked + span:before,
-[type="radio"]:checked + span:after,
-[type="radio"].with-gap:checked + span:before,
-[type="radio"].with-gap:checked + span:after {
-  border-radius: var(--md-sys-shape-corner-full);
-}
-
-/* Unchecked styles — 2dp ring, hidden inner dot */
-[type="radio"]:not(:checked) + span:before,
-[type="radio"]:not(:checked) + span:after {
-  border: var(--ring-border) solid var(--ring-color);
-}
-
-[type="radio"]:not(:checked) + span:after {
-  transform: scale(0);
-}
-
-/* Checked styles — primary ring + primary inner dot */
-[type="radio"]:checked + span:before {
-  border: var(--ring-border) solid transparent;
-}
-
-[type="radio"]:checked + span:after,
-[type="radio"].with-gap:checked + span:before,
-[type="radio"].with-gap:checked + span:after {
-  border: var(--ring-border) solid var(--dot-color);
-}
-
-[type="radio"]:checked + span:after,
-[type="radio"].with-gap:checked + span:after {
-  background-color: var(--dot-color);
-}
-
-// Inner dot is 10dp centered inside the 20dp ring. The dot pseudo-element is
-// sized to the full 20dp icon, so scale it down to the 10dp dot diameter.
-[type="radio"]:checked + span:after {
-  transform: scale(calc(var(--dot-size) / var(--icon-size)));
-}
-
-/* Radio With gap — same 10dp dot */
-[type="radio"].with-gap:checked + span:after {
-  transform: scale(calc(var(--dot-size) / var(--icon-size)));
+[type="radio"].with-gap:checked + span:before {
+  border-color: var(--dot-color);
+  background-size: var(--dot-size) var(--dot-size);
 }
 
 // -------------------------------------------------------------- STATE LAYER
@@ -150,23 +123,8 @@
 // ------------------------------------------------------------------ DISABLED
 // Disabled radios use on-surface at 38% opacity for ring, dot and label.
 [type="radio"]:disabled + span {
+  --ring-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
+  --dot-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
   color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
   cursor: default;
-}
-
-[type="radio"]:disabled:not(:checked) + span:before,
-[type="radio"]:disabled:checked + span:before {
-  background-color: transparent;
-  border-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-}
-
-[type="radio"]:disabled:checked + span:after,
-[type="radio"].with-gap:disabled:checked + span:before,
-[type="radio"].with-gap:disabled:checked + span:after {
-  border-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-}
-
-[type="radio"]:disabled:checked + span:after,
-[type="radio"].with-gap:disabled:checked + span:after {
-  background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
 }
