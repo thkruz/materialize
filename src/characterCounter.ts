@@ -9,7 +9,7 @@ type InputElement = HTMLInputElement | HTMLTextAreaElement;
 export class CharacterCounter extends Component<object> {
   declare el: InputElement;
   /** Stores the reference to the counter HTML element. */
-  counterEl: HTMLSpanElement;
+  counterEl!: HTMLSpanElement;
   /** Specifies whether the input is valid or not. */
   isInvalid: boolean;
   /** Specifies whether the input text has valid length or not. */
@@ -88,7 +88,7 @@ export class CharacterCounter extends Component<object> {
     this.counterEl.style.float = 'right';
     this.counterEl.style.fontSize = '12px';
     this.counterEl.style.height = '1';
-    this.el.parentElement.appendChild(this.counterEl);
+    this.el.parentElement!.appendChild(this.counterEl);
   }
 
   _removeCounter() {
