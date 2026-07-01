@@ -133,7 +133,7 @@
       max-width: 50%;
 
       img {
-        border-radius: 2px 0 0 2px;
+        border-radius: var(--md-sys-shape-corner-medium) 0 0 var(--md-sys-shape-corner-medium);
         max-width: 100%;
         width: auto;
       }
@@ -169,7 +169,7 @@
     // Image background for content
     img {
       display: block;
-      border-radius: 2px 2px 0 0;
+      border-radius: var(--md-sys-shape-corner-medium) var(--md-sys-shape-corner-medium) 0 0;
       position: relative;
       left: 0;
       right: 0;
@@ -203,7 +203,7 @@
 
   .card-content {
     padding: 24px;
-    border-radius: 0 0 2px 2px;
+    border-radius: 0 0 var(--md-sys-shape-corner-medium) var(--md-sys-shape-corner-medium);
     // M3: supporting body text uses the on-surface-variant role.
     color: var(--md-sys-color-on-surface-variant);
 
@@ -230,7 +230,7 @@
     padding: 0 1.6rem;
 
     &:last-child {
-      border-radius: 0 0 2px 2px;
+      border-radius: 0 0 var(--md-sys-shape-corner-medium) var(--md-sys-shape-corner-medium);
     }
     // Replaced card links with buttons (Accessibility, @see https://github.com/materializecss/materialize/issues/565)
     a {

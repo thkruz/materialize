@@ -68,6 +68,14 @@ describe('M3 Slider (range)', () => {
     expect(hasDecl(/\.keyboard-focused input\[type=range\]:focus:not\(\.active\)::-moz-range-thumb/, 'box-shadow', /--md-sys-color-primary/)).toBe(true);
   });
 
+  it('uses the focus state-layer opacity token (not a hardcoded %) for the handle state layer', () => {
+    expect(hasDecl(/\.keyboard-focused input\[type=range\]:focus:not\(\.active\)::-webkit-slider-thumb/, 'box-shadow', /--md-sys-state-focus-state-layer-opacity/)).toBe(true);
+  });
+
+  it('value label text uses the label-large type token (not a hardcoded font-size)', () => {
+    expect(hasDecl(/input\[type=range\] \+ \.thumb\.active \.value/, 'font-size', /--md-sys-typescale-label-large-font-size/)).toBe(true);
+  });
+
   it('uses motion tokens for transitions (no ad-hoc easing)', () => {
     expect(declText(/input\[type=range\] \+ \.thumb$/)).toMatch(/--md-sys-motion-easing-emphasized/);
     expect(declText(/::-webkit-slider-thumb/)).toMatch(/--md-sys-motion-easing-standard/);

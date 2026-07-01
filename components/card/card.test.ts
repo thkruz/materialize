@@ -22,6 +22,16 @@ describe('M3 Card', () => {
     ).toBe(true);
   });
 
+  it('rounds edge-flush images/content with the shape token, never a hardcoded 2px', () => {
+    // The image + content corners follow the card container corner (medium).
+    const radii = declValues(/\.card-image img|\.card \.card-content$/, 'border-radius');
+    expect(radii.length).toBeGreaterThan(0);
+    for (const r of radii) {
+      expect(r).not.toMatch(/\b2px\b/);
+      expect(r).toMatch(/--md-sys-shape-corner-medium/);
+    }
+  });
+
   // ---- Variants exist ----------------------------------------------------
   it('emits all three M3 variant classes', () => {
     expect(rulesMatching(/^\.card\.elevated$/).length).toBeGreaterThan(0);

@@ -58,6 +58,10 @@ describe('M3 Text field', () => {
     it('uses motion tokens for the label transition (no ad-hoc easing)', () => {
       expect(declText(/\.input-field > label$/)).toMatch(/--md-sys-motion-easing-standard/);
     });
+
+    it('gives the container the M3 56dp minimum height', () => {
+      expect(declValues(DEFAULT_INPUT, 'min-height')).toContain('56px');
+    });
   });
 
   describe('filled variant', () => {

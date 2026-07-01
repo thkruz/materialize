@@ -83,7 +83,8 @@ input[type=range] + .thumb {
       color: var(--md-sys-color-on-primary);
       margin-left: -1px;
       margin-top: 8px;
-      font-size: 10px;
+      // M3 slider value label uses the label-large type role.
+      font-size: var(--md-sys-typescale-label-large-font-size);
     }
   }
 }
@@ -109,7 +110,7 @@ input[type=range] + .thumb {
 // State layer that appears behind the handle on keyboard focus / interaction.
 @mixin range-state-layer {
   box-shadow: 0 0 0 calc((var(--md-comp-slider-state-layer-size) - var(--md-comp-slider-handle-size)) / 2)
-    color-mix(in srgb, transparent, var(--md-sys-color-primary) 12%);
+    color-mix(in srgb, transparent, var(--md-sys-color-primary) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%));
 }
 
 // WebKit

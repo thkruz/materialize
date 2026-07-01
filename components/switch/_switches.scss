@@ -126,6 +126,11 @@ input[type=checkbox]:not(:disabled).tabbed:focus ~ .lever::before {
   opacity: var(--md-sys-state-pressed-state-layer-opacity);
 }
 
+// Modern keyboard focus (M3 focus state layer) — mirrors checkbox/radio.
+input[type=checkbox]:not(:disabled):focus-visible ~ .lever::before {
+  opacity: var(--md-sys-state-focus-state-layer-opacity);
+}
+
 // Pressed handle grows to 28dp (both states).
 input[type=checkbox]:not(:disabled) ~ .lever:active::after {
   width: var(--handle-size-pressed);

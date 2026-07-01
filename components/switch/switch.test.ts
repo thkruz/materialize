@@ -50,6 +50,10 @@ describe('M3 Switch', () => {
     expect(hasDecl(/\.lever:active::before/, 'opacity', /pressed-state-layer-opacity/)).toBe(true);
   });
 
+  it('renders a focus state layer on modern keyboard focus (:focus-visible)', () => {
+    expect(hasDecl(/:focus-visible ~ \.lever::before/, 'opacity', /focus-state-layer-opacity/)).toBe(true);
+  });
+
   it('uses motion tokens for transitions (no ad-hoc easing)', () => {
     expect(declText(/\.switch label \.lever$/)).toMatch(/--md-sys-motion-easing-standard/);
   });

@@ -49,3 +49,26 @@ export const WithGap: StoryObj = {
     `;
   }
 };
+
+export const ErrorState: StoryObj = {
+  name: 'Error',
+  render() {
+    return `
+<form action="#">
+  <p>Error radios recolor the ring, dot and state layer with the M3 <code>error</code> role.</p>
+  <p>
+    <label>
+      <input class="error" name="group4" type="radio" />
+      <span>Error unselected</span>
+    </label>
+  </p>
+  <p>
+    <label>
+      <input name="group4" type="radio" checked aria-invalid="true" />
+      <span>Error selected</span>
+    </label>
+  </p>
+</form>
+    `;
+  }
+};

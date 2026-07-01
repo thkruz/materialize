@@ -63,7 +63,7 @@
       }
 
       .caption {
-        color: var(--md-sys-color-inverse-on-surface, #fff);
+        color: var(--md-sys-color-inverse-on-surface);
         position: absolute;
         top: 15%;
         left: 15%;
@@ -71,7 +71,7 @@
         opacity: 0;
 
         p {
-          color: color-mix(in srgb, var(--md-sys-color-inverse-on-surface, #fff) 75%, transparent);
+          color: color-mix(in srgb, var(--md-sys-color-inverse-on-surface) 75%, transparent);
         }
       }
 
@@ -106,7 +106,8 @@
       width: 100%;
       height: 100%;
       cursor: pointer;
-      background-color: var(--md-sys-color-shadow-light);
+      // Inactive indicator: on-surface at 38% (M3 low-emphasis content).
+      background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
       transition: background-color var(--md-sys-motion-duration-short4)
         var(--md-sys-motion-easing-standard);
       border-radius: var(--md-sys-shape-corner-full);
