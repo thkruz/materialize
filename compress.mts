@@ -1,11 +1,11 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import archiver from 'archiver';
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json').toString());
 
 const version = packageJson.version;
 
-function compressToZip(name, withSrc = false) {
+function compressToZip(name: string, withSrc = false): void {
   const output = fs.createWriteStream(name);
   const archive = archiver('zip');
 
@@ -22,11 +22,11 @@ function compressToZip(name, withSrc = false) {
   archive.directory('dist/js/', 'js');
   archive.directory('dist/css/', 'css');
   if (withSrc) {
-    archive.directory('src/');
-    archive.directory('sass/');
+    archive.directory('src/', 'src');
+    archive.directory('sass/', 'sass');
   }
-  archive.file('LICENSE');
-  archive.file('README.md');
+  archive.file('LICENSE', { name: 'LICENSE' });
+  archive.file('README.md', { name: 'README.md' });
 
   archive.finalize();
 }

@@ -19,11 +19,20 @@ const isRelease = process.argv.includes('--release');
 
 mkdirSync(outDir, { recursive: true });
 
+interface BuildCssOptions {
+  compressed?: boolean;
+  sourceMap?: boolean;
+}
+
 /**
  * Compile one SCSS entry, run it through autoprefixer, prepend the banner and
  * write the result (plus an optional external sourcemap).
  */
-async function buildCss(entry, fileName, { compressed = false, sourceMap = false } = {}) {
+async function buildCss(
+  entry: string,
+  fileName: string,
+  { compressed = false, sourceMap = false }: BuildCssOptions = {}
+): Promise<void> {
   const compiled = sass.compile(entry, {
     style: compressed ? 'compressed' : 'expanded',
     sourceMap
