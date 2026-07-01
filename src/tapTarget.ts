@@ -26,11 +26,11 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
   isOpen: boolean;
 
   static _taptargets: TapTarget[];
-  private wrapper: HTMLElement;
+  private wrapper!: HTMLElement;
   // private _origin: HTMLElement;
   private originEl: HTMLElement;
-  private waveEl: HTMLElement & Element & Node;
-  private contentEl: HTMLElement;
+  private waveEl!: HTMLElement & Element & Node;
+  private contentEl!: HTMLElement;
 
   constructor(el: HTMLElement, options: Partial<TapTargetOptions>) {
     super(el, options, TapTarget);
@@ -43,7 +43,7 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
 
     this.isOpen = false;
     // setup
-    this.originEl = document.querySelector(`#${el.dataset.target}`);
+    this.originEl = document.querySelector(`#${el.dataset.target}`)!;
     this.originEl.tabIndex = 0;
 
     this._setup();
@@ -143,12 +143,12 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
 
   _setup() {
     // Creating tap target
-    this.wrapper = this.el.parentElement;
-    this.waveEl = this.wrapper.querySelector('.tap-target-wave');
-    this.el.parentElement.ariaExpanded = 'false';
+    this.wrapper = this.el.parentElement!;
+    this.waveEl = this.wrapper.querySelector('.tap-target-wave')!;
+    this.el.parentElement!.ariaExpanded = 'false';
     this.originEl.style.zIndex = '1002';
     // this.originEl = this.wrapper.querySelector('.tap-target-origin');
-    this.contentEl = this.el.querySelector('.tap-target-content');
+    this.contentEl = this.el.querySelector('.tap-target-content')!;
     // Creating wrapper
     if (!this.wrapper.classList.contains('.tap-target-wrapper')) {
       this.wrapper = document.createElement('div');
