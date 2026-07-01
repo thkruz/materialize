@@ -30,7 +30,7 @@ export class Parallax extends Component<ParallaxOptions> {
     };
 
     this._enabled = window.innerWidth > this.options.responsiveThreshold;
-    this._img = this.el.querySelector('img');
+    this._img = this.el.querySelector('img')!;
     this._updateParallax();
     this._setupEventHandlers();
     this._setupStyles();
@@ -131,7 +131,7 @@ export class Parallax extends Component<ParallaxOptions> {
 
   _updateParallax() {
     const containerHeight =
-      this.el.getBoundingClientRect().height > 0 ? this.el.parentElement.offsetHeight : 500;
+      this.el.getBoundingClientRect().height > 0 ? this.el.parentElement!.offsetHeight : 500;
     const imgHeight = this._img.offsetHeight;
     const parallaxDist = imgHeight - containerHeight;
     const bottom = this._offset(this.el).top + containerHeight;
