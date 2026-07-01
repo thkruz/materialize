@@ -45,7 +45,7 @@ export class DockedDisplayPlugin {
   private readonly el: HTMLElement;
   private readonly container: HTMLDivElement;
   private options: Partial<DockedDisplayPluginOptions>;
-  private visible: boolean;
+  private visible!: boolean;
 
   constructor(
     el: HTMLElement,
@@ -61,7 +61,7 @@ export class DockedDisplayPlugin {
     this.container = document.createElement('div');
     this.container.classList.add('display-docked');
     this.container.append(container);
-    el.parentElement.append(this.container);
+    el.parentElement!.append(this.container);
 
     document.addEventListener('click', (e) => {
       if (
