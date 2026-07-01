@@ -1,0 +1,124 @@
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// M3 Icon button — https://m3.material.io/components/icon-buttons/specs
+//
+// Four styles: standard (base), filled, filled-tonal, outlined.
+// Every style: 40dp container, 24dp icon, `full` corner, >=48dp touch
+// target, state layers (hover 8% / focus 10% / pressed 10%).
+//
+// Expected markup:
+//   <button class="icon-button"><i class="material-icons">favorite</i></button>
+//   add `.filled` / `.tonal` / `.outlined` for the other styles,
+//   add `.selected` for the toggle "selected" state.
+// =====================================================================
+
+.icon-button {
+  // ---- container -------------------------------------------------
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  padding: 8px; // (40 - 24) / 2 -> centers the 24dp icon
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  border-radius: var(--md-sys-shape-corner-full);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  outline: 0;
+  transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+
+  // ---- standard style colors (unselected) ------------------------
+  color: var(--md-sys-color-on-surface-variant);
+
+  // ---- icon ------------------------------------------------------
+  .material-icons,
+  i {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    color: inherit;
+  }
+
+  // ---- state layer ----------------------------------------------
+  // Tints the container with the current icon color role.
+  @include state-layer(currentColor);
+
+  // ---- >=48dp touch target --------------------------------------
+  @include min-touch-target(48px);
+
+  // ---- keyboard focus ring --------------------------------------
+  @include focus-visible();
+
+  // ---- standard: selected takes the primary role ----------------
+  &.selected {
+    color: var(--md-sys-color-primary);
+  }
+
+  // ================================================================
+  //  Filled
+  // ================================================================
+  &.filled {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+
+    // Unselected toggle: surface-container-highest bg + primary icon.
+    &:not(.selected) {
+      background-color: var(--md-sys-color-surface-container-highest);
+      color: var(--md-sys-color-primary);
+    }
+  }
+
+  // ================================================================
+  //  Filled tonal
+  // ================================================================
+  &.tonal {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+
+  // ================================================================
+  //  Outlined
+  // ================================================================
+  &.outlined {
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    border: 1px solid var(--md-sys-color-outline);
+
+    // Selected toggle: inverse-surface bg + inverse-on-surface icon.
+    &.selected {
+      background-color: var(--md-sys-color-inverse-surface);
+      color: var(--md-sys-color-inverse-on-surface);
+      border-color: transparent;
+    }
+  }
+
+  // ================================================================
+  //  Disabled — applies to every style.
+  // ================================================================
+  &:disabled,
+  &.disabled,
+  &[disabled] {
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    background-color: transparent;
+    border-color: transparent;
+    pointer-events: none;
+    cursor: default;
+
+    // Filled / tonal / outlined-selected draw a 12% on-surface container.
+    &.filled,
+    &.tonal,
+    &.outlined.selected {
+      background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    }
+
+    // Suppress the state layer while disabled.
+    &::before {
+      opacity: 0;
+    }
+  }
+}
