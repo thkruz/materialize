@@ -85,11 +85,11 @@ export class Tooltip extends Component<TooltipOptions> {
    * If tooltip is focused.
    */
   isFocused: boolean;
-  tooltipEl: HTMLElement;
-  private _exitDelayTimeout: string | number | NodeJS.Timeout;
-  private _enterDelayTimeout: string | number | NodeJS.Timeout;
-  xMovement: number;
-  yMovement: number;
+  tooltipEl!: HTMLElement;
+  private _exitDelayTimeout!: string | number | NodeJS.Timeout;
+  private _enterDelayTimeout!: string | number | NodeJS.Timeout;
+  xMovement!: number;
+  yMovement!: number;
 
   constructor(el: HTMLElement, options: Partial<TooltipOptions>) {
     super(el, options, Tooltip);
@@ -154,9 +154,9 @@ export class Tooltip extends Component<TooltipOptions> {
       ? document.getElementById(this.options.tooltipId)
       : document.createElement('div');
     this.tooltipEl.append(tooltipContentEl);
-    tooltipContentEl.style.display = '';
+    tooltipContentEl!.style.display = '';
 
-    tooltipContentEl.classList.add('tooltip-content');
+    tooltipContentEl!.classList.add('tooltip-content');
     this._setTooltipContent(tooltipContentEl);
     this.tooltipEl.appendChild(tooltipContentEl);
     document.body.appendChild(this.tooltipEl);
@@ -217,7 +217,7 @@ export class Tooltip extends Component<TooltipOptions> {
     }, this.options.exitDelay);
   }
 
-  _setEnterDelayTimeout(isManual) {
+  _setEnterDelayTimeout(isManual: boolean) {
     clearTimeout(this._enterDelayTimeout);
     this._enterDelayTimeout = setTimeout(() => {
       if (!this.isHovered && !this.isFocused && !isManual) return;
