@@ -1,0 +1,117 @@
+// =====================================================================
+// Side sheet (Material 3)
+// https://m3.material.io/components/side-sheets/specs
+//
+// A surface anchored to the trailing (or leading) vertical edge that slides
+// in to reveal supplementary content or actions. Two configurations:
+//   - standard  (.side-sheet)          — docked, no scrim, flush square edge
+//   - modal     (.side-sheet--modal)   — dimming scrim, 16dp leading corners
+//
+// Markup contract:
+//   <div class="side-sheet__scrim"></div>            <!-- modal only -->
+//   <div class="side-sheet side-sheet--modal open">
+//     <header class="side-sheet__header">
+//       <span class="side-sheet__title">Title</span>
+//       <button class="icon-button" aria-label="Close">
+//         <i class="material-icons">close</i>
+//       </button>
+//     </header>
+//     ...content...
+//   </div>
+//
+// `.side-sheet--left` docks to the leading edge instead of the trailing edge.
+// Visibility is driven by the `.open` class.
+// =====================================================================
+
+.side-sheet {
+  // Docked to the trailing edge, full height.
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 2;
+  box-sizing: border-box;
+
+  // M3 width: between 256dp and 400dp.
+  width: 100%;
+  min-width: 256px;
+  max-width: 400px;
+  height: 100%;
+
+  // M3 container: surface-container-low; docked variant is flush (square).
+  background-color: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+
+  // Hidden off the trailing edge until `.open`.
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized),
+    visibility 0s linear var(--md-sys-motion-duration-medium4);
+
+  &.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate),
+      visibility 0s;
+  }
+}
+
+// Leading-edge dock.
+.side-sheet--left {
+  inset: 0 auto 0 0;
+  transform: translateX(-100%);
+
+  &.open { transform: translateX(0); }
+}
+
+// Modal side sheet: elevated, with rounded leading corners (16dp) and scrim.
+.side-sheet--modal {
+  box-shadow: var(--md-sys-elevation-level1);
+  border-radius: var(--md-sys-shape-corner-large) 0 0 var(--md-sys-shape-corner-large);
+
+  &.side-sheet--left {
+    border-radius: 0 var(--md-sys-shape-corner-large) var(--md-sys-shape-corner-large) 0;
+  }
+}
+
+// -------------------------------------------------------------------- Header
+.side-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+}
+
+.side-sheet__title {
+  // M3 side-sheet header uses the title-small type role.
+  font-family: var(--md-sys-typescale-title-small-font-family-name);
+  font-weight: var(--md-sys-typescale-title-small-font-weight);
+  font-size: var(--md-sys-typescale-title-small-font-size);
+  line-height: var(--md-sys-typescale-title-small-line-height);
+  letter-spacing: var(--md-sys-typescale-title-small-letter-spacing);
+  color: var(--md-sys-color-on-surface);
+}
+
+// -------------------------------------------------------------------- Scrim
+// Modal side sheets dim the rest of the screen with the M3 scrim at 32%.
+.side-sheet__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-color: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent);
+
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    visibility 0s linear var(--md-sys-motion-duration-medium2);
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+  }
+}

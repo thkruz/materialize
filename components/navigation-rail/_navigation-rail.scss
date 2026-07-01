@@ -1,0 +1,160 @@
+// =====================================================================
+// Navigation rail (Material 3)
+// https://m3.material.io/components/navigation-rail/specs
+//
+// Vertical navigation for tablet/desktop layouts. An 80dp-wide column of
+// evenly-spaced destinations, each stacking a 24dp icon above a
+// label-medium label with a 56x32dp active-indicator pill behind the
+// active destination's icon. An optional header slot holds a menu icon
+// button and/or a FAB above the destinations.
+//
+// Markup contract (BEM-ish):
+//   <nav class="navigation-rail">
+//     <div class="navigation-rail__header"> ...menu button / FAB... </div>
+//     <a class="navigation-rail__item active">
+//       <span class="navigation-rail__indicator">
+//         <i class="navigation-rail__icon material-icons">home</i>
+//       </span>
+//       <span class="navigation-rail__label">Home</span>
+//     </a>
+//     <a class="navigation-rail__item"> ... </a>
+//   </nav>
+//
+// Alignment modifiers on the container control where the destinations sit:
+//   .navigation-rail--top (default), .navigation-rail--center,
+//   .navigation-rail--bottom.
+// =====================================================================
+
+@use '../../sass/mixins.module.scss' as *;
+
+.navigation-rail {
+  // Fixed to the leading edge, full viewport height.
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1;
+
+  // M3: 80dp wide vertical column.
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 80px;
+  height: 100%;
+  padding: 44px 0 56px;
+  box-sizing: border-box;
+
+  // Container color: surface (with surface-container fallback ordering so
+  // themes that only define one still resolve).
+  background-color: var(--md-sys-color-surface, var(--md-sys-color-surface-container));
+}
+
+// Destination alignment modifiers. Destinations are grouped and pushed to
+// the top (default), centered, or bottom of the rail.
+.navigation-rail--center { justify-content: center; }
+.navigation-rail--bottom { justify-content: flex-end; }
+
+// ----------------------------------------------------------------- Header
+// Optional leading slot for a menu icon button and/or a FAB.
+.navigation-rail__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+// --------------------------------------------------------------- Destination
+.navigation-rail__item {
+  // Vertically stack the (indicator + icon) above the label.
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // Inactive by default (label color role).
+  color: var(--md-sys-color-on-surface-variant);
+
+  // Guarantee the M3 minimum 48dp touch target.
+  @include min-touch-target(48px);
+
+  @include focus-visible();
+}
+
+// -------------------------------------------------------------- Indicator
+// The active-indicator pill sits behind the icon. It is always present so
+// the layout does not shift between states; only the active item paints its
+// secondary-container background.
+.navigation-rail__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // M3: 56dp wide x 32dp tall pill.
+  width: 56px;
+  height: 32px;
+
+  // M3: full / rounded shape.
+  border-radius: var(--md-sys-shape-corner-full);
+
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+
+  // State layer lives on the indicator area (on-surface-variant tint).
+  @include state-layer(var(--md-sys-color-on-surface-variant));
+}
+
+// ------------------------------------------------------------------- Icon
+.navigation-rail__icon {
+  // M3: 24dp icon.
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+
+  // Inactive icon color role.
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+// ------------------------------------------------------------------ Label
+.navigation-rail__label {
+  // M3 type role: label-medium.
+  font-family: var(--md-sys-typescale-label-medium-font-family-name);
+  font-weight: var(--md-sys-typescale-label-medium-font-weight);
+  font-size: var(--md-sys-typescale-label-medium-font-size);
+  line-height: var(--md-sys-typescale-label-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-label-medium-letter-spacing);
+
+  // Inactive label color role.
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+// ----------------------------------------------------------------- Active
+.navigation-rail__item.active {
+  color: var(--md-sys-color-on-surface);
+
+  .navigation-rail__indicator {
+    // Active-indicator pill background.
+    background-color: var(--md-sys-color-secondary-container);
+  }
+
+  .navigation-rail__icon {
+    // Active icon color role.
+    color: var(--md-sys-color-on-secondary-container);
+  }
+
+  .navigation-rail__label {
+    // Active label color role.
+    color: var(--md-sys-color-on-surface);
+  }
+}
