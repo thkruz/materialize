@@ -143,6 +143,93 @@ function XunloadFixtures() {
   document.querySelectorAll('.dropdown-content').forEach((el) => el.remove());
 }
 
+// ---------------------------------------------------------------------------
+// Global test isolation: cancel timers a spec leaks so they cannot fire during
+// a later spec. Several components (toast, tap target, tooltip, carousel, …)
+// schedule setTimeout/setInterval callbacks that outlive the spec that created
+// them when that spec calls done() before those callbacks run. Under randomized
+// order the stray callbacks then mutate the DOM / shared static state — or even
+// run their assertions — inside an unrelated spec, producing order-dependent
+// failures (e.g. a leaked tap-target assertion failing the Fab spec). Tracking
+// the timers created during each spec and clearing the leftovers in afterEach
+// makes the suite order-independent.
+// ---------------------------------------------------------------------------
+(() => {
+  const nativeSetTimeout = window.setTimeout.bind(window);
+  const nativeSetInterval = window.setInterval.bind(window);
+  const nativeClearTimeout = window.clearTimeout.bind(window);
+  const nativeClearInterval = window.clearInterval.bind(window);
+  const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window);
+  const nativeCancelAnimationFrame = window.cancelAnimationFrame.bind(window);
+  // Baseline inline styles of <body>/<html> captured before any spec runs.
+  const originalBodyStyle = document.body.getAttribute('style');
+  const originalHtmlStyle = document.documentElement.getAttribute('style');
+  let trackedTimers = [];
+  let trackedFrames = [];
+
+  const restoreStyle = (el, original) => {
+    if (original === null) el.removeAttribute('style');
+    else el.setAttribute('style', original);
+  };
+
+  beforeEach(() => {
+    trackedTimers = [];
+    trackedFrames = [];
+    window.setTimeout = (...args) => {
+      const id = nativeSetTimeout(...args);
+      trackedTimers.push(id);
+      return id;
+    };
+    window.setInterval = (...args) => {
+      const id = nativeSetInterval(...args);
+      trackedTimers.push(id);
+      return id;
+    };
+    // requestAnimationFrame is tracked too: components such as the carousel run
+    // a self-perpetuating rAF loop (autoScroll) that destroy() does not cancel,
+    // so without this it keeps running across every later spec.
+    window.requestAnimationFrame = (cb) => {
+      const id = nativeRequestAnimationFrame(cb);
+      trackedFrames.push(id);
+      return id;
+    };
+  });
+
+  afterEach(() => {
+    // Restore the native timers first, then cancel anything the spec leaked.
+    window.setTimeout = nativeSetTimeout;
+    window.setInterval = nativeSetInterval;
+    window.requestAnimationFrame = nativeRequestAnimationFrame;
+    trackedTimers.forEach((id) => {
+      nativeClearTimeout(id);
+      nativeClearInterval(id);
+    });
+    trackedFrames.forEach((id) => nativeCancelAnimationFrame(id));
+    trackedTimers = [];
+    trackedFrames = [];
+
+    // Restore <body>/<html> inline styles. Components mutate these globals —
+    // e.g. sidenav sets `body.style.overflow = 'hidden'` — and a spec that
+    // opens one without a completed close leaks that state to a later spec.
+    restoreStyle(document.body, originalBodyStyle);
+    restoreStyle(document.documentElement, originalHtmlStyle);
+
+    // Remove component nodes appended to <body> that specs leak (they never
+    // call destroy()). Left in place these accumulate across the run and shift
+    // layout — e.g. full-viewport .sidenav-overlay / .drag-target make the
+    // document scrollable — which bleeds into later specs. XunloadFixtures()
+    // only clears a few of them and is not called by every spec, so clean them
+    // up globally here.
+    document
+      .querySelectorAll(
+        '.please-delete-me, .material-tooltip, .dropdown-content, .sidenav-overlay, ' +
+          '.drag-target, .materialbox-caption, #materialbox-overlay, #toast-container, ' +
+          '.hiddendiv, .display-modal, .tap-target-wrapper'
+      )
+      .forEach((el) => el.remove());
+  });
+})();
+
 beforeEach(() => {
   const matchers = {
     toExist: (util, customEqualityTesters) => {
