@@ -84,21 +84,21 @@ const _defaults: ChipsOptions = {
 };
 
 function gGetIndex(el: HTMLElement): number {
-  return [...el.parentNode.children].indexOf(el);
+  return [...el.parentNode!.children].indexOf(el);
 }
 
 class Chips extends Component<ChipsOptions> {
   /** Array of the current chips data. */
   chipsData: ChipData[];
   /** If the chips has autocomplete enabled. */
-  hasAutocomplete: boolean;
+  hasAutocomplete!: boolean;
   /** Autocomplete instance, if any. */
-  autocomplete: Autocomplete;
-  #input: HTMLInputElement;
-  #label: HTMLLabelElement;
+  autocomplete!: Autocomplete;
+  #input!: HTMLInputElement;
+  #label!: HTMLLabelElement;
   #chips: HTMLElement[];
   static #keydown: boolean;
-  #selectedChip: HTMLElement;
+  #selectedChip!: HTMLElement;
 
   constructor(el: HTMLElement, options: Partial<ChipsOptions>) {
     super(el, options, Chips);
@@ -194,7 +194,7 @@ class Chips extends Component<ChipsOptions> {
     const _chip = (<HTMLElement>e.target).closest('.chip');
     const clickedClose = (<HTMLElement>e.target).classList.contains('close');
     if (_chip) {
-      const index = [..._chip.parentNode.children].indexOf(_chip);
+      const index = [..._chip.parentNode!.children].indexOf(_chip);
       if (clickedClose) {
         this.deleteChip(index);
         this.#input.focus();
@@ -252,7 +252,7 @@ class Chips extends Component<ChipsOptions> {
   static #handleChipsBlur(e: Event) {
     if (!Chips.#keydown && document.hidden) {
       const chips = (<HTMLElement>e.target).closest('.chips');
-      const currChips: Chips = chips['M_Chips'];
+      const currChips: Chips = chips!['M_Chips'];
       currChips.#selectedChip = null;
     }
   }
@@ -331,7 +331,7 @@ class Chips extends Component<ChipsOptions> {
   }
 
   #setupInput() {
-    this.#input = this.el.querySelector('input');
+    this.#input = this.el.querySelector('input')!;
     if (!this.#input) {
       this.#input = document.createElement('input');
       this.el.append(this.#input);
@@ -346,7 +346,7 @@ class Chips extends Component<ChipsOptions> {
   }
 
   #setupLabel() {
-    this.#label = this.el.querySelector('label');
+    this.#label = this.el.querySelector('label')!;
     if (this.#label) this.#label.setAttribute('for', this.#input.getAttribute('id'));
   }
 
