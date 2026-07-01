@@ -92,7 +92,7 @@ class Modal extends Component<ModalOptions> {
     return dialog;
   }
 
-  static create(config) {
+  static create(config: ModalCreateConfig) {
     const isServer = false;
     if (isServer) return this.#createHtml(config);
     return this.#createHtmlElement(config);
