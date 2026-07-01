@@ -9,6 +9,7 @@ export default tseslint.config(
     // build-specs.mts (npm run pretest) and are gitignored — never lint them.
     ignores: [
       'dist',
+      'storybook-static',
       'tsconfig.json',
       'node_modules',
       'components/**/*[sS]pec.js',

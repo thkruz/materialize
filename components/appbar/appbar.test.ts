@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { rulesMatching, declValues, hasDecl, declText } from '../../test/helpers/sass';
+import { declValues, hasDecl, declText } from '../../test/helpers/sass';
 
 // M3 Top App Bar compliance — https://m3.material.io/components/top-app-bar/specs
 // These assertions read the compiled library CSS and check the app-bar rules
