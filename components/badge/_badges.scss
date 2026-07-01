@@ -85,9 +85,16 @@ span.badge {
   -webkit-font-smoothing: auto;
 }
 
-// Line height centering
+// Collection items are column flex containers, so a floated badge would be
+// treated as a flex item and stretch to the full row width. Pin it to the
+// trailing edge instead, vertically centered (same approach as .secondary-content).
 .collection-item span.badge {
-  margin-top: calc(calc(1.5rem * 0.5) - calc(var(--badge-height) * 0.5));
+  position: absolute;
+  top: 50%;
+  right: var(--list-item-padding-inline, 16px);
+  transform: translateY(-50%);
+  margin: 0;
+  float: none;
 }
 
 .collapsible span.badge {
