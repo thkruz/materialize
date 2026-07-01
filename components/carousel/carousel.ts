@@ -78,19 +78,19 @@ export class Carousel extends Component<CarouselOptions> {
   _indicators: HTMLUListElement;
   count: number;
   xform: string;
-  verticalDragged: boolean;
-  reference: number;
-  referenceY: number;
-  velocity: number;
-  frame: number;
-  timestamp: number;
-  ticker: string | number | NodeJS.Timeout;
-  amplitude: number;
+  verticalDragged!: boolean;
+  reference!: number;
+  referenceY!: number;
+  velocity!: number;
+  frame!: number;
+  timestamp!: number;
+  ticker!: string | number | NodeJS.Timeout;
+  amplitude!: number;
   /** The index of the center carousel item. */
   center: number = 0;
-  imageHeight: number;
-  scrollingTimeout: number | NodeJS.Timeout;
-  oneTimeCallback: (current: Element, dragged: boolean) => void | null;
+  imageHeight!: number;
+  scrollingTimeout!: number | NodeJS.Timeout;
+  oneTimeCallback!: (current: Element, dragged: boolean) => void | null;
 
   constructor(el: HTMLElement, options: Partial<CarouselOptions>) {
     super(el, options, Carousel);
@@ -109,8 +109,8 @@ export class Carousel extends Component<CarouselOptions> {
     this.dragged = false;
     this.offset = this.target = 0;
     this.images = [];
-    this.itemWidth = this.el.querySelector('.carousel-item').clientWidth;
-    this.itemHeight = this.el.querySelector('.carousel-item').clientHeight;
+    this.itemWidth = this.el.querySelector('.carousel-item')!.clientWidth;
+    this.itemHeight = this.el.querySelector('.carousel-item')!.clientHeight;
     this.dim = this.itemWidth * 2 + this.options.padding || 1; // Make sure dim is non zero for divisions.
 
     // Full Width carousel setup
@@ -332,7 +332,7 @@ export class Carousel extends Component<CarouselOptions> {
     } else if (!this.options.fullWidth) {
       const clickedElem = (<HTMLElement>e.target).closest('.carousel-item');
       if (!clickedElem) return;
-      const clickedIndex = [...clickedElem.parentNode.children].indexOf(clickedElem);
+      const clickedIndex = [...clickedElem.parentNode!.children].indexOf(clickedElem);
       const diff = this._wrap(this.center) - clickedIndex;
       // Disable clicks if carousel was shifted by click
       if (diff !== 0) {
@@ -371,15 +371,15 @@ export class Carousel extends Component<CarouselOptions> {
   _handleIndicatorInteraction = (e: Event) => {
     const indicator = (<HTMLElement>e.target).closest('.indicator-item');
     if (indicator) {
-      const index = [...indicator.parentNode.children].indexOf(indicator);
+      const index = [...indicator.parentNode!.children].indexOf(indicator);
       this._cycleTo(index);
     }
   };
 
   _handleResize = () => {
     if (this.options.fullWidth) {
-      this.itemWidth = this.el.querySelector('.carousel-item').clientWidth;
-      this.imageHeight = this.el.querySelector('.carousel-item.active').clientHeight;
+      this.itemWidth = this.el.querySelector('.carousel-item')!.clientWidth;
+      this.imageHeight = this.el.querySelector('.carousel-item.active')!.clientHeight;
       this.dim = this.itemWidth * 2 + this.options.padding;
       this.offset = this.center * 2 * this.itemWidth;
       this.target = this.offset;
@@ -394,7 +394,7 @@ export class Carousel extends Component<CarouselOptions> {
       ? this.el.querySelector('.carousel-item.active')
       : this.el.querySelector('.carousel-item');
 
-    const firstImage = firstSlide.querySelector('img');
+    const firstImage = firstSlide!.querySelector('img');
     if (firstImage) {
       if (firstImage.complete) {
         // If image won't trigger the load event
@@ -415,7 +415,7 @@ export class Carousel extends Component<CarouselOptions> {
         });
       }
     } else if (!imageOnly) {
-      const slideHeight = firstSlide.clientHeight;
+      const slideHeight = firstSlide!.clientHeight;
       this.el.style.height = slideHeight + 'px';
     }
   }
@@ -519,11 +519,11 @@ export class Carousel extends Component<CarouselOptions> {
     if (this.showIndicators) {
       const diff = this.center % this.count;
       const activeIndicator = this._indicators.querySelector('.indicator-item.active');
-      const activeIndicatorIndex = [...activeIndicator.parentNode.children].indexOf(
+      const activeIndicatorIndex = [...activeIndicator!.parentNode!.children].indexOf(
         activeIndicator
       );
       if (activeIndicatorIndex !== diff) {
-        activeIndicator.classList.remove('active');
+        activeIndicator!.classList.remove('active');
         const pos = diff < 0 ? this.count + diff : diff;
         this._indicators.querySelectorAll('.indicator-item')[pos].classList.add('active');
       }
@@ -536,7 +536,7 @@ export class Carousel extends Component<CarouselOptions> {
 
       // Add active class to center item.
       if (!el.classList.contains('active')) {
-        this.el.querySelector('.carousel-item').classList.remove('active');
+        this.el.querySelector('.carousel-item')!.classList.remove('active');
         el.classList.add('active');
       }
 
