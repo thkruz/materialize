@@ -53,6 +53,7 @@
 
   input, textarea {
     box-sizing: border-box; /* https://stackoverflow.com/questions/1377719/padding-within-inputs-breaks-width-100*/
+    width: 100%;
     // md.comp.filled-field.container height — 56dp minimum (M3).
     min-height: 56px;
     padding: 0 16px;
