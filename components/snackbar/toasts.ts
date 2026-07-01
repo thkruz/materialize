@@ -68,13 +68,13 @@ export class Toast {
   panning: boolean;
   options: ToastOptions;
   message: string;
-  counterInterval: NodeJS.Timeout | number;
-  wasSwiped: boolean;
-  startingXPos: number;
-  xPos: number;
-  time: number;
-  deltaX: number;
-  velocityX: number;
+  counterInterval!: NodeJS.Timeout | number;
+  wasSwiped!: boolean;
+  startingXPos!: number;
+  xPos!: number;
+  time!: number;
+  deltaX!: number;
+  velocityX!: number;
 
   static _toasts: Toast[];
   private static _container: HTMLElement | null;
@@ -134,7 +134,7 @@ export class Toast {
   static _onDragStart(e: TouchEvent | MouseEvent) {
     if (e.target && (<HTMLElement>e.target).closest('.toast')) {
       const toastElem = (<HTMLElement>e.target).closest('.toast');
-      const toast: Toast = toastElem['M_Toast'];
+      const toast: Toast = toastElem!['M_Toast'];
       toast.panning = true;
       Toast._draggedToast = toast;
       toast.el.classList.add('panning');
@@ -204,7 +204,7 @@ export class Toast {
 
   _createToast() {
     let toast: HTMLElement = this.options.toastId
-      ? document.getElementById(this.options.toastId)
+      ? document.getElementById(this.options.toastId)!
       : document.createElement('div');
     if (toast instanceof HTMLTemplateElement) {
       const node = (toast as HTMLTemplateElement).content.cloneNode(true);
