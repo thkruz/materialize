@@ -1,22 +1,37 @@
 @use '../../sass/variables' as *;
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// M3 Time picker — https://m3.material.io/components/time-pickers/specs
+// Dial + input variants. Container surface-container-high, corner
+// extra-large (28dp), elevation level 3. Dial surface-container-highest,
+// selector/hand primary with on-primary selected number, center dot
+// primary. Selected time field primary-container / on-primary-container,
+// unselected surface-container-highest / on-surface. AM/PM selected
+// tertiary-container / on-tertiary-container. Labels on-surface-variant.
+// Class/markup contract from timepicker.ts is preserved verbatim.
+// =====================================================================
 
 .timepicker-container {
   display: flex;
   flex-direction: column;
-  max-width: 325px;
+  max-width: 328px;
   padding: 0;
-  background-color: var(--md-sys-color-inverse-on-surface);
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: var(--md-sys-elevation-level3);
+  overflow: hidden;
 }
 
 .text-primary {
-  color:  var(--md-sys-color-on-primary);
+  color: var(--md-sys-color-on-surface);
 }
 
 /* Clock Digital Display */
 .timepicker-digital-display {
   width: auto;
   flex: 1 auto;
-  // background-color: var(--md-sys-color-surface);
   padding: 2rem .71rem .67rem .71rem;
   font-weight: 300;
 }
@@ -25,15 +40,14 @@
   display: flex;
   font-size: 4rem;
   text-align: left;
-  color: var(--font-on-primary-color-medium);
+  color: var(--md-sys-color-on-surface-variant);
   font-weight: 400;
-  /*position: relative;*/
   user-select: none;
   padding: 1rem 1rem 1.3rem 1rem;
 
-  input[type=text]{
+  input[type=text] {
     height: 4rem;
-    color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-surface);
     border-bottom: 0px;
     font-size: 4rem;
     direction: ltr;
@@ -61,16 +75,23 @@
   cursor: pointer;
 }
 
+// M3 time field: unselected uses surface-container-highest + on-surface.
 input[type=text].timepicker-input-hours,
 input[type=text].timepicker-input-minutes {
   height: 100%;
   padding: 1.33rem .8rem;
   border: 0;
+  border-radius: var(--md-sys-shape-corner-small);
   text-align: center;
-  color: var(--md-sys-color-on-background);
-  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface-container-highest);
+  transition:
+    background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 
+  // Selected (focused) field: primary-container bg + on-primary-container text.
   &:focus {
+    color: var(--md-sys-color-on-primary-container);
     background-color: var(--md-sys-color-primary-container);
   }
 }
@@ -80,15 +101,8 @@ input[type=text].timepicker-input-minutes {
   text-align: center;
 }
 
-/*input[type=text].text-primary {
-  color: var(--md-sys-color-on-background);
-}*/
-
 .timepicker-display-am-pm {
   font-size: 1.3rem;
-  /*position: absolute;
-  top: 1rem;
-  right: 1rem;*/
   font-weight: 400;
 }
 
@@ -97,6 +111,8 @@ input[type=text].timepicker-input-minutes {
   max-width: 3.5rem;
 }
 
+// AM/PM toggle: outlined segments; selected segment (.filled, applied by
+// timepicker.ts) uses tertiary-container / on-tertiary-container.
 .timepicker-container .am-btn,
 .timepicker-container .pm-btn {
   width: 3.6rem;
@@ -106,8 +122,17 @@ input[type=text].timepicker-input-minutes {
   line-height: 2rem;
   vertical-align: middle;
   text-align: center;
-  // background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: transparent;
   border: 1px solid var(--md-sys-color-outline);
+  transition:
+    background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+
+  &.filled {
+    color: var(--md-sys-color-on-tertiary-container);
+    background-color: var(--md-sys-color-tertiary-container);
+  }
 }
 
 .timepicker-container .am-btn {
@@ -125,12 +150,12 @@ input[type=text].timepicker-input-minutes {
 .timepicker-analog-display {
   flex: 2.5 auto;
   padding: .67rem;
-  // background-color: var(--md-sys-color-surface);
 }
 
+// M3 dial background: surface-container-highest, full (circular) shape.
 .timepicker-plate {
-  background-color: var(--md-sys-color-surface-variant);
-  border-radius: 50%;
+  background-color: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-full);
   width: 260px;
   height: 260px;
   overflow: visible;
@@ -153,8 +178,8 @@ input[type=text].timepicker-input-minutes {
 }
 
 .timepicker-tick {
-  border-radius: 50%;
-  color: var(--md-sys-color-on-background);
+  border-radius: var(--md-sys-shape-corner-full);
+  color: var(--md-sys-color-on-surface);
   line-height: 40px;
   text-align: center;
   width: 40px;
@@ -164,13 +189,19 @@ input[type=text].timepicker-input-minutes {
   font-size: 15px;
 }
 
-.timepicker-tick.active,
+// Selected number sits on the primary selector, so it must read on-primary.
+.timepicker-tick.active {
+  color: var(--md-sys-color-on-primary);
+}
+
 .timepicker-tick:hover {
-  background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 6%);
+  background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) var(--md-sys-state-hover-state-layer-opacity));
 }
 
 .timepicker-dial {
-  transition: transform 350ms, opacity 350ms;
+  transition:
+    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
 }
 
 .timepicker-dial-out {
@@ -185,12 +216,13 @@ input[type=text].timepicker-input-minutes {
   }
 }
 
+// Clock hand: primary.
 .timepicker-canvas {
-  transition: opacity 175ms;
+  transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 
   line {
     stroke: var(--md-sys-color-primary);
-    stroke-width: 4;
+    stroke-width: 2;
     stroke-linecap: round;
   }
 }
@@ -199,16 +231,17 @@ input[type=text].timepicker-input-minutes {
   opacity: 0.25;
 }
 
+// Center dot: primary.
 .timepicker-canvas-bearing {
   stroke: none;
   fill: var(--md-sys-color-primary);
 }
 
+// Selector puck at the end of the hand: primary.
 .timepicker-canvas-bg {
   stroke: none;
   fill: var(--md-sys-color-primary);
 }
-
 
 /* Footer */
 .timepicker-footer {
@@ -233,15 +266,20 @@ input[type=text].timepicker-input-minutes {
 
 /* Display modes */
 .timepicker-modal {
-  max-width: 326px;
+  max-width: 328px;
   max-height: none;
-  background-color: var(--md-sys-color-inverse-on-surface);
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: var(--md-sys-elevation-level3);
   overflow-x: hidden;
 
   // Reset margins and paddings since they are defined by the modal instance
   .timepicker-container {
     margin-left: calc(-1 * var(--modal-padding));
     margin-right: calc(-1 * var(--modal-padding));
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .modal-header + .modal-content {
@@ -279,7 +317,6 @@ input[type=text].timepicker-input-minutes {
   }
 
   .timepicker-text-container {
-    /*top: 31%;*/
     flex-direction: column;
     margin-top: 4.8rem;
     text-align: center;
@@ -297,17 +334,11 @@ input[type=text].timepicker-input-minutes {
     display: flex;
     flex-grow: 1;
     max-width: unset;
-    /*width: 100%;
-    padding: 0 4%;
-    flex-wrap: wrap;
-    flex-direction: row;
-    display: flex;*/
   }
 
   .timepicker-container .am-btn,
   .timepicker-container .pm-btn {
     flex-grow: 1;
-    /*width: auto;*/
     padding-left: calc(var(--btn-padding) / .565);
     padding-right: calc(var(--btn-padding) / .565);
     border-radius: var(--btn-border-radius);
