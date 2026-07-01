@@ -139,8 +139,8 @@ export class Collapsible extends Component<CollapsibleOptions> {
       if (collapsible !== this.el) return;
 
       const li = header.closest('li');
-      const isActive = li.classList.contains('active');
-      const index = [...li.parentNode.children].indexOf(li);
+      const isActive = li!.classList.contains('active');
+      const index = [...li!.parentNode!.children].indexOf(li);
 
       if (isActive) this.close(index);
       else this.open(index);
@@ -160,7 +160,7 @@ export class Collapsible extends Component<CollapsibleOptions> {
   _animateIn(index: number) {
     const li = <HTMLLIElement>this.el.children[index];
     if (!li) return;
-    const body: HTMLElement = li.querySelector('.collapsible-body');
+    const body: HTMLElement = li.querySelector('.collapsible-body')!;
     const duration = this.options.inDuration; // easeInOutCubic
     body.style.transition = `max-height ${duration}ms ease-out`;
     this._setExpanded(body);
@@ -174,7 +174,7 @@ export class Collapsible extends Component<CollapsibleOptions> {
   _animateOut(index: number) {
     const li = this.el.children[index];
     if (!li) return;
-    const body: HTMLElement = li.querySelector('.collapsible-body');
+    const body: HTMLElement = li.querySelector('.collapsible-body')!;
     const duration = this.options.outDuration; // easeInOutCubic
     body.style.transition = `max-height ${duration}ms ease-out`;
     body.style.maxHeight = '0';
