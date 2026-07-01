@@ -225,11 +225,13 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     const btnRect = this.el.getBoundingClientRect();
 
     const backdrop = document.createElement('div'),
-      scaleFactor = windowWidth / backdrop[0].clientWidth,
       fabColor = getComputedStyle(this.#anchor).backgroundColor; // css('background-color');
     backdrop.classList.add('fab-backdrop'); //  $('<div class="fab-backdrop"></div>');
     backdrop.style.backgroundColor = fabColor;
     this.#anchor.append(backdrop);
+
+    // Measure after the backdrop is in the DOM so clientWidth reflects its rendered size.
+    const scaleFactor = windowWidth / backdrop.clientWidth;
 
     this.offsetX = btnRect.left - windowWidth / 2 + btnRect.width / 2;
     this.offsetY = windowHeight - btnRect.bottom;
