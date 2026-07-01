@@ -48,7 +48,7 @@ export class Forms {
     //   return;
     // }
     // Textarea Auto Resize
-    let hiddenDiv: HTMLDivElement = document.querySelector('.hiddendiv');
+    let hiddenDiv: HTMLDivElement = document.querySelector('.hiddendiv')!;
     if (!hiddenDiv) {
       hiddenDiv = document.createElement('div');
       hiddenDiv.classList.add('hiddendiv', 'common');
@@ -116,7 +116,7 @@ export class Forms {
           const target = <HTMLInputElement>e.target;
           if (target instanceof HTMLInputElement) {
             if (target.value.length !== 0 || target.getAttribute('placeholder') !== null) {
-              for (const child of target.parentNode.children) {
+              for (const child of target.parentNode!.children) {
                 if (child.tagName == 'label') {
                   child.classList.add('active');
                 }
@@ -167,11 +167,11 @@ export class Forms {
   static InitFileInputPath(fileInput: HTMLInputElement) {
     fileInput.addEventListener('change', () => {
       const fileField = fileInput.closest('.file-field');
-      const pathInput = <HTMLInputElement>fileField.querySelector('input.file-path');
+      const pathInput = <HTMLInputElement>fileField!.querySelector('input.file-path');
       const files = fileInput.files;
       const filenames = [];
-      for (let i = 0; i < files.length; i++) {
-        filenames.push(files[i].name);
+      for (let i = 0; i < files!.length; i++) {
+        filenames.push(files![i].name);
       }
       pathInput.value = filenames.join(', ');
       pathInput.dispatchEvent(
