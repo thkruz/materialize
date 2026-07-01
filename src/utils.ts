@@ -222,7 +222,7 @@ export class Utils {
   static getIdFromTrigger(trigger: HTMLElement): string {
     let id = trigger.dataset.target;
     if (!id) {
-      id = trigger.getAttribute('href');
+      id = trigger.getAttribute('href')!;
       return id ? id.slice(1) : '';
     }
     return id;
