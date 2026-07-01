@@ -2,26 +2,32 @@
 
 .progress {
   position: relative;
+  // M3 linear progress indicator: 4dp track height.
   height: 4px;
   display: block;
   width: 100%;
-  background-color: var(--md-sys-color-surface-variant);
-  border-radius: 4px;
+  // M3 track uses the secondary-container role.
+  background-color: var(--md-sys-color-secondary-container);
+  // M3 rounded ends (fully rounded track).
+  border-radius: var(--md-sys-shape-corner-full);
   margin: $element-top-margin 0 $element-bottom-margin 0;
   overflow: hidden;
-  background-color: var(--md-sys-color-secondary-container);
 
   .determinate {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
+    // M3 active indicator uses the primary role with rounded ends.
     background-color: var(--md-sys-color-primary);
-    transition: width .3s linear;
+    border-radius: var(--md-sys-shape-corner-full);
+    transition: width var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-linear);
   }
 
   .indeterminate {
+    // M3 active indicator uses the primary role with rounded ends.
     background-color: var(--md-sys-color-primary);
+    border-radius: var(--md-sys-shape-corner-full);
 
     &:before {
       content: '';
@@ -145,6 +151,7 @@
   width: 100%;
   height: 100%;
   opacity: 0;
+  // M3 circular progress indicator uses the primary role by default.
   border-color: var(--md-sys-color-primary);
 }
 
@@ -334,7 +341,7 @@
   .circle {
     width: 200%;
     height: 100%;
-    border-width: 3px; /* STROKEWIDTH */
+    border-width: 4px; /* M3 STROKEWIDTH: 4dp */
     border-style: solid;
     border-color: inherit;
     border-bottom-color: transparent !important;
