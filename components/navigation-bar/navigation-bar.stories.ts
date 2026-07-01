@@ -1,39 +1,44 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
 
 export default {
-  title: 'Components/Navigation-Bar'
+  title: 'Components/Navigation Bar'
 } satisfies Meta;
 
-export const RightAligned: StoryObj = {
-  render() {
-    return `
-<nav class="nav navbar">
-  <div class="nav-wrapper">
-    <a href="#" class="brand-logo">Logo</a>
-    <ul id="nav-mobile" class="right hide-on-med-and-down">
-      <li><a href="sass.html">Sass</a></li>
-      <li><a href="badges.html">Components</a></li>
-      <li><a href="collapsible.html">JavaScript</a></li>
-    </ul>
-  </div>
-</nav>
-    `;
-  }
+const item = (icon: string, label: string, active = false) => `
+  <a class="navigation-bar__item${active ? ' active' : ''}">
+    <span class="navigation-bar__indicator"><i class="navigation-bar__icon material-icons">${icon}</i></span>
+    <span class="navigation-bar__label">${label}</span>
+  </a>`;
+
+// The navigation bar is position:fixed to the bottom, so wrap it in a
+// relatively-positioned box so it renders inside the story canvas.
+const frame = (items: string) => `
+  <div style="position:relative;height:120px">
+    <nav class="navigation-bar">
+      ${items}
+    </nav>
+  </div>`;
+
+export const ThreeDestinations: StoryObj = {
+  render: () =>
+    frame(
+      [
+        item('home', 'Home', true),
+        item('search', 'Search'),
+        item('person', 'Profile')
+      ].join('')
+    )
 };
 
-export const LeftAligned: StoryObj = {
-  render() {
-    return `
-<nav class="nav navbar">
-  <div class="nav-wrapper">
-    <a href="#" class="brand-logo right">Logo</a>
-    <ul id="nav-mobile" class="left hide-on-med-and-down">
-      <li><a href="sass.html">Sass</a></li>
-      <li><a href="badges.html">Components</a></li>
-      <li><a href="collapsible.html">JavaScript</a></li>
-    </ul>
-  </div>
-</nav>
-    `;
-  }
+export const FiveDestinations: StoryObj = {
+  render: () =>
+    frame(
+      [
+        item('home', 'Home', true),
+        item('search', 'Search'),
+        item('favorite', 'Favorites'),
+        item('notifications', 'Alerts'),
+        item('person', 'Profile')
+      ].join('')
+    )
 };
