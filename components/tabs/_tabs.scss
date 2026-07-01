@@ -1,4 +1,20 @@
 @use '../../sass/variables' as *;
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// M3 Tabs — https://m3.material.io/components/tabs/specs
+//
+// Primary tabs (default): 48dp tall, `surface` container. Active indicator
+// is a 3dp `primary` bar with 3dp rounded top corners. Active label + icon
+// use `primary`; inactive use `on-surface-variant`. Labels are `title-small`.
+//
+// Secondary tabs (`.tabs.secondary`): full-width 2dp `primary` indicator at
+// the bottom (square corners). Active text is `on-surface`; inactive text is
+// `on-surface-variant`.
+//
+// State layers (hover/focus/press) are tinted with the active role so the
+// interaction feedback follows M3 state opacities.
+// =====================================================================
 
 .tabs {
   padding-left: 0;
@@ -7,6 +23,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   width: 100%;
+  height: 48px; // M3 tab container height
   background-color: var(--md-sys-color-surface);
   margin: 0 auto;
   white-space: nowrap;
@@ -23,10 +40,6 @@
     .tab.disabled a:hover,
     .tab.disabled a:focus {
       color: rgba(255, 255, 255, 0.38);
-    }
-
-    .tab a:hover {
-      background-color: rgba(0, 0, 0, 0.04);
     }
 
     .tab a.active,
@@ -66,6 +79,7 @@
       position: relative;
       top: 8px;
       vertical-align: middle;
+      font-size: 24px; // M3 optional 24dp leading/top icon
     }
 
     span {
@@ -74,41 +88,36 @@
     }
 
     a {
+      // M3 inactive label + icon color.
       color: var(--md-sys-color-on-surface-variant);
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       width: 100%;
       height: 100%;
-      min-height: 48px; //needed for only-icons tabs
+      min-height: 48px; // needed for only-icons tabs
       padding: 0 24px;
-      font-size: 14px;
+      // M3 title-small typescale for the tab label.
+      font-family: var(--md-sys-typescale-title-small-font-family-name);
+      font-size: var(--md-sys-typescale-title-small-font-size);
+      font-weight: var(--md-sys-typescale-title-small-font-weight);
+      line-height: var(--md-sys-typescale-title-small-line-height);
+      letter-spacing: var(--md-sys-typescale-title-small-letter-spacing);
       text-overflow: ellipsis;
       user-select: none;
       overflow: hidden;
-      transition:
-        color 0.28s ease,
-        background-color 0.28s ease;
+      transition: color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 
-      &.active {
-        background-color: transparent;
-      }
+      // State layer (primary tint) driven by the shared M3 mixin. It renders a
+      // ::before overlay at the M3 hover/focus/pressed opacities.
+      @include state-layer(var(--md-sys-color-primary));
 
+      // M3 active label + icon color.
       &.active,
       &:focus,
       &:hover {
         color: var(--md-sys-color-primary);
-      }
-
-      &:hover {
-        background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 6%);
-      }
-
-      &:focus {
-        background-color: var(--md-sys-color-primary-container);
-      }
-
-      &.active {
-        background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 18%);
       }
 
       &:focus,
@@ -119,16 +128,18 @@
 
     &.disabled a,
     &.disabled a:hover {
-      color: var(--md-sys-color-on-surface);
+      color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
       cursor: default;
-      background-color: transparent;
 
-      &:not(:focus) {
-        background-color: transparent;
+      // Disabled tabs get no state layer.
+      &::before {
+        opacity: 0;
       }
     }
   }
 
+  // JS-driven active indicator. Primary tabs: 3dp `primary` bar with rounded
+  // top corners. The Tabs component sets left/right inline for animation.
   .indicator {
     position: absolute;
     bottom: 0;
@@ -136,6 +147,30 @@
     background-color: var(--md-sys-color-primary);
     will-change: left, right;
     border-radius: 3px 3px 0 0;
+  }
+
+  // -------------------------------------------------------------------
+  // Secondary tabs variant.
+  // Full-width 2dp `primary` indicator at the bottom with square corners.
+  // Active text recolors to `on-surface`; inactive stays `on-surface-variant`.
+  // -------------------------------------------------------------------
+  &.secondary {
+    .tab a {
+      // State layer switches to the on-surface tint for secondary tabs.
+      @include state-layer(var(--md-sys-color-on-surface));
+
+      &.active,
+      &:focus,
+      &:hover {
+        color: var(--md-sys-color-on-surface);
+      }
+    }
+
+    .indicator {
+      height: 2px;
+      border-radius: 0;
+      background-color: var(--md-sys-color-primary);
+    }
   }
 
   &.tabs-horizontal .tab {
