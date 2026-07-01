@@ -105,7 +105,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
   /** The index of the item focused. */
   focusedIndex: number;
   filterQuery: string[];
-  filterTimeout: NodeJS.Timeout | number;
+  filterTimeout!: NodeJS.Timeout | number;
 
   constructor(el: HTMLElement, options: Partial<DropdownOptions>) {
     super(el, options, Dropdown);
@@ -113,7 +113,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
 
     Dropdown._dropdowns.push(this);
     this.id = Utils.getIdFromTrigger(el);
-    this.dropdownEl = document.getElementById(this.id);
+    this.dropdownEl = document.getElementById(this.id)!;
 
     this.options = {
       ...Dropdown.defaults,
@@ -354,7 +354,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
         (el) => el.innerText.toLowerCase().indexOf(string) === 0
       );
       if (newOptionEl) {
-        this.focusedIndex = [...newOptionEl.parentNode.children].indexOf(newOptionEl);
+        this.focusedIndex = [...newOptionEl.parentNode!.children].indexOf(newOptionEl);
         this._focusFocusedItem();
       }
     }
