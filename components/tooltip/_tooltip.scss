@@ -1,40 +1,95 @@
+@use '../../sass/mixins.module.scss' as *;
+
+// M3 Plain tooltip — https://m3.material.io/components/tooltips/specs
+// inverse-surface container, inverse-on-surface text, body-small type,
+// corner extra-small (4dp), min-height 24dp, 4dp vertical / 8dp horizontal padding.
 .material-tooltip {
-  padding: 0 8px;  
-  border-radius: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  max-width: 300px;
+  padding: 4px 8px;
+  overflow: hidden;
   color: var(--md-sys-color-inverse-on-surface);
   background-color: var(--md-sys-color-inverse-surface);
+  border-radius: var(--md-sys-shape-corner-extra-small);
   font-family: var(--md-sys-typescale-body-small-font-family-name);
   font-size: var(--md-sys-typescale-body-small-font-size);
   line-height: var(--md-sys-typescale-body-small-line-height);
   font-weight: var(--md-sys-typescale-body-small-font-weight);
-  min-height: 24px;
+  letter-spacing: var(--md-sys-typescale-body-small-letter-spacing);
   opacity: 0;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 400;
-  letter-spacing: 0.4px;
-  position: absolute;
-  max-width: 300px;
-  overflow: hidden;
-  left: 0;
-  top: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
   visibility: hidden;
-  z-index: 2000;
+  pointer-events: none;
 }
 
 .backdrop {
   position: absolute;
-  opacity: 0;
   height: 7px;
   width: 14px;
   border-radius: 0 0 50% 50%;
   background-color: var(--md-sys-color-inverse-surface);
   z-index: -1;
+  opacity: 0;
   transform-origin: 50% 0;
   visibility: hidden;
+}
+
+// M3 Rich tooltip — surface-container container, corner medium (12dp),
+// elevation level 2. Optional title-small subhead (on-surface), body-medium
+// body text (on-surface-variant), and text action buttons (label-large,
+// primary). Applied as `.material-tooltip.rich`.
+.material-tooltip.rich {
+  display: block;
+  min-height: 40px;
+  max-width: 320px;
+  padding: 12px 16px;
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-medium);
+  box-shadow: var(--md-sys-elevation-level2);
+  font-family: var(--md-sys-typescale-body-medium-font-family-name);
+  font-size: var(--md-sys-typescale-body-medium-font-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  font-weight: var(--md-sys-typescale-body-medium-font-weight);
+  letter-spacing: var(--md-sys-typescale-body-medium-letter-spacing);
+
+  .tooltip-subhead {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font-family-name);
+    font-size: var(--md-sys-typescale-title-small-font-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    font-weight: var(--md-sys-typescale-title-small-font-weight);
+    letter-spacing: var(--md-sys-typescale-title-small-letter-spacing);
+  }
+
+  .tooltip-content {
+    display: block;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .tooltip-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+
+    .btn,
+    .btn-flat,
+    button,
+    a {
+      color: var(--md-sys-color-primary);
+      font-family: var(--md-sys-typescale-label-large-font-family-name);
+      font-size: var(--md-sys-typescale-label-large-font-size);
+      line-height: var(--md-sys-typescale-label-large-line-height);
+      font-weight: var(--md-sys-typescale-label-large-font-weight);
+      letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+    }
+  }
 }
