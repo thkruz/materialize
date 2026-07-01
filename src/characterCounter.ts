@@ -15,7 +15,7 @@ export class CharacterCounter extends Component<object> {
   /** Specifies whether the input text has valid length or not. */
   isValidLength: boolean;
 
-  constructor(el: HTMLInputElement | HTMLTextAreaElement, options: Partial<BaseOptions>) {
+  constructor(el: HTMLElement, options: Partial<BaseOptions>) {
     super(el, {}, CharacterCounter);
     this.el['M_CharacterCounter'] = this;
 
@@ -68,7 +68,7 @@ export class CharacterCounter extends Component<object> {
 
   destroy() {
     this._removeEventHandlers();
-    this.el['CharacterCounter'] = undefined;
+    this.el['M_CharacterCounter'] = undefined;
     this._removeCounter();
   }
 
@@ -96,7 +96,7 @@ export class CharacterCounter extends Component<object> {
   }
 
   updateCounter = () => {
-    const maxLength = parseInt(this.el.getAttribute('maxlength')),
+    const maxLength = parseInt(this.el.getAttribute('maxlength')!),
       actualLength = (this.el as HTMLInputElement).value.length;
 
     this.isValidLength = actualLength <= maxLength;
