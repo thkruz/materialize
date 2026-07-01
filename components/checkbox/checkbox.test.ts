@@ -75,6 +75,18 @@ describe('M3 Checkbox', () => {
     expect(hasDecl(/\.error:checked::after|\.checkbox\.error input\[type=checkbox\]:checked::after/, 'background-color', /--md-sys-color-error/)).toBe(true);
   });
 
+  it('also triggers the error role via aria-invalid (parity with radio)', () => {
+    expect(
+      hasDecl(/input\[type=checkbox\]\[aria-invalid=[^\]]+\]::after/, 'border-color', /--md-sys-color-error/)
+    ).toBe(true);
+  });
+
+  it('keeps the input background transparent so the .error color utility cannot fill the control', () => {
+    // The box is drawn via ::after; the visible input must never take a
+    // background from the global `.error` (or any color) utility class.
+    expect(hasDecl(/input\[type=checkbox\]$/, 'background-color', /transparent/)).toBe(true);
+  });
+
   it('dims the disabled checkbox to on-surface at 38%', () => {
     expect(hasDecl(/input\[type=checkbox\]:disabled::after$/, 'border-color', /on-surface\)\s+38%/)).toBe(true);
     expect(

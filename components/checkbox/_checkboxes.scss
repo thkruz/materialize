@@ -39,6 +39,11 @@ input[type="checkbox"] {
   height: 48px;
   display: inline-flex;
   vertical-align: middle;
+  // The box is drawn entirely via ::after, so the input itself stays
+  // transparent. This also shields the checkbox from the global `.error`
+  // color utility (which would otherwise paint the whole control red); the
+  // `input[type="checkbox"]` selector outranks the `.error` utility.
+  background-color: transparent;
   // State-layer tint color; flips to primary when selected, error in error.
   --checkbox-state-layer-color: var(--md-sys-color-on-surface);
 }
@@ -132,11 +137,13 @@ input[type="checkbox"]:not(:disabled):not(:checked):not(:indeterminate):hover::a
 // ------------------------------------------------------------------- ERROR
 // Error state uses the `error` role for border, fill and state layer.
 input[type="checkbox"].error,
+input[type="checkbox"][aria-invalid="true"],
 .checkbox.error input[type="checkbox"] {
   --checkbox-state-layer-color: var(--md-sys-color-error);
 }
 
 input[type="checkbox"].error::after,
+input[type="checkbox"][aria-invalid="true"]::after,
 .checkbox.error input[type="checkbox"]::after {
   border-color: var(--md-sys-color-error);
 }
@@ -144,6 +151,8 @@ input[type="checkbox"].error::after,
 input[type="checkbox"].error:checked::after,
 input[type="checkbox"].error:indeterminate::after,
 input[type="checkbox"].error.indeterminate-checkbox::after,
+input[type="checkbox"][aria-invalid="true"]:checked::after,
+input[type="checkbox"][aria-invalid="true"]:indeterminate::after,
 .checkbox.error input[type="checkbox"]:checked::after,
 .checkbox.error input[type="checkbox"]:indeterminate::after {
   border-color: var(--md-sys-color-error);
@@ -191,6 +200,7 @@ input[type="checkbox"]:disabled + span:not(.lever) {
 }
 
 .checkbox.error input[type="checkbox"] + span:not(.lever),
-input[type="checkbox"].error + span:not(.lever) {
+input[type="checkbox"].error + span:not(.lever),
+input[type="checkbox"][aria-invalid="true"] + span:not(.lever) {
   color: var(--md-sys-color-error);
 }
