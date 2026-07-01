@@ -33,3 +33,6 @@ dist/
 
 *storybook.log
 storybook-static
+
+# Local-only internal notes / scratch docs (not for publication)
+docs-local/
