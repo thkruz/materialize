@@ -4,11 +4,13 @@
 @at-root {
   :root {
     --btn-height: 40px;
-    --btn-font-size-icon: 16px;
+    --btn-font-size-icon: 18px;
     --btn-padding: 24px;
     --btn-padding-icon: 16px;
     --btn-gap-icon: 8px;
-    --btn-border-radius: 4px;
+    // M3 common buttons use the fully-rounded (stadium) shape by default.
+    // A large radius yields a pill that adapts to any button height.
+    --btn-border-radius: 9999px;
     --btn-font-size: 14px;
   }
 }
