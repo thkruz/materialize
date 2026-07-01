@@ -85,76 +85,154 @@
 
 //------------------ Focus
 
-// Floating button
+// Floating action button (FAB)
+// M3 spec: https://m3.material.io/components/floating-action-button/specs
+// M3 FABs are rounded SQUARES (not circles). The container is
+// `primary-container` with `on-primary-container` content, elevation level 3
+// resting / level 4 on hover, and a per-size shape token:
+//   small   -> 40dp, corner medium (12dp)
+//   default -> 56dp, corner large (16dp)
+//   large   -> 96dp, corner extra-large (28dp)
 .btn-floating {
-  // FIXES
-  // width: unset;
-  // padding: 16px !important;
-  // padding-right: 24px !important; /* only with icon */
-  // gap: 8px;
   @extend .btn;
-  width: $button-floating-size;
-  height: $button-floating-size;
-  color: var(--md-sys-color-on-primary-container);
-  background-color: var(--md-sys-color-primary-container);
-  border-radius: $button-floating-radius;
+  // Default (regular) FAB: 56dp square, corner `large` (16dp).
+  --fab-size: 56px;
+  --fab-corner: var(--md-sys-shape-corner-large);
+  --fab-container: var(--md-sys-color-primary-container);
+  --fab-on-container: var(--md-sys-color-on-primary-container);
+  width: var(--fab-size);
+  height: var(--fab-size);
+  color: var(--fab-on-container);
+  background-color: var(--fab-container);
+  border-radius: var(--fab-corner);
   padding: 0;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
+  justify-content: center;
   position: relative;
   overflow: hidden;
   z-index: 1;
-  @extend .z-depth-1;
-  transition: background-color .3s;
+  // Resting elevation is level 3, hover is level 4 (M3 elevation tokens).
+  box-shadow: var(--md-sys-elevation-level3);
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   cursor: pointer;
   vertical-align: middle;
   text-align: center;
 
+  // State layer: a full-bleed overlay tinted with the content color, revealed
+  // by hover / focus / press opacity tokens.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--fab-on-container);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  }
+
   &:hover {
-    @extend .z-depth-1-half;
-    background-color: color-mix(in srgb, var(--md-sys-color-primary-container), var(--md-sys-color-on-primary-container) 16%);
-  }
+    box-shadow: var(--md-sys-elevation-level4);
 
-  &:focus {
-    background-color: $button-floating-background-focus;
-    @extend .z-depth-1-half;
-  }
-
-  &:before {
-    border-radius: 0;
-  }
-
-  &.btn-large {
-    width: 56px;
-    height: 56px;
-    padding: 0;
-    &.halfway-fab {
-      bottom: -56px * 0.5;
+    &::before {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
     }
-    // font-size:
-    // i {
-    //   // line-height: 56px;
-    // }
   }
 
+  &:focus::before {
+    opacity: var(--md-sys-state-focus-state-layer-opacity);
+  }
+
+  &:active::before {
+    opacity: var(--md-sys-state-pressed-state-layer-opacity);
+  }
+
+  // Small FAB: 40dp square, corner `medium` (12dp).
   &.btn-small {
-    --btn-small-height: calc(0.75 * var(--btn-height));
-    width: var(--btn-small-height);
-    height: var(--btn-small-height);
+    --fab-size: 40px;
+    --fab-corner: var(--md-sys-shape-corner-medium);
 
     &.halfway-fab {
-      bottom: calc(var(--btn-small-height) * -0.5);
+      bottom: calc(var(--fab-size) * -0.5);
     }
-    // i {
-    //   line-height: $button-floating-small-size;
-    // }
+  }
+
+  // NOTE: legacy `.btn-large` remains a 56dp FAB so existing markup keeps its
+  // size. The true M3 Large FAB (96dp / corner extra-large) is `.large-fab`.
+  &.btn-large {
+    --fab-size: 56px;
+
+    &.halfway-fab {
+      bottom: calc(var(--fab-size) * -0.5);
+    }
+  }
+
+  // Large FAB: 96dp square, corner `extra-large` (28dp).
+  &.large-fab {
+    --fab-size: 96px;
+    --fab-corner: var(--md-sys-shape-corner-extra-large);
+
+    i {
+      font-size: 2.25rem; // 36dp icon per M3 large FAB
+    }
+
+    &.halfway-fab {
+      bottom: calc(var(--fab-size) * -0.5);
+    }
+  }
+
+  // ---- Color variants ---------------------------------------------------
+  // Surface FAB: surface-container-high container with primary content.
+  &.surface {
+    --fab-container: var(--md-sys-color-surface-container-high);
+    --fab-on-container: var(--md-sys-color-primary);
+  }
+
+  // Secondary FAB.
+  &.secondary {
+    --fab-container: var(--md-sys-color-secondary-container);
+    --fab-on-container: var(--md-sys-color-on-secondary-container);
+  }
+
+  // Tertiary FAB.
+  &.tertiary {
+    --fab-container: var(--md-sys-color-tertiary-container);
+    --fab-on-container: var(--md-sys-color-on-tertiary-container);
+  }
+
+  // ---- Extended FAB -----------------------------------------------------
+  // M3 Extended FAB: 56dp height, corner `large` (16dp), auto width with a
+  // min-width, icon (24dp) + `label-large` label, 16-20dp horizontal padding.
+  &.extended,
+  &.fab-extended {
+    --fab-size: 56px;
+    width: auto;
+    height: var(--fab-size);
+    min-width: 80px;
+    padding: 0 20px;
+    gap: 8px;
+    column-gap: 8px;
+    // label-large typescale for the FAB label.
+    font-family: var(--md-sys-typescale-label-large-font-family-name);
+    font-weight: var(--md-sys-typescale-label-large-font-weight);
+    font-size: var(--md-sys-typescale-label-large-font-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+    text-transform: none;
+
+    i {
+      font-size: 1.5rem; // 24dp leading icon
+    }
   }
 
   &.halfway-fab {
     position: absolute;
     right: 24px;
-    bottom: -$button-floating-size * 0.5;
+    bottom: calc(var(--fab-size) * -0.5);
 
     &.left {
       right: auto;
@@ -164,7 +242,7 @@
 
   i {
     color: currentColor;
-    font-size: 1.6rem;
+    font-size: 1.5rem; // 24dp icon per M3 FAB
     width: inherit;
     display: inline-block;
     text-align: center;
