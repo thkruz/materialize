@@ -10,8 +10,8 @@ const _defaults: RangeOptions = {};
 export class Range extends Component<RangeOptions> {
   declare el: HTMLInputElement;
   private _mousedown: boolean;
-  value: HTMLElement;
-  thumb: HTMLElement;
+  value!: HTMLElement;
+  thumb!: HTMLElement;
 
   constructor(el: HTMLInputElement, options: Partial<RangeOptions>) {
     super(el, options, Range);
