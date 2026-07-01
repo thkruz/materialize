@@ -1,0 +1,19 @@
+{
+  // Typecheck configuration for the Jasmine browser specs.
+  //
+  // The specs are checked in isolation from the library source: they exercise the
+  // built global `M` bundle (typed as an opaque global in spec/spec-globals.d.ts)
+  // rather than importing `src`, so this program contains only the specs, their
+  // helper, and the shared ambient declarations. strictNullChecks is relaxed
+  // because DOM test code leans on `document.querySelector(...)` returning a
+  // non-null element, and asserting that at every call site adds noise without
+  // catching real bugs.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "strictNullChecks": false,
+    "types": ["jasmine", "node"]
+  },
+  "include": ["spec/**/*", "components/**/*Spec.ts"],
+  "exclude": []
+}

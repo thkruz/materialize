@@ -20,7 +20,7 @@ describe('Datepicker Plugin', () => {
       const datepicker = M.Datepicker.getInstance(input);
       //datepicker.open();
       setTimeout(() => {
-        const day1 = document.querySelector('.datepicker-container button[data-day="1"]');
+        const day1 = document.querySelector<HTMLElement>('.datepicker-container button[data-day="1"]');
         day1.click();
         // Removed since autoSubmit option
         // document.querySelector('.datepicker-done').click();
@@ -42,7 +42,7 @@ describe('Datepicker Plugin', () => {
       const datepicker = M.Datepicker.getInstance(input);
       //datepicker.open();
       setTimeout(() => {
-        const day1 = document.querySelector('.datepicker-container button[data-day="1"]');
+        const day1 = document.querySelector<HTMLElement>('.datepicker-container button[data-day="1"]');
         day1.click();
         // Removed since autoSubmit option
         // document.querySelector('.datepicker-done').click();
@@ -56,7 +56,7 @@ describe('Datepicker Plugin', () => {
     });
 
     it('can change the calendar modal selected date by input', (done) => {
-      const input = document.querySelector('#datepickerInput');
+      const input = document.querySelector<HTMLInputElement>('#datepickerInput');
       M.Datepicker.init(input, { format: 'mm/dd/yyyy', openByDefault: true });
       const today = new Date();
       const month = today.getMonth();
@@ -69,11 +69,11 @@ describe('Datepicker Plugin', () => {
         const selectMonthElem = document.querySelector('.datepicker-select.orig-select-month');
         const selectYearElem = document.querySelector('.datepicker-select.orig-select-year');
         const selectedDayElem = document.querySelector(`.datepicker-row td[data-day="${day}"]`);
-        expect(selectMonthElem.querySelector('option[selected="selected"]').value)
+        expect(selectMonthElem.querySelector<HTMLOptionElement>('option[selected="selected"]').value)
           .withContext(
           'selected month does not match'
         ).toBe((month).toString());
-        expect(selectYearElem.querySelector('option[selected="selected"]').value)
+        expect(selectYearElem.querySelector<HTMLOptionElement>('option[selected="selected"]').value)
           .withContext(
           'selected year does not match'
         ).toBe(year.toString());
@@ -103,7 +103,7 @@ describe('Datepicker Plugin', () => {
       setTimeout(() => {
         for (let i = 1; i <= 3; i++) {
           setTimeout(() => {
-            document.querySelector(`.datepicker-container button[data-day="${i}"]`).click();
+            document.querySelector<HTMLElement>(`.datepicker-container button[data-day="${i}"]`).click();
           }, i * 10);
         }
         setTimeout(() => {
@@ -116,7 +116,7 @@ describe('Datepicker Plugin', () => {
     });
 
     it('should integrate action util buttons by option', (done) => {
-      const input = document.querySelector('#datepickerInput');
+      const input = document.querySelector<HTMLInputElement>('#datepickerInput');
       M.Datepicker.init(input, { format: 'mm/dd/yyyy', autoSubmit: false, showClearBtn: true });
       const today = new Date();
       const clearBtn = document.querySelector('.datepicker-clear');

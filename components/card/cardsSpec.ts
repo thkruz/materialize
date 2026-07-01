@@ -115,7 +115,7 @@ describe('Cards', () => {
     </div>
   `;
 
-  const roundedRect = (el) => {
+  const roundedRect = (el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
     return {
       top: Math.round(rect.top),
@@ -137,12 +137,12 @@ describe('Cards', () => {
   });
 
   describe('reveal cards', () => {
-    let revealCard;
-    let revealDiv;
+    let revealCard: HTMLElement;
+    let revealDiv: HTMLElement;
 
     beforeEach(() => {
-      revealCard = document.querySelector('.card.reveal');
-      revealDiv = revealCard.querySelector('.card-reveal');
+      revealCard = document.querySelector<HTMLElement>('.card.reveal');
+      revealDiv = revealCard.querySelector<HTMLElement>('.card-reveal');
     });
 
     it('should have a hidden card-reveal initially', () => {
@@ -150,7 +150,7 @@ describe('Cards', () => {
     });
 
     it('should show card-reveal after clicking an activator', (done) => {
-      const activator = revealCard.querySelector('.activator');
+      const activator = revealCard.querySelector<HTMLElement>('.activator');
 
       click(activator);
 
@@ -161,7 +161,7 @@ describe('Cards', () => {
     });
 
     it('should size and position card-reveal to cover the card when opened', (done) => {
-      const activator = revealCard.querySelector('.activator');
+      const activator = revealCard.querySelector<HTMLElement>('.activator');
 
       click(activator);
 
@@ -184,12 +184,12 @@ describe('Cards', () => {
   });
 
   describe('image cards', () => {
-    let imageCard;
-    let image;
+    let imageCard: HTMLElement;
+    let image: HTMLElement;
 
     beforeEach(() => {
-      imageCard = document.querySelector('.card.image');
-      image = imageCard.querySelector('.card-image > img');
+      imageCard = document.querySelector<HTMLElement>('.card.image');
+      image = imageCard.querySelector<HTMLElement>('.card-image > img');
     });
 
     it('should have an image that fills the full width of the card', () => {
@@ -208,10 +208,16 @@ describe('Cards', () => {
       maxImageHeight,
       maxContentHeight,
       sizeName
+    }: {
+      card: HTMLElement;
+      expectedHeight: number;
+      maxImageHeight: number;
+      maxContentHeight: number;
+      sizeName: string;
     }) => {
-      const cardImage = card.querySelector('.card-image');
-      const cardContent = card.querySelector('.card-content');
-      const cardAction = card.querySelector('.card-action');
+      const cardImage = card.querySelector<HTMLElement>('.card-image');
+      const cardContent = card.querySelector<HTMLElement>('.card-content');
+      const cardAction = card.querySelector<HTMLElement>('.card-action');
 
       const cardRect = roundedRect(card);
       const imageRect = roundedRect(cardImage);

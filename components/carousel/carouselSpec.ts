@@ -48,7 +48,7 @@ describe('Carousel', () => {
         indicators: true
       });
 
-      document.querySelectorAll('.indicator-item')[1].click();
+      document.querySelectorAll<HTMLElement>('.indicator-item')[1].click();
       setTimeout(() => {
         expect(carousel.center).toEqual(
           1,

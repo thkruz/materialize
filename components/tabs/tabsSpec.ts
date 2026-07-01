@@ -61,9 +61,9 @@ describe('Tabs Plugin', () => {
       const activeTabHash = activeTab.getAttribute('href');
       const disabledTab = normalTabs.querySelector('.disabled a');
       const disabledTabHash = disabledTab.getAttribute('href');
-      const firstTab = normalTabs.querySelector('.tab a');
+      const firstTab = normalTabs.querySelector<HTMLElement>('.tab a');
       const firstTabHash = firstTab.getAttribute('href');
-      const indicator = normalTabs.querySelector('.indicator');
+      const indicator = normalTabs.querySelector<HTMLElement>('.indicator');
       expect(indicator).toExist('Indicator should be generated');
       // expect(Math.abs(indicator.offset().left - activeTab.offset().left)).toBeLessThan(1, 'Indicator should be at active tab by default.');
       click(disabledTab);
@@ -110,9 +110,9 @@ describe('Tabs Plugin', () => {
 
     it('should horizontally scroll when too many tabs', (done) => {
       let tabsScrollWidth = 0;
-      const normalTabs = document.querySelector('.tabs.normal');
+      const normalTabs = document.querySelector<HTMLElement>('.tabs.normal');
       normalTabs.style.width = '400px';
-      const tabs = normalTabs.querySelectorAll('.tab');
+      const tabs = normalTabs.querySelectorAll<HTMLElement>('.tab');
       for (let i = 0; i < tabs.length; i++) {
         setTimeout(() => {
           tabsScrollWidth += tabs[i].offsetWidth;
@@ -132,9 +132,9 @@ describe('Tabs Plugin', () => {
       const normalTabs = document.querySelector('.tabs.normal');
       const activeTab = normalTabs.querySelector('.active');
       const activeTabHash = activeTab.getAttribute('href');
-      const firstTab = normalTabs.querySelector('li a');
+      const firstTab = normalTabs.querySelector<HTMLElement>('li a');
       const firstTabHash = firstTab.getAttribute('href');
-      const indicator = normalTabs.querySelector('.indicator');
+      const indicator = normalTabs.querySelector<HTMLElement>('.indicator');
       const tabs = normalTabs.querySelectorAll('.tab a');
       for (let i = 0; i < tabs.length; i++) {
         const tabHash = tabs[i].getAttribute('href');

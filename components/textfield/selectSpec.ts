@@ -122,17 +122,19 @@ describe('Select Plugin:', () => {
     });
 
     it('should have pre-selected value', (done) => {
-      const elem = document.querySelector('select.normal');
+      const elem = document.querySelector<HTMLSelectElement>('select.normal');
       const instance = M.FormSelect.getInstance(elem);
       const input = instance.wrapper.querySelector('input.select-dropdown');
-      const firstOption = elem.querySelector('option[selected]');
+      const firstOption = elem.querySelector<HTMLElement>('option[selected]');
 
       setTimeout(() => {
         expect(input.value).toEqual(
           firstOption.innerText,
           'Value should be equal to preselected option.'
         );
-        expect(
+        // Legacy expect() call passing a message with no matcher (a no-op at
+        // runtime); cast locally to the 2-arg shape to keep it unchanged.
+        (expect as (actual: unknown, message?: string) => void)(
           firstOption.getAttribute('aria-selected'),
           'First item should be selected to assistive technologies.'
         );
@@ -142,13 +144,13 @@ describe('Select Plugin:', () => {
 
     it('should not initialize if browser default', () => {
       const browserDefault = document.querySelector('select.browser-default');
-      expect(browserDefault.parentNode.classList.contains('select-wrapper')).toBeFalse(
+      expect((browserDefault.parentNode as HTMLElement).classList.contains('select-wrapper')).toBeFalse(
         'Wrapper should not be made'
       );
     });
 
     it('should getSelectedValues correctly', (done) => {
-      const elem = document.querySelector('select.normal');
+      const elem = document.querySelector<HTMLSelectElement>('select.normal');
       const instance = M.FormSelect.getInstance(elem);
       const normalInput = instance.wrapper.querySelector('input.select-dropdown');
       const normalDropdown = instance.wrapper.querySelector('ul.select-dropdown');
@@ -177,13 +179,13 @@ describe('Select Plugin:', () => {
 
   describe('Multiselect:', () => {
     it('Dropdown should allow multiple selections to assistive technologies', () => {
-      const elem = document.querySelector('select.multiple');
+      const elem = document.querySelector<HTMLSelectElement>('select.multiple');
       const instance = M.FormSelect.getInstance(elem);
       expect(instance.dropdownOptions.getAttribute('aria-multiselectable')).toBe('true');
     });
 
     it('should open dropdown and select multiple options', (done) => {
-      const elem = document.querySelector('select.multiple');
+      const elem = document.querySelector<HTMLSelectElement>('select.multiple');
       const instance = M.FormSelect.getInstance(elem);
       const input = instance.wrapper.querySelector('input.select-dropdown');
       const dropdown = instance.wrapper.querySelector('ul.select-dropdown');
@@ -242,7 +244,7 @@ describe('Select Plugin:', () => {
     });
 
     it('should open dropdown and deselect multiple options', (done) => {
-      const elem = document.querySelector('select.multiple');
+      const elem = document.querySelector<HTMLSelectElement>('select.multiple');
       const instance = M.FormSelect.getInstance(elem);
       const input = instance.wrapper.querySelector('input.select-dropdown');
       const dropdown = instance.wrapper.querySelector('ul.select-dropdown');
@@ -278,7 +280,7 @@ describe('Select Plugin:', () => {
     });
 
     it('should have multiple pre-selected values', (done) => {
-      const elem = document.querySelector('select.multiple');
+      const elem = document.querySelector<HTMLSelectElement>('select.multiple');
       const instance = M.FormSelect.getInstance(elem);
       const input = instance.wrapper.querySelector('input.select-dropdown');
       const text = Array.from(elem.querySelectorAll('option[selected]'))
@@ -292,7 +294,12 @@ describe('Select Plugin:', () => {
   });
 
   describe('Optgroup Select', () => {
-    let browserSelect, optInput, optDropdown, optionInOptgroup, optionAfterOptGroup, selectInstance;
+    let browserSelect: HTMLSelectElement;
+    let optInput: any;
+    let optDropdown: any;
+    let optionInOptgroup: any;
+    let optionAfterOptGroup: any;
+    let selectInstance: any;
 
     beforeEach(() => {
       browserSelect = document.querySelector('select.optgroup');
@@ -303,7 +310,7 @@ describe('Select Plugin:', () => {
       optInput = selectInstance.wrapper.querySelector('input.select-dropdown');
       optDropdown = selectInstance.wrapper.querySelector('ul.select-dropdown');
       const optgroups = optDropdown.querySelectorAll('li.optgroup');
-      const browerSelectOptgroups = browserSelect.querySelectorAll('optgroup');
+      const browerSelectOptgroups = browserSelect.querySelectorAll<HTMLOptGroupElement>('optgroup');
       for (let i = 0; i < optgroups.length; i++) {
         expect(optgroups[i].getAttribute('role')).toBe('group', 'Should behave as group.');
       }
@@ -319,7 +326,7 @@ describe('Select Plugin:', () => {
       optInput = selectInstance.wrapper.querySelector('input.select-dropdown');
       optDropdown = selectInstance.wrapper.querySelector('ul.select-dropdown');
       const optgroups = optDropdown.querySelectorAll('li.optgroup');
-      const browerSelectOptgroups = browserSelect.querySelectorAll('optgroup');
+      const browerSelectOptgroups = browserSelect.querySelectorAll<HTMLOptGroupElement>('optgroup');
       for (let i = 0; i < browerSelectOptgroups.length; i++) {
         expect(browerSelectOptgroups[i].label).toEqual(
           optgroups[i].innerText,
@@ -362,7 +369,7 @@ describe('Select Plugin:', () => {
       optDropdown = selectInstance.wrapper.querySelector('ul.select-dropdown');
       const originalVal = optInput.value;
       const optgroups = optDropdown.querySelectorAll('li.optgroup');
-      const browerSelectOptgroups = browserSelect.querySelectorAll('optgroup');
+      const browerSelectOptgroups = browserSelect.querySelectorAll<HTMLOptGroupElement>('optgroup');
       for (let i = 0; i < browerSelectOptgroups.length; i++) {
         expect(browerSelectOptgroups[i].label).toEqual(
           optgroups[i].innerText,

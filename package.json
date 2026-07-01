@@ -42,6 +42,8 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "typecheck:spec": "tsc --noEmit -p tsconfig.spec.json",
+    "pretest": "node build-specs.mts",
     "test": "jasmine-browser-runner runSpecs --config=jasmine.json",
     "build": "vite build && vite build --mode min && node build-css.mts",
     "build:release": "vite build && vite build --mode min && node build-css.mts --release",
@@ -76,6 +78,7 @@
     "@storybook/addon-docs": "^10.4.6",
     "@storybook/addon-themes": "^10.4.6",
     "@storybook/html-vite": "^10.4.6",
+    "@types/jasmine": "^5.1.15",
     "@types/node": "^20.5.2",
     "archiver": "^7.0.1",
     "autoprefixer": "^10.4.21",

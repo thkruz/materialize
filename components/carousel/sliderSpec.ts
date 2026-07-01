@@ -36,14 +36,14 @@ describe('Slider Plugin:', () => {
   afterEach(() => XunloadFixtures());
 
   describe('Slider:', () => {
-    let slider;
+    let slider: any;
 
     beforeEach(() => {
       slider = M.Slider.init(document.querySelector('.slider'), {
         interval: 100,
         duration: 0, // transition
         pauseOnFocus: true,
-        indicatorLabelFunc: (idx) => 'Slide ' + idx
+        indicatorLabelFunc: (idx: number) => 'Slide ' + idx
       });
     });
 

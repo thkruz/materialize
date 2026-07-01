@@ -89,15 +89,15 @@ describe('Scrollspy', () => {
       </div>
   `;
   const defaultOptions = { animationDuration: 1 };
-  let scrollspyInstances = [];
+  let scrollspyInstances: any[] = [];
 
-  function isItemActive(value, activeClassName) {
+  function isItemActive(value: string, activeClassName?: string) {
     activeClassName = activeClassName ? activeClassName : 'active';
     const element = document.querySelector(`a[href="#${value}"]`);
     return Array.from(element.classList).includes(activeClassName);
   }
 
-  function expectOnlyThisElementIsActive(value, activeClassName) {
+  function expectOnlyThisElementIsActive(value: string, activeClassName?: string) {
     ['introduction', 'initialization', 'options']
       .filter((el) => el !== value)
       .forEach((el) =>
@@ -111,7 +111,7 @@ describe('Scrollspy', () => {
       .toBeTrue();
   }
 
-  function expectNoActiveElements(activeClassName) {
+  function expectNoActiveElements(activeClassName?: string) {
     ['introduction', 'initialization', 'options'].forEach((el) =>
       expect(isItemActive(el, activeClassName))
         .withContext(`expecting ${el} not to be active`)
@@ -119,18 +119,18 @@ describe('Scrollspy', () => {
     );
   }
 
-  function resetScrollspy(options) {
+  function resetScrollspy(options?: Record<string, unknown>) {
     options = options ? options : {};
     scrollspyInstances.forEach((value) => value.destroy());
     const elements = document.querySelectorAll('.scrollspy');
     scrollspyInstances = M.ScrollSpy.init(elements, options);
   }
 
-  function clickLink(value) {
-    document.querySelector(`a[href="#${value}"]`).click();
+  function clickLink(value: string) {
+    document.querySelector<HTMLElement>(`a[href="#${value}"]`).click();
   }
 
-  function getDistanceFromTop(element) {
+  function getDistanceFromTop(element: Element) {
     const rect = element.getBoundingClientRect();
     const scrollTop = window.scrollY || window.pageYOffset;
     const distanceFromTop = rect.top + scrollTop;
@@ -138,7 +138,7 @@ describe('Scrollspy', () => {
     return distanceFromTop;
   }
 
-  function scrollTo(targetPosition) {
+  function scrollTo(targetPosition: number) {
     window.scrollTo(0, targetPosition);
   }
 

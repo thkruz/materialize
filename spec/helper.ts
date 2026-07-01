@@ -1,4 +1,4 @@
-const KEYMAP = {
+const KEYMAP: Record<string, string> = {
   '27': 'Escape',
   '32': 'Space',
   '13': 'Enter',
@@ -119,9 +119,8 @@ const KEYMAP = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function XloadHtml(html, options) {
-  options = options ? options : {};
-  const defaultOptions = { insertionType: 'append' };
+function XloadHtml(html: string, options: { insertionType?: 'append' | 'prepend' } = {}): void {
+  const defaultOptions = { insertionType: 'append' as const };
   options = {
     ...defaultOptions,
     ...options
@@ -137,7 +136,7 @@ function XloadHtml(html, options) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function XunloadFixtures() {
+function XunloadFixtures(): void {
   document.querySelectorAll('.please-delete-me').forEach((el) => el.remove());
   document.querySelectorAll('.material-tooltip').forEach((el) => el.remove());
   document.querySelectorAll('.dropdown-content').forEach((el) => el.remove());
@@ -164,10 +163,10 @@ function XunloadFixtures() {
   // Baseline inline styles of <body>/<html> captured before any spec runs.
   const originalBodyStyle = document.body.getAttribute('style');
   const originalHtmlStyle = document.documentElement.getAttribute('style');
-  let trackedTimers = [];
-  let trackedFrames = [];
+  let trackedTimers: number[] = [];
+  let trackedFrames: number[] = [];
 
-  const restoreStyle = (el, original) => {
+  const restoreStyle = (el: HTMLElement, original: string | null): void => {
     if (original === null) el.removeAttribute('style');
     else el.setAttribute('style', original);
   };
@@ -175,24 +174,24 @@ function XunloadFixtures() {
   beforeEach(() => {
     trackedTimers = [];
     trackedFrames = [];
-    window.setTimeout = (...args) => {
+    window.setTimeout = ((...args: Parameters<typeof window.setTimeout>) => {
       const id = nativeSetTimeout(...args);
       trackedTimers.push(id);
       return id;
-    };
-    window.setInterval = (...args) => {
+    }) as typeof window.setTimeout;
+    window.setInterval = ((...args: Parameters<typeof window.setInterval>) => {
       const id = nativeSetInterval(...args);
       trackedTimers.push(id);
       return id;
-    };
+    }) as typeof window.setInterval;
     // requestAnimationFrame is tracked too: components such as the carousel run
     // a self-perpetuating rAF loop (autoScroll) that destroy() does not cancel,
     // so without this it keeps running across every later spec.
-    window.requestAnimationFrame = (cb) => {
+    window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
       const id = nativeRequestAnimationFrame(cb);
       trackedFrames.push(id);
       return id;
-    };
+    }) as typeof window.requestAnimationFrame;
   });
 
   afterEach(() => {
@@ -231,102 +230,61 @@ function XunloadFixtures() {
 })();
 
 beforeEach(() => {
-  const matchers = {
-    toExist: (util, customEqualityTesters) => {
+  const matchers: jasmine.CustomMatcherFactories = {
+    toExist: (util) => {
       return {
-        compare: (actual) => {
-          const result = {};
-          result.pass = util.equals(!!actual, true, customEqualityTesters);
-          return result;
+        compare: (actual: unknown) => {
+          return { pass: util.equals(!!actual, true) };
         }
       };
     },
-    hasMaxHeightZero: (util, customEqualityTesters) => {
+    hasMaxHeightZero: (util) => {
       return {
-        compare: (actual) => {
+        compare: (actual: Element) => {
           const style = getComputedStyle(actual);
-          const result = {};
-          result.pass = util.equals(
-            style.getPropertyValue('max-height'),
-            '0px',
-            customEqualityTesters
-          );
-          return result;
+          return { pass: util.equals(style.getPropertyValue('max-height'), '0px') };
         }
       };
     },
-    notHasMaxHeightZero: (util, customEqualityTesters) => {
+    notHasMaxHeightZero: (util) => {
       return {
-        compare: (actual) => {
+        compare: (actual: Element) => {
           const style = getComputedStyle(actual);
-          const result = {};
-          result.pass = !util.equals(
-            style.getPropertyValue('max-height'),
-            '0px',
-            customEqualityTesters
-          );
-          return result;
+          return { pass: !util.equals(style.getPropertyValue('max-height'), '0px') };
         }
       };
     },
-    toBeHidden: (util, customEqualityTesters) => {
+    toBeHidden: (util) => {
       return {
-        compare: (actual) => {
+        compare: (actual: Element) => {
           const style = getComputedStyle(actual);
-          const result = {};
-          result.pass = util.equals(
-            style.getPropertyValue('display'),
-            'none',
-            customEqualityTesters
-          );
-          return result;
+          return { pass: util.equals(style.getPropertyValue('display'), 'none') };
         }
       };
     },
-    toBeVisible: (util, customEqualityTesters) => {
+    toBeVisible: (util) => {
       return {
-        compare: (actual) => {
+        compare: (actual: Element) => {
           const style = getComputedStyle(actual);
-          const result = {};
-          result.pass = !util.equals(
-            style.getPropertyValue('display'),
-            'none',
-            customEqualityTesters
-          );
-          if (result.pass) {
-            result.pass = util.equals(
-              style.getPropertyValue('visibility'),
-              'visible',
-              customEqualityTesters
-            );
+          let pass = !util.equals(style.getPropertyValue('display'), 'none');
+          if (pass) {
+            pass = util.equals(style.getPropertyValue('visibility'), 'visible');
           }
-          return result;
+          return { pass };
         }
       };
     },
-    toHaveClass: (util, customEqualityTesters) => {
+    toHaveClass: (util) => {
       return {
-        compare: (actual, expected) => {
-          const result = {};
-          result.pass = util.equals(
-            actual.classList.contains(expected),
-            true,
-            customEqualityTesters
-          );
-          return result;
+        compare: (actual: Element, expected: string) => {
+          return { pass: util.equals(actual.classList.contains(expected), true) };
         }
       };
     },
-    toNotHaveClass: (util, customEqualityTesters) => {
+    toNotHaveClass: (util) => {
       return {
-        compare: function (actual, expected) {
-          const result = {};
-          result.pass = util.equals(
-            actual.classList.contains(expected),
-            false,
-            customEqualityTesters
-          );
-          return result;
+        compare: function (actual: Element, expected: string) {
+          return { pass: util.equals(actual.classList.contains(expected), false) };
         }
       };
     }
@@ -337,9 +295,11 @@ beforeEach(() => {
   /**
    * Creates standard click event on DOM element
    */
-  window.click = (elem) => {
+  window.click = (elem: Element) => {
     const evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent('click', {
+    // Legacy initMouseEvent invoked with an options object (historical usage in
+    // these specs); cast to keep the exact runtime call while satisfying types.
+    (evt.initMouseEvent as unknown as (type: string, options: object) => void)('click', {
       bubbles: true,
       cancelable: true,
       view: window
@@ -347,7 +307,7 @@ beforeEach(() => {
     elem.dispatchEvent(evt);
   };
 
-  window.mouseenter = (el) => {
+  window.mouseenter = (el: Element) => {
     const ev = document.createEvent('MouseEvent');
     ev.initMouseEvent(
       'mouseenter',
@@ -369,7 +329,7 @@ beforeEach(() => {
     el.dispatchEvent(ev);
   };
 
-  window.mouseleave = (el) => {
+  window.mouseleave = (el: Element) => {
     const ev = document.createEvent('MouseEvent');
     ev.initMouseEvent(
       'mouseleave',
@@ -391,7 +351,7 @@ beforeEach(() => {
     el.dispatchEvent(ev);
   };
 
-  window.keydown = (targetElement, keycode) => {
+  window.keydown = (targetElement: Element, keycode: number) => {
     targetElement.dispatchEvent(
       new KeyboardEvent('keydown', {
         key: KEYMAP[keycode],
@@ -401,7 +361,7 @@ beforeEach(() => {
     );
   };
 
-  window.keyup = (targetElement, keycode) => {
+  window.keyup = (targetElement: Element, keycode: number) => {
     targetElement.dispatchEvent(
       new KeyboardEvent('keyup', {
         key: KEYMAP[keycode],
@@ -411,15 +371,17 @@ beforeEach(() => {
     );
   };
 
-  window.focus = (el) => {
+  // `focus`/`blur` collide with the native 0-arg Window methods, so cast the
+  // element-taking spec helpers onto them.
+  window.focus = ((el: Element) => {
     const ev = document.createEvent('Events');
     ev.initEvent('focus', true, true);
     el.dispatchEvent(ev);
-  };
+  }) as typeof window.focus;
 
-  window.blur = (el) => {
+  window.blur = ((el: Element) => {
     const ev = document.createEvent('Events');
     ev.initEvent('blur', true, true);
     el.dispatchEvent(ev);
-  };
+  }) as typeof window.blur;
 });

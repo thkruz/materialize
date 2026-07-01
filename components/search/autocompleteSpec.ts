@@ -40,7 +40,7 @@ describe('Autocomplete Plugin', () => {
   afterEach(() => XunloadFixtures());
 
   describe('Autocomplete', () => {
-    function resetAutocomplete(autocompleteElement, data) {
+    function resetAutocomplete(autocompleteElement: HTMLElement, data: any[]) {
       M.Autocomplete.getInstance(autocompleteElement).destroy();
       return M.Autocomplete.init(autocompleteElement, {
         data: data,
@@ -52,7 +52,7 @@ describe('Autocomplete Plugin', () => {
       });
     }
 
-    function openDropdownAndSelectFirstOption(autocomplete, onFinish) {
+    function openDropdownAndSelectFirstOption(autocomplete: HTMLElement, onFinish: () => void) {
       click(autocomplete);
       keyup(autocomplete, 9); // works
       setTimeout(() => {
@@ -63,7 +63,7 @@ describe('Autocomplete Plugin', () => {
     }
 
     it('should work with multiple initializations', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       M.Autocomplete.init(normal, { hi: null });
       M.Autocomplete.init(normal, { hi: null });
       M.Autocomplete.init(normal, { hi: null });
@@ -88,8 +88,8 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('should limit results in search function', (done) => {
-      const limited = document.querySelector('#limited-autocomplete');
-      const data = [];
+      const limited = document.querySelector<HTMLInputElement>('#limited-autocomplete');
+      const data: any[] = [];
       for (let i = 100; i >= 0; i--) {
         const randString = 'a' + Math.random().toString(36).substring(2);
         data.push({ id: randString });
@@ -114,7 +114,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('should open correctly from typing', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       const autocompleteEl = normal.parentNode.querySelector('.autocomplete-content');
       focus(normal);
       normal.value = 'e';
@@ -129,7 +129,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('should open correctly from keyboard focus', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       const autocompleteEl = normal.parentNode.querySelector('.autocomplete-content');
       normal.value = 'e';
       keyup(normal, 9);
@@ -144,7 +144,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('should select option on click', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       M.Autocomplete.init(normal, {
         data: [{ id: 'Value A' }],
         minLength: 0,
@@ -160,8 +160,8 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('should select proper options on both autocompletes', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
-      const limited = document.querySelector('#limited-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
+      const limited = document.querySelector<HTMLInputElement>('#limited-autocomplete');
       M.Autocomplete.init(normal, {
         data: [{ id: 'Value A' }],
         minLength: 0,
@@ -188,8 +188,8 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('destroy method should properly dispose autocomplete component', () => {
-      const normal = document.querySelector('#normal-autocomplete');
-      const limited = document.querySelector('#limited-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
+      const limited = document.querySelector<HTMLInputElement>('#limited-autocomplete');
       expect(normal.parentNode.querySelector('.autocomplete-content')).not.toBeNull();
       expect(limited.parentNode.querySelector('.autocomplete-content')).not.toBeNull();
       const normalInstance = M.Autocomplete.getInstance(normal);
@@ -201,7 +201,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('selectOption method should chose only from showed dropdown', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       const autocompleteInstance = resetAutocomplete(normal, [
         { id: 'Value Q1' },
         { id: 'Value Q' },
@@ -233,7 +233,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('setValues method should chose from any init data entry', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       const autocompleteInstance = resetAutocomplete(normal, [
         { id: 'Value Q1' },
         { id: 'Value Q' },
@@ -265,7 +265,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('selected options should preselect option in single select', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       M.Autocomplete.getInstance(normal).destroy();
       M.Autocomplete.init(normal, {
         data: [{ id: 'Value A', text: 'Text 1' }, { id: 'Value B', text: 'Text 2' }],
@@ -281,7 +281,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('selected options should preselect options in multi select', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       M.Autocomplete.getInstance(normal).destroy();
       M.Autocomplete.init(normal, {
         data: [{ id: 'Value A', text: 'Text 1' }, { id: 'Value B', text: 'Text 2' }, { id: 'Value C', text: 'Text 3' }],
@@ -291,7 +291,7 @@ describe('Autocomplete Plugin', () => {
 
       setTimeout(() => {
         const dropdownAutocompleteIds = Array.from(instance.selectedValues).map(
-          (selectedValue) => selectedValue.id
+          (selectedValue: any) => selectedValue.id
         );
         expect(dropdownAutocompleteIds)
           .withContext('Value should equal chosen option.')
@@ -301,7 +301,7 @@ describe('Autocomplete Plugin', () => {
     });
 
     it('selectOptions should select multiple options', (done) => {
-      const normal = document.querySelector('#normal-autocomplete');
+      const normal = document.querySelector<HTMLInputElement>('#normal-autocomplete');
       resetAutocomplete(normal, [
         { id: 1, text: 'Value A' },
         { id: 2, text: 'Value B' },
@@ -311,7 +311,7 @@ describe('Autocomplete Plugin', () => {
       const autocomplete = M.Autocomplete.getInstance(normal)
       autocomplete.selectOptions(selectOptions);
       setTimeout(() => {
-        expect(autocomplete.selectedValues.filter((value) => !(selectOptions.indexOf(value.id) === -1)).length === selectOptions.length)
+        expect(autocomplete.selectedValues.filter((value: any) => !(selectOptions.indexOf(value.id) === -1)).length === selectOptions.length)
           .withContext('filtered selectValues based on selectOptions should match')
           .toBe(true);
         done();

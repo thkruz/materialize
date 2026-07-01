@@ -123,7 +123,7 @@ describe('Toasts:', () => {
       expect(first.el).toBeDefined();
       M.Toast._container = null;
 
-      let instance;
+      let instance: any;
       expect(() => {
         instance = new M.Toast({ text: 'No container', displayLength: 50, inDuration: 10, outDuration: 10 });
       }).not.toThrow('because _createToast guards the null container');

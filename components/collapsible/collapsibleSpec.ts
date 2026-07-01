@@ -1,5 +1,9 @@
 describe('Collapsible Plugin:', () => {
-  let collapsible, accordion, popout, expandable, expandablePreselect;
+  let collapsible: NodeListOf<HTMLElement>,
+    accordion: HTMLElement,
+    popout: HTMLElement,
+    expandable: HTMLElement,
+    expandablePreselect: HTMLElement;
 
   const fixture = `<ul class="collapsible expandable" data-collapsible="expandable">
   <li>
@@ -63,11 +67,11 @@ describe('Collapsible Plugin:', () => {
 
   beforeEach(() => {
     XloadHtml(fixture);
-    collapsible = document.querySelectorAll('.collapsible');
-    expandable = document.querySelector('.expandable');
-    expandablePreselect = document.querySelector('.expandable-preselected');
-    accordion = document.querySelector('.accordion');
-    popout = document.querySelector('.popout');
+    collapsible = document.querySelectorAll<HTMLElement>('.collapsible');
+    expandable = document.querySelector<HTMLElement>('.expandable');
+    expandablePreselect = document.querySelector<HTMLElement>('.expandable-preselected');
+    accordion = document.querySelector<HTMLElement>('.accordion');
+    popout = document.querySelector<HTMLElement>('.popout');
     M.Collapsible.init(collapsible, { inDuration: 0, outDuration: 0 });
     M.Collapsible.init(expandable, { accordion: false, inDuration: 0, outDuration: 0 });
     M.Collapsible.init(expandablePreselect, { accordion: false, inDuration: 0, outDuration: 0 });
@@ -169,7 +173,7 @@ describe('Collapsible Plugin:', () => {
   describe('accordion', () => {
     it('should open first and second items, keeping only second open', (done) => {
       // Collapsible body height should be 0 on start when hidden.
-      const firstHeader = accordion.querySelector('.collapsible-header');
+      const firstHeader = accordion.querySelector<HTMLElement>('.collapsible-header');
       const firstBody = accordion.querySelector('.collapsible-body');
       const secondHeader = accordion.querySelectorAll('.collapsible-header')[1];
       const secondBody = accordion.querySelectorAll('.collapsible-body')[1];

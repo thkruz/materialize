@@ -88,7 +88,7 @@ describe('Forms:', () => {
 
   describe('TextArea Resize', () => {
     it('Should resize', () => {
-      const el = document.querySelector('#textarea');
+      const el = document.querySelector<HTMLTextAreaElement>('#textarea');
       const pHeight = el.clientHeight;
       el.value = `
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eleifend urna orci, vitae sagittis ligula maximus quis. Duis eleifend ipsum vitae facilisis tincidunt. Aliquam condimentum consequat ex, ut commodo purus tristique at. Donec malesuada fringilla libero vel sodales. Nulla finibus volutpat lectus a varius. Praesent consequat ornare pulvinar. Quisque nec massa diam.
@@ -102,7 +102,7 @@ describe('Forms:', () => {
     });
 
     it('Programmatically initialized textarea resize', (done) => {
-      const element = document.querySelector('#textarea');
+      const element = document.querySelector<HTMLTextAreaElement>('#textarea');
       M.Forms.InitTextarea(element);
       const textareaHeight = element.clientHeight;
       element.value = MULTILINE_TEXT;
@@ -116,7 +116,7 @@ describe('Forms:', () => {
     it('Automatically initialized textarea resize', (done) => {
       const event = new Event('DOMContentLoaded');
       document.dispatchEvent(event);
-      const element = document.querySelector('#textarea');
+      const element = document.querySelector<HTMLTextAreaElement>('#textarea');
       const textareaHeight = element.clientHeight;
       element.value = MULTILINE_TEXT;
       keydown(element, 13);

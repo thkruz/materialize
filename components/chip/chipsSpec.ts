@@ -56,7 +56,7 @@ describe('Chips', () => {
   afterEach(() => XunloadFixtures());
 
   describe('chips plugin', () => {
-    let chips, chipsUserInput, input;
+    let chips: HTMLElement, chipsUserInput: HTMLElement, input: any;
 
     it('should work with multiple initializations', () => {
       chips = document.querySelector('.chips');
@@ -76,7 +76,7 @@ describe('Chips', () => {
       keydown(input, 13);
       setTimeout(() => {
         const numChips = chips.querySelectorAll('.chip').length;
-        const oneChip = chips.querySelector('.chip');
+        const oneChip = chips.querySelector<HTMLElement>('.chip');
         expect(numChips).toEqual(1, 'one chip should have been added');
         for (let i = oneChip.children.length - 1; i >= 0; i--) {
           oneChip.children[i].remove();
@@ -103,24 +103,24 @@ describe('Chips', () => {
     it('should have working callbacks', (done) => {
       chips = document.querySelector('.chips.input-field');
       let chipWasAdded = false;
-      let chipAddedElem = null;
+      let chipAddedElem: HTMLElement = null;
       let chipSelect = false;
-      let chipSelected = null;
+      let chipSelected: HTMLElement = null;
       let chipDelete = false;
-      let chipDeleted = null;
+      let chipDeleted: HTMLElement = null;
 
       M.Chips.init(chips, {
         allowUserInput: true,
         data: [{ id: 'One' }, { id: 'Two' }, { id: 'Three' }],
-        onChipAdd: (chipsEl, chipEl) => {
+        onChipAdd: (chipsEl: HTMLElement, chipEl: HTMLElement) => {
           chipAddedElem = chipEl;
           chipWasAdded = true;
         },
-        onChipSelect: (chipsEl, chipEl) => {
+        onChipSelect: (chipsEl: HTMLElement, chipEl: HTMLElement) => {
           chipSelected = chipEl;
           chipSelect = true;
         },
-        onChipDelete: (chipsEl, chipEl) => {
+        onChipDelete: (chipsEl: HTMLElement, chipEl: HTMLElement) => {
           chipDeleted = chipEl;
           chipDelete = true;
         }
