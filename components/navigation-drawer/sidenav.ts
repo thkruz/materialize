@@ -74,17 +74,17 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
   lastWindowWidth: number;
   lastWindowHeight: number;
   static _sidenavs: Sidenav[];
-  private _overlay: HTMLElement;
-  dragTarget: Element;
-  private _startingXpos: number;
-  private _xPos: number;
-  private _time: number;
-  private _width: number;
-  private _initialScrollTop: number;
-  private _verticallyScrolling: boolean;
-  private deltaX: number;
-  private velocityX: number;
-  private percentOpen: number;
+  private _overlay!: HTMLElement;
+  dragTarget!: HTMLElement;
+  private _startingXpos!: number;
+  private _xPos!: number;
+  private _time!: number;
+  private _width!: number;
+  private _initialScrollTop!: number;
+  private _verticallyScrolling!: boolean;
+  private deltaX!: number;
+  private velocityX!: number;
+  private percentOpen!: number;
 
   constructor(el: HTMLElement, options: Partial<SidenavOptions>) {
     super(el, options, Sidenav);
@@ -145,8 +145,8 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
   destroy() {
     this._removeEventHandlers();
     this._enableBodyScrolling();
-    this._overlay.parentNode.removeChild(this._overlay);
-    this.dragTarget.parentNode.removeChild(this.dragTarget);
+    this._overlay.parentNode!.removeChild(this._overlay);
+    this.dragTarget.parentNode!.removeChild(this.dragTarget);
     this.el['M_Sidenav'] = undefined;
     this.el.style.transform = '';
     const index = Sidenav._sidenavs.indexOf(this);
@@ -205,7 +205,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     const trigger = e.target.closest('.sidenav-trigger');
     if (e.target && trigger) {
       const sidenavId = Utils.getIdFromTrigger(trigger);
-      const sidenavInstance = document.getElementById(sidenavId)['M_Sidenav'];
+      const sidenavInstance = document.getElementById(sidenavId)!['M_Sidenav'];
       if (sidenavInstance) {
         sidenavInstance.open();
       }
@@ -214,7 +214,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
   }
 
   // Set variables needed at the beginning of drag and stop any current transition.
-  private _startDrag(e) {
+  private _startDrag(e: TouchEvent) {
     const clientX = e.targetTouches[0].clientX;
     this.isDragged = true;
     this._startingXpos = clientX;
@@ -227,7 +227,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
   }
 
   //Set variables needed at each drag move update tick
-  private _dragMoveUpdate(e) {
+  private _dragMoveUpdate(e: TouchEvent) {
     const clientX = e.targetTouches[0].clientX;
     const currentScrollTop = this.isOpen ? this.el.scrollTop : Utils.getDocumentScrollTop();
     this.deltaX = Math.abs(this._xPos - clientX);
@@ -239,7 +239,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     }
   }
 
-  private _handleDragTargetDrag = (e) => {
+  private _handleDragTargetDrag = (e: TouchEvent) => {
     // Check if draggable
     if (!this._isDraggable()) return;
     let totalDeltaX = this._calculateDelta(e);
@@ -279,7 +279,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     }
   };
 
-  private _handleCloseDrag = (e) => {
+  private _handleCloseDrag = (e: TouchEvent) => {
     // Check if open and draggable
     if (!this.isOpen || !this._isDraggable()) return;
     let totalDeltaX = this._calculateDelta(e);
@@ -300,7 +300,7 @@ export class Sidenav extends Component<SidenavOptions> implements Openable {
     this._overlay.style.opacity = this.percentOpen.toString();
   };
 
-  private _calculateDelta = (e) => {
+  private _calculateDelta = (e: TouchEvent) => {
     // If not being dragged, set initial drag start variables
     if (!this.isDragged) {
       this._startDrag(e);
