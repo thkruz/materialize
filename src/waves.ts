@@ -1,21 +1,16 @@
-// type RGBColor = {
-//   r: number;
-//   g: number;
-//   b: number;
-// };
+type RGBColor = {
+  r: number;
+  g: number;
+  b: number;
+};
 
-// type Position = {
-//   x: number;
-//   y: number;
-// };
+type Position = {
+  x: number;
+  y: number;
+};
 
 class Waves {
-  /**
-   *
-   * @param {HTMLElement} el
-   * @returns
-   */
-  static #offset(el) {
+  static #offset(el: HTMLElement): { top: number; left: number } {
     const box = el.getBoundingClientRect();
     const docElem = document.documentElement;
     return {
@@ -27,17 +22,22 @@ class Waves {
   // https://phoenix-dx.com/css-techniques-for-material-ripple-effect/
 
   /**
-   *
-   * @param {HTMLElement} targetElement
-   * @param position
-   * @param color
+   * Renders the Material ripple ("wave") effect on the target element.
+   * @param targetElement Element to render the effect on.
+   * @param position Optional origin position; when null the ripple is centered.
+   * @param color Optional ripple color.
    */
-  static renderWaveEffect(targetElement, position = null, color = null) {
+  static renderWaveEffect(
+    targetElement: HTMLElement,
+    position: Position | null = null,
+    color: RGBColor | null = null
+  ): void {
     const isCentered = position === null;
     const duration = 500;
-    let animationFrame, animationStart;
+    let animationFrame: number;
+    let animationStart: number | undefined;
 
-    const animationStep = (timestamp) => {
+    const animationStep = (timestamp: number): void => {
       if (!animationStart) animationStart = timestamp;
       const frame = timestamp - animationStart;
       if (frame < duration) {
@@ -67,17 +67,17 @@ class Waves {
     animationFrame = window.requestAnimationFrame(animationStep);
   }
 
-  static Init() {
+  static Init(): void {
     if (typeof document !== 'undefined')
       document?.addEventListener('DOMContentLoaded', () => {
-        document.body.addEventListener('click', (e) => {
-          const trigger = e.target;
-          const el = trigger.closest('.waves-effect');
-          if (el && el.contains(trigger)) {
+        document.body.addEventListener('click', (e: MouseEvent) => {
+          const trigger = e.target as Element | null;
+          const el = trigger?.closest('.waves-effect') as HTMLElement | null;
+          if (el && trigger && el.contains(trigger)) {
             const isCircular = el.classList.contains('waves-circle');
             const x = e.pageX - this.#offset(el).left;
             const y = e.pageY - this.#offset(el).top;
-            let color = null;
+            let color: RGBColor | null = null;
             if (el.classList.contains('waves-light')) color = { r: 255, g: 255, b: 255 };
             this.renderWaveEffect(el, isCircular ? null : { x, y }, color);
           }
