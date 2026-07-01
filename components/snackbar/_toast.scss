@@ -1,8 +1,21 @@
 @use '../../sass/variables' as *;
 @use '../../sass/global' as *;
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// M3 Snackbar (toast)
+// Spec: https://m3.material.io/components/snackbar/specs
+//   - Container: inverse-surface bg, extra-small (4dp) corner, elevation 3.
+//   - Text: inverse-on-surface, body-medium typescale.
+//   - Single-line min-height 48dp; two-line supported (height auto).
+//   - Width: min 344dp, max 672dp; margin 8-16dp from screen edges.
+//   - Optional action label: inverse-primary, label-large.
+//   - Optional close icon: inverse-on-surface, 24dp.
+// Markup contract (unchanged): #toast-container > .toast [.toast-action]
+// =====================================================================
 
 #toast-container {
-  display:block;
+  display: block;
   position: fixed;
   z-index: 10000;
 
@@ -24,23 +37,34 @@
 
 .toast {
   @extend .z-depth-3;
-  border-radius: 4px;
+
+  // M3 container shape + elevation.
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  box-shadow: var(--md-sys-elevation-level3);
+
   top: 35px;
   width: auto;
   margin-top: 10px;
   position: relative;
-  max-width: 100%;
+
+  // M3 sizing: 344dp min, 672dp max, single-line 48dp min-height.
+  min-width: 344px;
+  max-width: 672px;
   height: auto;
   min-height: 48px;
-  
-  //line-height: 1.5em;
-  //padding: 10px 25px;
-  padding-left: 16px;
-  padding-right: 12px;
 
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
+  // 16dp leading padding, 8dp trailing padding (tightens toward action/close).
+  padding-left: 16px;
+  padding-right: 8px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+
+  // M3 label = body-medium typescale.
+  font-family: var(--md-sys-typescale-body-medium-font-family-name);
+  font-weight: var(--md-sys-typescale-body-medium-font-weight);
+  font-size: var(--md-sys-typescale-body-medium-font-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-body-medium-letter-spacing);
 
   color: var(--md-sys-color-inverse-on-surface);
   background-color: var(--md-sys-color-inverse-surface);
@@ -48,21 +72,89 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   cursor: default;
 
+  transition:
+    opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+
+  // Optional action label: inverse-primary, label-large typescale.
   .toast-action {
     color: var(--md-sys-color-inverse-primary);
-    font-weight: 500;
-    margin-right: -25px;
-    margin-left: 3rem;
+
+    font-family: var(--md-sys-typescale-label-large-font-family-name);
+    font-weight: var(--md-sys-typescale-label-large-font-weight);
+    font-size: var(--md-sys-typescale-label-large-font-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 8px;
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    text-transform: none;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      // Subtle state layer using the inverse-primary role.
+      background-color: color-mix(
+        in srgb,
+        var(--md-sys-color-inverse-primary) 8%,
+        transparent
+      );
+    }
   }
 
-  &.rounded{
+  // Optional trailing close icon: inverse-on-surface, 24dp.
+  .toast-close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 6px;
+    box-sizing: content-box;
+    color: var(--md-sys-color-inverse-on-surface);
+    background: transparent;
+    border: none;
+    border-radius: var(--md-sys-shape-corner-full);
+    cursor: pointer;
+
+    i,
+    .material-icons,
+    svg {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(
+        in srgb,
+        var(--md-sys-color-inverse-on-surface) 8%,
+        transparent
+      );
+    }
+  }
+
+  &.rounded {
     border-radius: 24px;
   }
 
   @media #{$small-and-down} {
     width: 100%;
+    min-width: 100%;
+    max-width: 100%;
     border-radius: 0;
   }
 }
