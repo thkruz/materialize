@@ -36,12 +36,12 @@ const _defaults: TabsOptions = {
 export class Tabs extends Component<TabsOptions> {
   _tabLinks: NodeListOf<HTMLAnchorElement>;
   _index: number;
-  _indicator: HTMLLIElement;
-  _tabWidth: number;
-  _tabsWidth: number;
-  _tabsCarousel: Carousel;
-  _activeTabLink: HTMLAnchorElement;
-  _content: HTMLElement;
+  _indicator!: HTMLLIElement;
+  _tabWidth!: number;
+  _tabsWidth!: number;
+  _tabsCarousel!: Carousel;
+  _activeTabLink!: HTMLAnchorElement;
+  _content!: HTMLElement;
 
   constructor(el: HTMLElement, options: Partial<TabsOptions>) {
     super(el, options, Tabs);
@@ -100,7 +100,7 @@ export class Tabs extends Component<TabsOptions> {
 
   destroy() {
     this._removeEventHandlers();
-    this._indicator.parentNode.removeChild(this._indicator);
+    this._indicator.parentNode!.removeChild(this._indicator);
     if (this.options.swipeable) {
       this._teardownSwipeableTabs();
     } else {
@@ -152,9 +152,9 @@ export class Tabs extends Component<TabsOptions> {
     }
 
     // Handle click on tab link only
-    if (!tabLink || !tab.classList.contains('tab')) return;
+    if (!tabLink || !tab!.classList.contains('tab')) return;
     // is disabled?
-    if (tab.classList.contains('disabled')) {
+    if (tab!.classList.contains('disabled')) {
       e.preventDefault();
       return;
     }
@@ -166,7 +166,7 @@ export class Tabs extends Component<TabsOptions> {
     // Update the variables with the new link and content
 
     this._activeTabLink = tabLink;
-    if (tabLink.hash) this._content = document.querySelector(tabLink.hash);
+    if (tabLink.hash) this._content = document.querySelector(tabLink.hash)!;
     this._tabLinks = this.el.querySelectorAll('li.tab > a');
     // Make the tab active
     this._activeTabLink.classList.add('active');
@@ -226,7 +226,7 @@ export class Tabs extends Component<TabsOptions> {
 
     this._index = Math.max(Array.from(this._tabLinks).indexOf(this._activeTabLink), 0);
     if (this._activeTabLink && this._activeTabLink.hash) {
-      this._content = document.querySelector(this._activeTabLink.hash);
+      this._content = document.querySelector(this._activeTabLink.hash)!;
       if (this._content) this._content.classList.add('active');
     }
   }
@@ -239,7 +239,7 @@ export class Tabs extends Component<TabsOptions> {
     this._tabLinks.forEach((a) => {
       if (a.hash) {
         const currContent = document.querySelector(a.hash);
-        currContent.classList.add('carousel-item');
+        currContent!.classList.add('carousel-item');
         tabsContent.push(currContent);
       }
     });
@@ -257,14 +257,14 @@ export class Tabs extends Component<TabsOptions> {
 
     // Keep active tab index to set initial carousel slide
     const tab = this._activeTabLink.parentElement;
-    const activeTabIndex = Array.from(tab.parentNode.children).indexOf(tab);
+    const activeTabIndex = Array.from(tab!.parentNode!.children).indexOf(tab);
 
     this._tabsCarousel = Carousel.init(tabsWrapper, {
       fullWidth: true,
       noWrap: true,
       onCycleTo: (item) => {
         const prevIndex = this._index;
-        this._index = Array.from(item.parentNode.children).indexOf(item);
+        this._index = Array.from(item.parentNode!.children).indexOf(item);
         this._activeTabLink.classList.remove('active');
         this._activeTabLink = Array.from(this._tabLinks)[this._index];
         this._activeTabLink.classList.add('active');
