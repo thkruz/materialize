@@ -26,10 +26,10 @@
       bottom: 30px;
 
       .indicator-item {
-        background-color: rgba(255, 255, 255, 0.45);
+        background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
 
         &.active {
-          background-color: var(--md-ref-palette-primary100);
+          background-color: var(--md-sys-color-primary);
         }
       }
 
@@ -63,7 +63,7 @@
       }
 
       .caption {
-        color: #fff;
+        color: var(--md-sys-color-inverse-on-surface, #fff);
         position: absolute;
         top: 15%;
         left: 15%;
@@ -71,7 +71,7 @@
         opacity: 0;
 
         p {
-          color: rgba(255, 255, 255, 0.75);
+          color: color-mix(in srgb, var(--md-sys-color-inverse-on-surface, #fff) 75%, transparent);
         }
       }
 
@@ -107,8 +107,9 @@
       height: 100%;
       cursor: pointer;
       background-color: var(--md-sys-color-shadow-light);
-      transition: background-color .3s;
-      border-radius: 50%;
+      transition: background-color var(--md-sys-motion-duration-short4)
+        var(--md-sys-motion-easing-standard);
+      border-radius: var(--md-sys-shape-corner-full);
       border-width: 0;
       
       &.active {
