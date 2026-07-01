@@ -1,11 +1,33 @@
 @use '../../sass/mixins.module.scss' as *;
 
+/*
+ * Material 3 Date picker
+ * https://m3.material.io/components/date-pickers/specs
+ *
+ * Container : surface-container-high, elevation level 3
+ * Shape     : modal  -> extra-large (28dp)
+ *             docked -> medium (12dp)
+ * Selected day : primary filled circle + on-primary label
+ * Today        : 1dp primary outline, primary label
+ * Other days   : on-surface label, on-surface state layer on hover/focus/press
+ * Weekday head : body-small, on-surface-variant
+ * Headline     : on-surface
+ * Range        : primary-container track
+ */
+
 .datepicker-container {
   display: flex;
   flex-direction: column;
-  max-width: 325px;
+  max-width: 328px;
   padding: 0;
-  background-color: var(--md-sys-color-inverse-on-surface);
+  overflow: hidden;
+
+  // M3 container surface + elevation. Docked pickers use the medium (12dp)
+  // corner; the modal variant overrides this to extra-large below.
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-corner-medium);
+  box-shadow: var(--md-sys-elevation-level3);
 }
 
 .datepicker-controls {
@@ -23,12 +45,17 @@
       height: 49px;
       margin: 4px 0 0 0;
       border-bottom: none;
-      border-radius: 4px;
+      border-radius: var(--md-sys-shape-corner-full);
       text-align: center;
+      color: var(--md-sys-color-on-surface-variant);
 
       &:focus {
         color: var(--md-sys-color-primary);
-        background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 20%);
+        background-color: color-mix(
+          in srgb,
+          transparent,
+          var(--md-sys-color-primary) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%)
+        );
       }
 
       &::selection {
@@ -67,7 +94,11 @@
     @include btn($height: 49px);
 
     &:focus {
-      background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 20%);
+      background-color: color-mix(
+        in srgb,
+        transparent,
+        var(--md-sys-color-on-surface-variant) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%)
+      );
     }
   }
 
@@ -77,30 +108,29 @@
   }
 }
 
-.month-prev, .month-next {
+.month-prev,
+.month-next {
   height: 49px;
   margin-top: 4px;
   cursor: pointer;
   background-color: transparent;
   border: none;
+  border-radius: var(--md-sys-shape-corner-full);
 }
 
-
-/* Date Display */
+/* Date Display / Headline */
 .datepicker-date-display {
   flex: 1 auto;
-  // @removed since v2.2.1-dev regarding Material M3 standards
-  // background-color: var(--md-sys-color-primary);
-  // color:  var(--md-sys-color-on-primary);
   padding: 20px 22px;
-  border-bottom: 1px solid var(--md-sys-color-surface-variant-light);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant, var(--md-sys-color-outline));
+  color: var(--md-sys-color-on-surface);
   font-weight: 500;
 
   .year-text {
     display: block;
     font-size: 1.5rem;
     line-height: 25px;
-    color: var(--md-sys-color-on-primary);
+    color: var(--md-sys-color-on-surface-variant);
   }
 
   .date-text {
@@ -108,6 +138,7 @@
     font-size: 2.8rem;
     line-height: 47px;
     font-weight: 500;
+    color: var(--md-sys-color-on-surface);
   }
 
   .daterange & {
@@ -116,7 +147,6 @@
     }
   }
 }
-
 
 /* Calendar */
 .datepicker-calendar-container {
@@ -141,24 +171,24 @@
     border: none;
   }
 
+  // M3 weekday labels: body-small, on-surface-variant
   abbr {
     text-decoration: none;
     color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-small-font-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    font-weight: var(--md-sys-typescale-body-small-font-weight);
+    letter-spacing: var(--md-sys-typescale-body-small-letter-spacing);
   }
 
   .datepicker-day {
     padding: 0;
-    color: var(--md-sys-color-on-background);
-    // border-radius: 50%;
+    color: var(--md-sys-color-on-surface);
 
+    // Today: 1dp primary outline + primary label
     &.is-today {
       color: var(--md-sys-color-primary);
     }
-
-    /*&.is-selected button {
-      background-color: var(--md-sys-color-primary);
-      color:  var(--md-sys-color-on-primary);
-    }*/
   }
 }
 
@@ -171,6 +201,7 @@
 // @todo
 .datepicker-day.is-endrange {}
 
+/* Range selection track uses primary-container */
 .datepicker-day.is-daterange-start,
 .datepicker-day.is-daterange-end,
 .datepicker-day.is-daterange {
@@ -201,42 +232,77 @@
 }
 
 .datepicker-day-button {
-  background-color: transparent;
-  border: none;
-  line-height: 34px;
+  position: relative;
   display: block;
-  width: 34px;
-  border-radius: 50%;
-  margin: 5px;
-  padding: 0 5px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 2px;
+  padding: 0;
   cursor: pointer;
   color: inherit;
-  position: relative;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
   z-index: 1;
+  transition: background-color var(--md-sys-motion-duration-short2)
+    var(--md-sys-motion-easing-standard);
 
-  &:hover {
-    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 6%);
-  }
+  // M3 day type: body-large (line-height kept at 40px for circular centering)
+  font-size: var(--md-sys-typescale-body-large-font-size);
+  font-weight: var(--md-sys-typescale-body-large-font-weight);
+  letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
 
-  &:focus {
-    border-color: var(--md-sys-color-primary);
-  }
-
-  .is-selected & {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-
-    &:focus {
-      background-color: var(--md-sys-color-surface-variant);
-      color: var(--md-sys-color-primary);
-    }
-  }
-
-  &.is-outside-current-month button,
-  &.is-disabled button {
-    color: var(--md-sys-color-on-surface);
+  // State layer (on-surface tint) for hover / focus / press on regular days.
+  &::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    border-radius: inherit;
+    background-color: var(--md-sys-color-on-surface);
+    opacity: 0;
     pointer-events: none;
+    transition: opacity var(--md-sys-motion-duration-short2)
+      var(--md-sys-motion-easing-standard);
+    z-index: -1;
   }
+
+  &:hover::before {
+    opacity: var(--md-sys-state-hover-state-layer-opacity);
+  }
+
+  &:focus::before {
+    opacity: var(--md-sys-state-focus-state-layer-opacity);
+  }
+
+  &:active::before {
+    opacity: var(--md-sys-state-pressed-state-layer-opacity);
+  }
+}
+
+// Today: 1dp primary outline, primary label.
+.datepicker-day.is-today .datepicker-day-button {
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-primary);
+}
+
+// Selected day: primary filled circle + on-primary label.
+.datepicker-day.is-selected .datepicker-day-button {
+  color: var(--md-sys-color-on-primary);
+  background-color: var(--md-sys-color-primary);
+  border-color: transparent;
+
+  // Selected-day state layer tints with on-primary.
+  &::before {
+    background-color: var(--md-sys-color-on-primary);
+  }
+}
+
+// Outside-month / disabled days are dimmed on-surface at 38% (M3 disabled).
+.datepicker-day.is-outside-current-month .datepicker-day-button,
+.datepicker-day.is-disabled .datepicker-day-button {
+  color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
+  pointer-events: none;
 }
 
 /* Footer */
@@ -261,8 +327,17 @@
 }
 
 /* Display modes */
+// Modal variant: extra-large (28dp) corner + surface-container-high + elevation 3.
 .datepicker-modal {
-  max-width: calc(325px + var(--modal-padding) * 2);
+  max-width: calc(328px + var(--modal-padding) * 2);
   max-height: none;
-  background-color: var(--md-sys-color-inverse-on-surface);
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: var(--md-sys-elevation-level3);
+
+  .datepicker-container {
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    box-shadow: none;
+  }
 }
