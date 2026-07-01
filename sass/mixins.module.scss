@@ -85,9 +85,8 @@
 
 @mixin btn-elevated {
   // M3 elevated button: surface-container-low bg + primary label.
-  // This theme has no tonal surface-container roles, so `surface` approximates it.
   color: var(--md-sys-color-primary);
-  background-color: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface-container-low);
   @extend .z-depth-1;
 
   &:hover,
@@ -98,17 +97,17 @@
 
   &:hover {
     @extend .z-depth-2;
-    background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-primary) 8%);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 8%);
   }
 
   &:focus {
     @extend .z-depth-1;
-    background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-primary) 10%);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 10%);
   }
 
   &:active {
     @extend .z-depth-1;
-    background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-primary) 10%);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 10%);
   }
 
   @include focus-visible();
@@ -191,5 +190,67 @@
     outline: 3px solid var(--md-sys-color-secondary);
     outline-offset: 2px;
   }
+}
+
+// =====================================================================
+// Reusable M3 primitives (Phase 0 foundation)
+// =====================================================================
+
+// State layer — the M3 hover/focus/pressed tint overlaid on an element.
+// Renders as a ::before pseudo-element so it composites over the element's
+// own background at the correct opacity without changing layout. Pass the
+// "on-" color that should tint the surface (defaults to on-surface).
+@mixin state-layer($color: var(--md-sys-color-on-surface)) {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: $color;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  }
+
+  &:hover::before {
+    opacity: var(--md-sys-state-hover-state-layer-opacity);
+  }
+
+  &:focus-visible::before {
+    opacity: var(--md-sys-state-focus-state-layer-opacity);
+  }
+
+  &:active::before {
+    opacity: var(--md-sys-state-pressed-state-layer-opacity);
+  }
+}
+
+// Guarantee the M3 minimum 48x48dp touch target while keeping the visible
+// element any size. Uses a centered, non-layout-affecting pseudo-element.
+@mixin min-touch-target($size: 48px) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: max(100%, #{$size});
+    width: max(100%, #{$size});
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Apply an M3 elevation level (0-5) by token.
+@mixin elevation($level: 1) {
+  box-shadow: var(--md-sys-elevation-level#{$level});
+}
+
+// Apply an M3 shape-scale corner by name (none / extra-small / small /
+// medium / large / extra-large / full).
+@mixin shape($corner: medium) {
+  border-radius: var(--md-sys-shape-corner-#{$corner});
 }
 
