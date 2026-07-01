@@ -1,0 +1,132 @@
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// M3 Segmented button — https://m3.material.io/components/segmented-buttons/specs
+// ---------------------------------------------------------------------
+// A horizontal row of 2–5 segments acting as a single- or multi-select
+// control. Expected markup:
+//
+//   <div class="segmented-button">
+//     <button class="segment selected">…</button>
+//     <button class="segment">…</button>
+//   </div>
+//
+// The group carries the outer `full`-rounded ends; only the first and last
+// segment round their outer corners. Segments share a single 1dp `outline`
+// border which is collapsed between adjacent segments so it never doubles up.
+// =====================================================================
+
+.segmented-button {
+  display: inline-flex;
+  align-items: stretch;
+  // The group owns the outer shape so the whole row reads as one control.
+  border-radius: var(--md-sys-shape-corner-full);
+
+  // Each segment.
+  .segment {
+    // ---- Dimensions ----
+    height: 40px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px;
+    min-width: 48px;
+
+    // ---- Shared 1dp outline border ----
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: transparent;
+    // Inner segments would double the shared border; pull the left one back
+    // over the previous segment's right border so it renders as a single 1dp.
+    margin-left: -1px;
+
+    // ---- Unselected treatment ----
+    color: var(--md-sys-color-on-surface);
+
+    // ---- Typography: label-large ----
+    font-family: var(--md-sys-typescale-label-large-font-family-name);
+    font-size: var(--md-sys-typescale-label-large-font-size);
+    font-weight: var(--md-sys-typescale-label-large-font-weight);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+
+    cursor: pointer;
+    outline: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    white-space: nowrap;
+    transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+      color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+
+    // ---- State layer (hover 8 / focus 10 / pressed 10%) ----
+    // Tinted with the current label color role so it works for both the
+    // unselected (on-surface) and selected (on-secondary-container) states.
+    @include state-layer(currentColor);
+
+    // Leading/trailing icons: 18dp.
+    .material-icons {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    // First segment rounds only its outer (leading) corners.
+    &:first-child {
+      margin-left: 0;
+      border-top-left-radius: var(--md-sys-shape-corner-full);
+      border-bottom-left-radius: var(--md-sys-shape-corner-full);
+    }
+
+    // Last segment rounds only its outer (trailing) corners.
+    &:last-child {
+      border-top-right-radius: var(--md-sys-shape-corner-full);
+      border-bottom-right-radius: var(--md-sys-shape-corner-full);
+    }
+
+    // ---- Selected treatment ----
+    &.selected {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+      // Selected segment sits above its neighbours so its shared border edge
+      // is not clipped by the adjacent transparent segment.
+      z-index: 1;
+
+      .material-icons {
+        color: var(--md-sys-color-on-secondary-container);
+      }
+
+      // Optional leading check icon, 18dp.
+      .check {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: var(--md-sys-color-on-secondary-container);
+      }
+    }
+
+    // Keyboard focus ring.
+    @include focus-visible();
+
+    // ---- Disabled treatment ----
+    // Label/icon on-surface 38%, border on-surface 12%.
+    &:disabled,
+    &.disabled {
+      color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+      border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+      background-color: transparent;
+      pointer-events: none;
+      cursor: default;
+
+      .material-icons,
+      .check {
+        color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+      }
+
+      // Suppress the state layer when disabled.
+      &::before {
+        opacity: 0;
+      }
+    }
+  }
+}
