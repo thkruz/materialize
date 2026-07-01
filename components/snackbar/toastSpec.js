@@ -1,49 +1,14 @@
 describe('Toasts:', () => {
-  const nativeSetTimeout = window.setTimeout;
-  const nativeSetInterval = window.setInterval;
-  let pendingTimers = [];
-
   beforeEach(() => {
-    // A toast runs a setInterval plus dismiss setTimeouts that outlive the spec
-    // that created it (the short specs call done() well before their toast has
-    // finished animating out). Left alone, those timers fire during a *later*
-    // spec and mutate the shared Toast._toasts / Toast._container statics — e.g.
-    // a stray dismiss does splice(indexOf(this), 1) which, with the toast absent
-    // from the current array, evaluates to splice(-1, 1) and evicts the live
-    // toast, then removes its container. Record every timer created during a
-    // spec so afterEach can cancel the leftovers.
-    pendingTimers = [];
-    window.setTimeout = function (...args) {
-      const id = nativeSetTimeout.apply(window, args);
-      pendingTimers.push(id);
-      return id;
-    };
-    window.setInterval = function (...args) {
-      const id = nativeSetInterval.apply(window, args);
-      pendingTimers.push(id);
-      return id;
-    };
-
-    // Reset the shared static state + DOM so specs are order-independent. The
-    // "_container null guard" specs below intentionally leave Toast._container
-    // null; without this a following spec (under randomized order) can build a
-    // toast while the container is null and never attach it to the DOM.
+    // Reset the shared Toast static state + DOM so specs are order-independent.
+    // The "_container null guard" specs below intentionally leave
+    // Toast._container null; without this a following spec (under randomized
+    // order) can build a toast while the container is null and never attach it
+    // to the DOM. (Leaked toast timers are cancelled globally in spec/helper.js.)
     M.Toast._removeContainer();
     document.querySelectorAll('#toast-container, .toast').forEach((el) => el.remove());
     M.Toast._toasts = [];
     M.Toast._container = null;
-  });
-
-  afterEach(() => {
-    // Restore the native timers first, then cancel anything this spec leaked so
-    // it cannot interfere with the next spec.
-    window.setTimeout = nativeSetTimeout;
-    window.setInterval = nativeSetInterval;
-    pendingTimers.forEach((id) => {
-      clearTimeout(id);
-      clearInterval(id);
-    });
-    pendingTimers = [];
   });
 
   describe('Toast javascript functions', () => {
