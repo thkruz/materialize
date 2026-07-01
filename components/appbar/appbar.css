@@ -55,3 +55,176 @@
   position: fixed;
   z-index: 997;
 }
+
+/* =========================================================================
+   Material 3 Top App Bar
+   https://m3.material.io/components/top-app-bar/specs
+
+   Four size variants share the base `.app-bar` block. Height, title
+   typescale and title placement change per size. The container color is
+   `surface` at rest and `surface-container` once page content scrolls under
+   the bar (`.scrolled`).
+   ========================================================================= */
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  /* Small size is the default: 64dp tall. */
+  height: 64px;
+  padding: 0 4px;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-level0);
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+/* Leading navigation icon + trailing action icons. */
+.app-bar .app-bar-nav,
+.app-bar .app-bar-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.app-bar .app-bar-actions {
+  margin-left: auto;
+}
+
+.app-bar .app-bar-nav > *,
+.app-bar .app-bar-actions > * {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Headline / title. Small + center-aligned use title-large. */
+.app-bar .app-bar-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 12px;
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-title-large-font-family-name);
+  font-weight: var(--md-sys-typescale-title-large-font-weight);
+  font-size: var(--md-sys-typescale-title-large-font-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+  letter-spacing: var(--md-sys-typescale-title-large-letter-spacing);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Small — explicit variant class mirrors the default sizing. */
+.app-bar.small {
+  height: 64px;
+}
+
+.app-bar.small .app-bar-title {
+  font-size: var(--md-sys-typescale-title-large-font-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+}
+
+/* Center-aligned — 64dp with the title centered horizontally. */
+.app-bar.center-aligned {
+  height: 64px;
+}
+
+.app-bar.center-aligned .app-bar-title {
+  text-align: center;
+  flex: 1 1 auto;
+}
+
+/* Medium — 112dp. Title drops to its own lower line, headline-small. */
+.app-bar.medium {
+  height: 112px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: space-between;
+  padding-bottom: 24px;
+}
+
+.app-bar.medium .app-bar-title {
+  flex-basis: 100%;
+  order: 2;
+  padding-left: 16px;
+  font-family: var(--md-sys-typescale-headline-small-font-family-name);
+  font-weight: var(--md-sys-typescale-headline-small-font-weight);
+  font-size: var(--md-sys-typescale-headline-small-font-size);
+  line-height: var(--md-sys-typescale-headline-small-line-height);
+  letter-spacing: var(--md-sys-typescale-headline-small-letter-spacing);
+}
+
+/* Large — 152dp. Title on its own lower line, headline-medium. */
+.app-bar.large {
+  height: 152px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: space-between;
+  padding-bottom: 28px;
+}
+
+.app-bar.large .app-bar-title {
+  flex-basis: 100%;
+  order: 2;
+  padding-left: 16px;
+  font-family: var(--md-sys-typescale-headline-medium-font-family-name);
+  font-weight: var(--md-sys-typescale-headline-medium-font-weight);
+  font-size: var(--md-sys-typescale-headline-medium-font-size);
+  line-height: var(--md-sys-typescale-headline-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-headline-medium-letter-spacing);
+}
+
+/* Scrolled state — container recolors to surface-container with elevation. */
+.app-bar.scrolled {
+  background-color: var(--md-sys-color-surface-container);
+  box-shadow: var(--md-sys-elevation-level2);
+}
+
+/* =========================================================================
+   Material 3 Bottom App Bar
+   80dp tall, `surface-container` container, holds icon buttons + optional FAB.
+   ========================================================================= */
+
+.bottom-app-bar {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 80px;
+  padding: 0 16px 0 4px;
+  gap: 8px;
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.bottom-app-bar .app-bar-actions {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  gap: 4px;
+}
+
+.bottom-app-bar .app-bar-actions > * {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional trailing FAB is pushed to the end. */
+.bottom-app-bar .app-bar-fab {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
