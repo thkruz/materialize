@@ -138,47 +138,47 @@ type Point = {
 export class Timepicker extends Component<TimepickerOptions> {
   declare el: HTMLInputElement;
   id: string;
-  containerEl: HTMLElement;
-  plate: HTMLElement;
-  digitalClock: HTMLElement;
-  inputHours: HTMLInputElement;
-  inputMinutes: HTMLInputElement;
-  x0: number;
-  y0: number;
-  moved: boolean;
-  dx: number;
-  dy: number;
+  containerEl!: HTMLElement;
+  plate!: HTMLElement;
+  digitalClock!: HTMLElement;
+  inputHours!: HTMLInputElement;
+  inputMinutes!: HTMLInputElement;
+  x0!: number;
+  y0!: number;
+  moved!: boolean;
+  dx!: number;
+  dy!: number;
   /**
    * Current view on the timepicker.
    * @default 'hours'
    */
-  currentView: Views;
-  hand: SVGElement;
-  minutesView: HTMLElement;
-  hours: number;
-  minutes: number;
+  currentView!: Views;
+  hand!: SVGElement;
+  minutesView!: HTMLElement;
+  hours!: number;
+  minutes!: number;
   /** The selected time. */
-  time: string;
+  time!: string;
   /**
    * If the time is AM or PM on twelve-hour clock.
    * @default 'PM'
    */
-  amOrPm: 'AM' | 'PM';
+  amOrPm!: 'AM' | 'PM';
   static _template;
   /** Vibrate device when dragging clock hand. */
-  vibrate: 'vibrate' | 'webkitVibrate' | null;
-  _canvas: HTMLElement;
-  hoursView: HTMLElement;
-  spanAmPm: HTMLSpanElement;
-  footer: HTMLElement;
-  private _amBtn: HTMLElement;
-  private _pmBtn: HTMLElement;
-  bg: Element;
-  bearing: Element;
-  g: Element;
-  toggleViewTimer: string | number | NodeJS.Timeout;
-  vibrateTimer: NodeJS.Timeout | number;
-  private displayPlugin: DockedDisplayPlugin | ModalDisplayPlugin;
+  vibrate!: 'vibrate' | 'webkitVibrate' | null;
+  _canvas!: HTMLElement;
+  hoursView!: HTMLElement;
+  spanAmPm!: HTMLSpanElement;
+  footer!: HTMLElement;
+  private _amBtn!: HTMLElement;
+  private _pmBtn!: HTMLElement;
+  bg!: Element;
+  bearing!: Element;
+  g!: Element;
+  toggleViewTimer!: string | number | NodeJS.Timeout;
+  vibrateTimer!: NodeJS.Timeout | number;
+  private displayPlugin!: DockedDisplayPlugin | ModalDisplayPlugin;
 
   constructor(el: HTMLInputElement, options: Partial<TimepickerOptions>) {
     super(el, options, Timepicker);
@@ -299,7 +299,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }
   };
 
-  _handleClockClickStart = (e) => {
+  _handleClockClickStart = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     const clockPlateBR = this.plate.getBoundingClientRect();
     const offset = { x: clockPlateBR.left, y: clockPlateBR.top };
@@ -321,7 +321,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     document.addEventListener('touchend', this._handleDocumentClickEnd);
   };
 
-  _handleDocumentClickMove = (e) => {
+  _handleDocumentClickMove = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     const clickPos = Timepicker._Pos(e);
     const x = clickPos.x - this.x0;
@@ -330,7 +330,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     this.setHand(x, y, false);
   };
 
-  _handleDocumentClickEnd = (e) => {
+  _handleDocumentClickEnd = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     document.removeEventListener('mouseup', this._handleDocumentClickEnd);
     document.removeEventListener('touchend', this._handleDocumentClickEnd);
@@ -373,7 +373,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     if (this.options.container && !!containerEl) {
       containerEl.append(this.containerEl);
     } else {
-      this.el.parentElement.appendChild(this.containerEl);
+      this.el.parentElement!.appendChild(this.containerEl);
     }
   }
 
@@ -384,15 +384,15 @@ export class Timepicker extends Component<TimepickerOptions> {
       : navigator['webkitVibrate']
         ? 'webkitVibrate'
         : null;
-    this._canvas = this.containerEl.querySelector('.timepicker-canvas');
-    this.plate = this.containerEl.querySelector('.timepicker-plate');
-    this.digitalClock = this.containerEl.querySelector('.timepicker-display-column');
-    this.hoursView = this.containerEl.querySelector('.timepicker-hours');
-    this.minutesView = this.containerEl.querySelector('.timepicker-minutes');
-    this.inputHours = this.containerEl.querySelector('.timepicker-input-hours');
-    this.inputMinutes = this.containerEl.querySelector('.timepicker-input-minutes');
-    this.spanAmPm = this.containerEl.querySelector('.timepicker-span-am-pm');
-    this.footer = this.containerEl.querySelector('.timepicker-footer');
+    this._canvas = this.containerEl.querySelector('.timepicker-canvas')!;
+    this.plate = this.containerEl.querySelector('.timepicker-plate')!;
+    this.digitalClock = this.containerEl.querySelector('.timepicker-display-column')!;
+    this.hoursView = this.containerEl.querySelector('.timepicker-hours')!;
+    this.minutesView = this.containerEl.querySelector('.timepicker-minutes')!;
+    this.inputHours = this.containerEl.querySelector('.timepicker-input-hours')!;
+    this.inputMinutes = this.containerEl.querySelector('.timepicker-input-minutes')!;
+    this.spanAmPm = this.containerEl.querySelector('.timepicker-span-am-pm')!;
+    this.footer = this.containerEl.querySelector('.timepicker-footer')!;
     this.amOrPm = 'PM';
   }
 
@@ -666,7 +666,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }, this.options.duration);
   };
 
-  resetClock(delay) {
+  resetClock(delay: number) {
     const view = this.currentView,
       value = this[view],
       isHours = view === 'hours',
@@ -710,7 +710,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }
   };
 
-  drawClockFromTimeInput(value, isHours) {
+  drawClockFromTimeInput(value: number, isHours: boolean) {
     const unit = Math.PI / (isHours ? 6 : 30);
     const radian = value * unit;
     let radius;
@@ -723,7 +723,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     this.setClockAttributes(radian, radius);
   }
 
-  setHand(x, y, roundBy5: boolean = false) {
+  setHand(x: number, y: number, roundBy5: boolean = false) {
     const isHours = this.currentView === 'hours',
       unit = Math.PI / (isHours || roundBy5 ? 6 : 30),
       z = Math.sqrt(x * x + y * y),
