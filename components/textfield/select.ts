@@ -28,23 +28,23 @@ type ValueStruct = {
 export class FormSelect extends Component<FormSelectOptions> {
   declare el: HTMLSelectElement;
   /** If this is a multiple select. */
-  isMultiple: boolean;
+  isMultiple!: boolean;
   /**
    * Label associated with the current select element.
    * Is "null", if not detected.
    */
-  labelEl: HTMLLabelElement;
+  labelEl!: HTMLLabelElement;
   /** Dropdown UL element. */
-  dropdownOptions: HTMLUListElement;
+  dropdownOptions!: HTMLUListElement;
   /** Text input that shows current selected option. */
-  input: HTMLInputElement;
+  input!: HTMLInputElement;
   /** Instance of the dropdown plugin for this select. */
-  dropdown: Dropdown;
+  dropdown!: Dropdown;
   /** The select wrapper element. */
-  wrapper: HTMLDivElement;
-  selectOptions: (HTMLOptionElement | HTMLOptGroupElement)[];
-  private _values: ValueStruct[];
-  nativeTabIndex: number;
+  wrapper!: HTMLDivElement;
+  selectOptions!: (HTMLOptionElement | HTMLOptGroupElement)[];
+  private _values!: ValueStruct[];
+  nativeTabIndex!: number;
 
   constructor(el: HTMLSelectElement, options: FormSelectOptions) {
     super(el, options, FormSelect);
@@ -179,7 +179,7 @@ export class FormSelect extends Component<FormSelectOptions> {
   };
 
   _setupDropdown() {
-    this.labelEl = document.querySelector('[for="' + this.el.id + '"]');
+    this.labelEl = document.querySelector('[for="' + this.el.id + '"]')!;
 
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('select-wrapper', 'input-field');
@@ -302,7 +302,7 @@ export class FormSelect extends Component<FormSelectOptions> {
         if (selectedOption) {
           // Focus selected option in dropdown
           Utils.keyDown = true;
-          this.dropdown.focusedIndex = [...selectedOption.parentNode.children].indexOf(
+          this.dropdown.focusedIndex = [...selectedOption.parentNode!.children].indexOf(
             selectedOption
           );
           this.dropdown._focusFocusedItem();
@@ -343,7 +343,7 @@ export class FormSelect extends Component<FormSelectOptions> {
   }
 
   _removeDropdown() {
-    this.wrapper.querySelector('.caret').remove();
+    this.wrapper.querySelector('.caret')!.remove();
     this.input.remove();
     this.dropdownOptions.remove();
     this.wrapper.before(this.el);
@@ -431,7 +431,7 @@ export class FormSelect extends Component<FormSelectOptions> {
     // Filter not disabled
     const notDisabledOptionPairs = selectedOptionPairs.filter((op) => !op.el.disabled);
     const texts = notDisabledOptionPairs.map((value) =>
-      value.optionEl.querySelector('span').innerText.trim()
+      value.optionEl.querySelector('span')!.innerText.trim()
     );
     // Set input-text to first Option with empty value which indicates a description like "choose your option"
     if (texts.length === 0) {
