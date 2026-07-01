@@ -34,7 +34,7 @@ export class Component<O extends BaseOptions> {
   /**
    * The options the instance was initialized with.
    */
-  options: O;
+  options!: O;
 
   /**
    * Constructs component instance and set everything up.
