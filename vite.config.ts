@@ -59,11 +59,11 @@ export default defineConfig(({ mode }) => {
   return {
     // No index.html / public assets to serve for a library build.
     publicDir: false,
-    // Prefer TypeScript sources: some component folders contain stray legacy
-    // `.mjs` files next to the canonical `.ts`, and Vite's default extension
-    // order would otherwise resolve the `.mjs` first (Rollup only saw `.ts`).
+    // Resolve TypeScript sources first. Vite's default extension order would
+    // resolve a `.mjs`/`.js` sibling ahead of the canonical `.ts`; the codebase
+    // is now TypeScript-only, but keeping `.ts` first is a cheap safeguard.
     resolve: {
-      extensions: ['.ts', '.tsx', '.mjs', '.mts', '.js', '.jsx', '.json']
+      extensions: ['.ts', '.tsx', '.mts', '.mjs', '.js', '.jsx', '.json']
     },
     plugins: [
       injectVersion(),
