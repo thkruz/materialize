@@ -119,7 +119,7 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     ScrollSpy._count--;
     this._removeEventHandlers();
     const actElem = document.querySelector(this.options.getActiveElement(this.el.id));
-    actElem.classList.remove(this.options.activeClass);
+    actElem!.classList.remove(this.options.activeClass);
     this.el['M_ScrollSpy'] = undefined;
   }
 
@@ -220,7 +220,7 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     }
   };
 
-  static _offset(el) {
+  static _offset(el: HTMLElement) {
     const box = el.getBoundingClientRect();
     const docElem = document.documentElement;
     return {
@@ -312,20 +312,20 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     }
   }
 
-  private static _getDistanceToViewport(element) {
+  private static _getDistanceToViewport(element: HTMLElement) {
     const rect = element.getBoundingClientRect();
     const distance = rect.top;
     return distance;
   }
 
-  private static _smoothScrollIntoView(element, duration = 300) {
+  private static _smoothScrollIntoView(element: HTMLElement, duration = 300) {
     const targetPosition =
       element.getBoundingClientRect().top + (window.scrollY || window.pageYOffset);
     const startPosition = window.scrollY || window.pageYOffset;
     const distance = targetPosition - startPosition;
     const startTime = performance.now();
 
-    function scrollStep(currentTime) {
+    function scrollStep(currentTime: number) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const scrollY = startPosition + distance * progress;
