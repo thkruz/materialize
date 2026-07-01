@@ -56,15 +56,15 @@ export class Materialbox extends Component<MaterialboxOptions> {
   originalHeight: number;
   private originInlineStyles: string;
   private placeholder: HTMLElement;
-  private _changedAncestorList: HTMLElement[];
-  private newHeight: number;
-  private newWidth: number;
-  private windowWidth: number;
-  private windowHeight: number;
-  private attrWidth: string;
-  private attrHeight: string;
-  private _overlay: HTMLElement;
-  private _photoCaption: HTMLElement;
+  private _changedAncestorList!: HTMLElement[];
+  private newHeight!: number;
+  private newWidth!: number;
+  private windowWidth!: number;
+  private windowHeight!: number;
+  private attrWidth!: string;
+  private attrHeight!: string;
+  private _overlay!: HTMLElement;
+  private _photoCaption!: HTMLElement;
 
   constructor(el: HTMLElement, options: Partial<MaterialboxOptions>) {
     super(el, options, Materialbox);
@@ -81,7 +81,7 @@ export class Materialbox extends Component<MaterialboxOptions> {
     this.placeholder.classList.add('material-placeholder');
     this.originalWidth = 0;
     this.originalHeight = 0;
-    this.originInlineStyles = this.el.getAttribute('style');
+    this.originInlineStyles = this.el.getAttribute('style')!;
     this.caption = this.el.getAttribute('data-caption') || '';
     this.el.tabIndex = 0;
     // Wrap
@@ -387,8 +387,8 @@ export class Materialbox extends Component<MaterialboxOptions> {
     this.el.style.zIndex = '1000';
     this.el.style.willChange = 'left, top, width, height';
     // Change from width or height attribute to css
-    this.attrWidth = this.el.getAttribute('width');
-    this.attrHeight = this.el.getAttribute('height');
+    this.attrWidth = this.el.getAttribute('width')!;
+    this.attrHeight = this.el.getAttribute('height')!;
     if (this.attrWidth) {
       this.el.style.width = this.attrWidth + 'px';
       this.el.removeAttribute('width');
