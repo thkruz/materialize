@@ -57,7 +57,7 @@ export {
   Range
 };
 
-// `__MZ_VERSION__` is replaced with package.json's version at build time (see rollup.config.ts).
+// `__MZ_VERSION__` is replaced with package.json's version at build time (see vite.config.ts).
 export const version: string = '__MZ_VERSION__';
 
 export interface AutoInitOptions {

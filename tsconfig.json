@@ -20,6 +20,6 @@
     "src/**/*",
     "components",
     "components/**/*",
-    "rollup.config.ts"
+    "vite.config.ts"
   ]
 }

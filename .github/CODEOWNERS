@@ -11,6 +11,7 @@
 /.github/               @thkruz
 
 # Build & publish configuration.
-/rollup.config.ts       @thkruz
+/vite.config.ts         @thkruz
+/build-css.mjs          @thkruz
 /compress.mjs           @thkruz
 /package.json           @thkruz
