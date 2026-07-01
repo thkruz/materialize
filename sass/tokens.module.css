@@ -180,6 +180,21 @@
   --md-sys-color-surface-container-dark: #1e2022;
   --md-sys-color-surface-container-high-dark: #282a2c;
   --md-sys-color-surface-container-highest-dark: #333537;
+  /* fixed accent colors (M3) — identical across light & dark schemes by design.
+     Derived from the source tonal palettes: fixed = tone 90, fixed-dim = tone 80,
+     on-*-fixed = tone 10, on-*-fixed-variant = tone 30. */
+  --md-sys-color-primary-fixed: #cbe6ff;
+  --md-sys-color-primary-fixed-dim: #8fcdff;
+  --md-sys-color-on-primary-fixed: #001e30;
+  --md-sys-color-on-primary-fixed-variant: #004b71;
+  --md-sys-color-secondary-fixed: #d4e4f6;
+  --md-sys-color-secondary-fixed-dim: #b8c8d9;
+  --md-sys-color-on-secondary-fixed: #0d1d29;
+  --md-sys-color-on-secondary-fixed-variant: #394856;
+  --md-sys-color-tertiary-fixed: #ecdcff;
+  --md-sys-color-tertiary-fixed-dim: #d0bfe7;
+  --md-sys-color-on-tertiary-fixed: #211634;
+  --md-sys-color-on-tertiary-fixed-variant: #4d4162;
   /* display - large */
   --md-sys-typescale-display-large-font-family-name: Roboto;
   --md-sys-typescale-display-large-font-family-style: Regular;

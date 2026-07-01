@@ -35,6 +35,24 @@ describe('M3 design tokens (Phase 0)', () => {
       // and the runtime alias that flips with the theme
       expect(css).toMatch(new RegExp(`--md-sys-color-${role}:\\s*var\\(--md-sys-color-${role}-(light|dark)\\)`));
     });
+
+    // M3 "fixed" accent roles are scheme-independent (identical in light & dark),
+    // so they are defined once as resolved tokens rather than -light/-dark pairs.
+    const fixedRoles = [
+      'primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant',
+      'secondary-fixed', 'secondary-fixed-dim', 'on-secondary-fixed', 'on-secondary-fixed-variant',
+      'tertiary-fixed', 'tertiary-fixed-dim', 'on-tertiary-fixed', 'on-tertiary-fixed-variant'
+    ];
+
+    it.each(fixedRoles)('defines fixed accent role --md-sys-color-%s', (role) => {
+      // resolved to a concrete hex value, not a light/dark alias
+      expect(css).toMatch(new RegExp(`--md-sys-color-${role}:\\s*#[0-9a-fA-F]{3,8}`));
+    });
+
+    it('exposes fixed-accent utility classes wired to the tokens', () => {
+      expect(hasDecl(/\.primary-fixed\b/, 'background-color', /--md-sys-color-primary-fixed\b/)).toBe(true);
+      expect(hasDecl(/\.on-secondary-fixed-variant-text/, 'color', /--md-sys-color-on-secondary-fixed-variant/)).toBe(true);
+    });
   });
 
   describe('type scale', () => {
