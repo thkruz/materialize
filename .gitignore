@@ -33,3 +33,12 @@ dist/
 
 *storybook.log
 storybook-static
+
+# Local-only internal notes / scratch docs (not for publication)
+docs-local/
+
+# Jasmine specs are authored in TypeScript; build-specs.mts (npm run pretest)
+# transpiles them to these .js files for jasmine-browser-runner. Generated.
+components/**/*[sS]pec.js
+spec/*[sS]pec.js
+spec/helper.js

@@ -1,10 +1,25 @@
-.chip {
-  --font-size: 14px;
-  --font-size-icon: 18px;
-  --padding: 8px;
+/*
+ * Material 3 Chips — https://m3.material.io/components/chips/specs
+ *
+ * Four chip types are supported through modifier classes on the base `.chip`
+ * element: `.assist`, `.filter`, `.input`, `.suggestion`. A `.selected` modifier
+ * toggles the filter chip's selected treatment and `.elevated` produces the
+ * elevated container variant. The base `.chip` keeps the historical markup
+ * contract (`.chip`, `.chip .close`, `.chip > img`, `.chip > .material-icons`).
+ *
+ * All roles/shape/state/motion values come from the design tokens defined in
+ * sass/tokens.module.css — do not hard-code equivalents here.
+ */
 
+.chip {
+  /* label-large is the M3 chip label type */
+  --font-size: var(--md-sys-typescale-label-large-font-size);
+  --font-size-icon: 18px;
+  --padding: 16px;
+
+  position: relative;
   color: var(--md-sys-color-on-surface-variant);
-  background-color: rgba(0, 0, 0, 0.09);
+  background-color: transparent;
   display: inline-flex;
   white-space: nowrap;
   gap: 8px;
@@ -12,44 +27,84 @@
   height: 32px;
   padding-left: var(--padding);
   padding-right: var(--padding);
+  font-family: var(--md-sys-typescale-label-large-font-family-name);
   font-size: var(--font-size);
-  font-weight: 500;
-  border-radius: 8px;
+  font-weight: var(--md-sys-typescale-label-large-font-weight);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+  border-radius: var(--md-sys-shape-corner-small);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--md-sys-color-outline);
   align-items: center;
   user-select: none;
   vertical-align: top;
+  overflow: hidden;
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
+
+/*
+ * State layer — an overlay tinted with the label color role. It stays invisible
+ * (opacity 0) until hover (8%), focus (10%) or press (10%).
+ */
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+}
+
+.chip:hover::before {
+  opacity: var(--md-sys-state-hover-state-layer-opacity);
+}
+
+.chip:focus-visible::before,
+.chip:focus::before {
+  opacity: var(--md-sys-state-focus-state-layer-opacity);
+}
+
+.chip:active::before {
+  opacity: var(--md-sys-state-pressed-state-layer-opacity);
+}
+
 .chip:focus {
   outline: none;
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
 }
 
-.chip.outlined {
-  background-color: transparent;
-  border-color: var(--md-sys-color-outline);
-  border-width: 1px;
-  border-style: solid;
-}
-
+/* Leading avatar fills the 24dp leading area. */
 .chip > img {
   margin: 0;
   width: 24px;
   height: 24px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 50%;
 }
 
+/* Leading / trailing icons are 18dp and inherit the label color role. */
 .chip > .material-icons {
   font-size: var(--font-size-icon);
-  color: var(--md-sys-color-on-surface-variant);
+  width: 18px;
+  height: 18px;
+  color: inherit;
 }
 
 .chip .close {
+  position: relative;
+  z-index: 1;
   border: none;
+  background-color: transparent;
+  color: inherit;
   border-radius: 50%;
-  height: 24px;
-  width: 24px;
+  height: 18px;
+  width: 18px;
+  font-size: var(--font-size-icon);
   padding: 0;
   display: grid;
   justify-content: center;
@@ -57,19 +112,118 @@
   cursor: pointer;
 }
 
-.chip .close:hover {
-  background-color: #8888;
+/* ------------------------------------------------------------------ *
+ *  Assist chip
+ *  Transparent container, 1dp outline border, on-surface label,
+ *  primary leading icon.
+ * ------------------------------------------------------------------ */
+.chip.assist {
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--md-sys-color-outline);
 }
 
+.chip.assist > .material-icons {
+  color: var(--md-sys-color-primary);
+}
+
+/* Elevated assist: surface-container-low background + elevation level 1, no border. */
+.chip.assist.elevated,
+.chip.elevated {
+  background-color: var(--md-sys-color-surface-container-low);
+  border-color: transparent;
+  border-width: 0;
+  box-shadow: var(--md-sys-elevation-level1);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Filter chip
+ *  Unselected: transparent container + 1dp outline + on-surface-variant.
+ *  Selected:   secondary-container bg, on-secondary-container label,
+ *              no border, leading check icon (18dp).
+ * ------------------------------------------------------------------ */
+.chip.filter {
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--md-sys-color-outline);
+}
+
+.chip.filter.selected {
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-width: 0;
+  border-color: transparent;
+}
+
+.chip.filter.selected > .material-icons {
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Input chip
+ *  Transparent container, 1dp outline border, on-surface-variant label,
+ *  trailing remove/close icon 18dp on-surface-variant.
+ * ------------------------------------------------------------------ */
+.chip.input {
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--md-sys-color-outline);
+}
+
+.chip.input .close {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Suggestion chip
+ *  Transparent container, 1dp outline border, on-surface-variant label.
+ * ------------------------------------------------------------------ */
+.chip.suggestion {
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--md-sys-color-outline);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Disabled — on-surface at 12% container / 38% label, border 12%.
+ * ------------------------------------------------------------------ */
+.chip.disabled,
+.chip:disabled,
+.chip[disabled],
+.chip[aria-disabled='true'] {
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.chip.disabled::before,
+.chip:disabled::before,
+.chip[disabled]::before,
+.chip[aria-disabled='true']::before {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Chips container (input field / tag entry)
+ * ------------------------------------------------------------------ */
 .chips {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   flex-wrap: wrap;
   border: none;
   box-shadow: none;
   margin: 0 0 8px 0;
   padding: 4px;
-  /* min-height: 45px; */
   outline: none;
   transition: all 0.3s;
 }
@@ -86,8 +240,6 @@
   color: var(--md-sys-color-on-background);
   display: inline-block;
   font-size: 16px;
-  /* height: 32px;
-   line-height: 32px; */
   height: 32px;
   outline: 0;
   margin: 0;

@@ -1,0 +1,35 @@
+// Divider (Material 3)
+// Spec: https://m3.material.io/components/divider/specs
+//
+// A divider is a thin (1dp) line, colored `outline-variant`, used to group
+// content. The base `.divider` rule also lives in `sass/_global.scss`; it is
+// intentionally restated here so this component partial is self-contained and
+// testable in isolation. The declarations are identical, so there is no
+// conflicting duplication.
+
+.divider {
+  height: 1px;
+  overflow: hidden;
+  background-color: var(--md-sys-color-outline-variant);
+
+  // Inset divider: 16dp leading (left) inset. Spec: full-bleed on the trailing
+  // edge, inset from the leading edge.
+  &.inset {
+    margin-left: 16px;
+  }
+
+  // Middle-inset divider: 16dp inset on both the leading and trailing edges.
+  &.middle-inset {
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  // Vertical divider: 1dp wide, stretches to fill the height of its container.
+  &.vertical {
+    display: inline-block;
+    width: 1px;
+    height: auto;
+    min-height: 100%;
+    align-self: stretch;
+  }
+}

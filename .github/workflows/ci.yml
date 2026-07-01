@@ -1,0 +1,178 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref — but never cancel a main (release) run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Default to read-only; the release job below grants itself contents:write.
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Fail fast if an update to main forgot to bump the version. Runs on PRs
+  # targeting main (compares against the base branch) and on direct pushes
+  # to main (compares against the previous commit).
+  # ---------------------------------------------------------------------
+  version-check:
+    name: Version bump
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0   # full history so the version-bump check can read the previous commit
+    - name: Require version bump on main
+      env:
+        PUSH_BEFORE: ${{ github.event.before }}
+        PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      run: |
+        NEW=$(jq -r .version package.json)
+        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+          BEFORE="$PR_BASE_SHA"
+        else
+          BEFORE="$PUSH_BEFORE"
+        fi
+        if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+          echo "No base commit to compare against — skipping version check."
+          exit 0
+        fi
+        OLD=$(git show "$BEFORE:package.json" 2>/dev/null | jq -r .version || echo "")
+        echo "Base version: ${OLD:-<none>}  |  New version: $NEW"
+        if [ "$OLD" = "$NEW" ]; then
+          echo "::error::package.json version ($NEW) matches the base branch on main. Bump the version before merging/pushing."
+          exit 1
+        fi
+
+  audit:
+    name: Audit dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Audit dependencies
+      run: npm audit --audit-level=moderate
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Typecheck
+      run: npm run typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Lint
+      run: npm run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [audit, typecheck, lint]   # no point building until the cheap checks pass
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Build
+      run: npm run build
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 1
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build   # jasmine loads the compiled dist/**/materialize.{js,css}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
+    - name: Test
+      run: npm run test
+
+  # ---------------------------------------------------------------------
+  # Release — only on a push to main, and only once every check above has
+  # passed. The version-bump gate guarantees this commit carries a new
+  # version, so it's safe to tag, release, and publish. Creating the tag
+  # here does NOT re-trigger CI (tags no longer trigger it).
+  # ---------------------------------------------------------------------
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [version-check, audit, typecheck, lint, build, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write   # needed to create GitHub Releases
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 23
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Build release artifacts
+      run: |
+        npm run build -- --environment BUILD:release
+        node compress.mjs
+    - name: Publish GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        VERSION=$(jq -r .version package.json)
+        gh release create "v$VERSION" \
+          dist/materialize-v*.zip \
+          dist/materialize-src-v*.zip \
+          --target "$GITHUB_SHA" \
+          --title "v$VERSION" \
+          --generate-notes
+    - name: Publish to npm
+      # dist/ was just freshly built above, so skip the prepublishOnly rebuild.
+      run: npm publish --ignore-scripts
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

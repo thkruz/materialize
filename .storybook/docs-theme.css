@@ -1,0 +1,9 @@
+/* The Docs pages are chromed by addon-docs' own (light) theme, which does not
+   follow the theme toolbar. The M3 tokens inside the iframe DO flip, so dark
+   components would otherwise render on the docs page's white background.
+   Painting the story preview blocks with the token background keeps every
+   inline preview legible in both themes. */
+.docs-story {
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+}

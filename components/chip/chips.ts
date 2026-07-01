@@ -56,17 +56,17 @@ interface ChipsOptions extends BaseOptions {
    * Callback for chip add.
    * @default null
    */
-  onChipAdd: (element: HTMLElement, chip: HTMLElement) => void;
+  onChipAdd: ((element: HTMLElement, chip: HTMLElement) => void) | null;
   /**
    * Callback for chip select.
    * @default null
    */
-  onChipSelect: (element: HTMLElement, chip: HTMLElement) => void;
+  onChipSelect: ((element: HTMLElement, chip: HTMLElement) => void) | null;
   /**
    * Callback for chip delete.
    * @default null
    */
-  onChipDelete: (element: HTMLElement, chip: HTMLElement) => void;
+  onChipDelete: ((element: HTMLElement, chip: HTMLElement) => void) | null;
 }
 
 const _defaults: ChipsOptions = {
@@ -84,21 +84,21 @@ const _defaults: ChipsOptions = {
 };
 
 function gGetIndex(el: HTMLElement): number {
-  return [...el.parentNode.children].indexOf(el);
+  return [...el.parentNode!.children].indexOf(el);
 }
 
 class Chips extends Component<ChipsOptions> {
   /** Array of the current chips data. */
   chipsData: ChipData[];
   /** If the chips has autocomplete enabled. */
-  hasAutocomplete: boolean;
+  hasAutocomplete!: boolean;
   /** Autocomplete instance, if any. */
-  autocomplete: Autocomplete;
-  #input: HTMLInputElement;
-  #label: HTMLLabelElement;
+  autocomplete!: Autocomplete;
+  #input!: HTMLInputElement;
+  #label!: HTMLLabelElement;
   #chips: HTMLElement[];
   static #keydown: boolean;
-  #selectedChip: HTMLElement;
+  #selectedChip!: HTMLElement | null;
 
   constructor(el: HTMLElement, options: Partial<ChipsOptions>) {
     super(el, options, Chips);
@@ -194,7 +194,7 @@ class Chips extends Component<ChipsOptions> {
     const _chip = (<HTMLElement>e.target).closest('.chip');
     const clickedClose = (<HTMLElement>e.target).classList.contains('close');
     if (_chip) {
-      const index = [..._chip.parentNode.children].indexOf(_chip);
+      const index = [..._chip.parentNode!.children].indexOf(_chip);
       if (clickedClose) {
         this.deleteChip(index);
         this.#input.focus();
@@ -252,7 +252,7 @@ class Chips extends Component<ChipsOptions> {
   static #handleChipsBlur(e: Event) {
     if (!Chips.#keydown && document.hidden) {
       const chips = (<HTMLElement>e.target).closest('.chips');
-      const currChips: Chips = chips['M_Chips'];
+      const currChips: Chips = chips!['M_Chips'];
       currChips.#selectedChip = null;
     }
   }
@@ -287,7 +287,7 @@ class Chips extends Component<ChipsOptions> {
     }
   };
 
-  #renderChip(chip: ChipData): HTMLLIElement {
+  #renderChip(chip: ChipData): HTMLLIElement | undefined {
     if (!chip.id) return;
     const renderedChip = document.createElement('li');
     renderedChip.classList.add('chip');
@@ -310,7 +310,7 @@ class Chips extends Component<ChipsOptions> {
   #renderChips() {
     this.#chips = []; //.remove();
     for (let i = 0; i < this.chipsData.length; i++) {
-      const chipElem = this.#renderChip(this.chipsData[i]);
+      const chipElem = this.#renderChip(this.chipsData[i])!;
       this.el.appendChild(chipElem);
       this.#chips.push(chipElem);
     }
@@ -331,7 +331,7 @@ class Chips extends Component<ChipsOptions> {
   }
 
   #setupInput() {
-    this.#input = this.el.querySelector('input');
+    this.#input = this.el.querySelector('input')!;
     if (!this.#input) {
       this.#input = document.createElement('input');
       this.el.append(this.#input);
@@ -346,8 +346,8 @@ class Chips extends Component<ChipsOptions> {
   }
 
   #setupLabel() {
-    this.#label = this.el.querySelector('label');
-    if (this.#label) this.#label.setAttribute('for', this.#input.getAttribute('id'));
+    this.#label = this.el.querySelector('label')!;
+    if (this.#label) this.#label.setAttribute('for', this.#input.getAttribute('id')!);
   }
 
   #setPlaceholder() {
@@ -373,7 +373,7 @@ class Chips extends Component<ChipsOptions> {
    */
   addChip(chip: ChipData) {
     if (!this.#isValidAndNotExist(chip) || this.chipsData.length >= this.options.limit) return;
-    const renderedChip = this.#renderChip(chip);
+    const renderedChip = this.#renderChip(chip)!;
     this.#chips.push(renderedChip);
     this.chipsData.push(chip);
     //$(this._input).before(renderedChip);

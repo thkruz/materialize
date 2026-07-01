@@ -1,281 +1,206 @@
-/* Checkboxes */
+// =====================================================================
+// M3 Checkbox
+// Spec: https://m3.material.io/components/checkbox/specs
+//   - 18dp box, 2dp corner radius.
+//   - Unselected: 2dp `on-surface-variant` border, transparent fill.
+//   - Selected / indeterminate: `primary` fill + `on-primary` check / dash.
+//   - 40dp circular state layer (hover 8% / focus 10% / pressed 10%),
+//     tinting `on-surface` when unselected and `primary` when selected.
+//   - Error state uses the `error` role.
+//   - Disabled uses `on-surface` at 38%.
+//   - Minimum 48dp touch target.
+// Markup contract (unchanged): bare `input[type=checkbox]` (box drawn with
+// ::before = border, ::after = fill + check/dash), plus the compound
+// `input[type=checkbox] + span` label. Classes `.filled-in`,
+// `.indeterminate-checkbox`, `:checked`, `:indeterminate`, `.error` supported.
+// =====================================================================
 
 @at-root {
   :root {
-    --checkbox-size: 18px; // 18px
-    --checkbox-shape: 2px;
+    --checkbox-size: 18px; // M3 box: 18dp
+    --checkbox-shape: 2px; // M3 corner radius: 2dp
+    --checkbox-border-width: 2px; // M3 unselected border: 2dp
+    --checkbox-state-layer-size: 40px; // M3 state layer: 40dp
   }
 }
 
 input[type="checkbox"] {
-  /* Add if not using autoprefixer */
   -webkit-appearance: none;
   appearance: none;
-  /* For iOS < 15 to remove gradient background */
-  // background-color: #fff;
   margin: 0;
   position: relative;
   cursor: pointer;
+  // The input itself is the 48dp touch target (M3 minimum); the visible 18dp
+  // box and 40dp state layer are drawn centered via ::after / ::before.
+  box-sizing: border-box;
+  min-width: 48px;
+  min-height: 48px;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  vertical-align: middle;
+  // The box is drawn entirely via ::after, so the input itself stays
+  // transparent. This also shields the checkbox from the global `.error`
+  // color utility (which would otherwise paint the whole control red); the
+  // `input[type="checkbox"]` selector outranks the `.error` utility.
+  background-color: transparent;
+  // State-layer tint color; flips to primary when selected, error in error.
+  --checkbox-state-layer-color: var(--md-sys-color-on-surface);
 }
 
-input[type="checkbox"]:focus {
-  outline: 3px solid var(--md-sys-color-secondary);
-  border-radius: 50%;
-  outline-offset: 0.5rem;
-}
-
-input[type="checkbox"]:before {
-  opacity: 1;
+// ---------------------------------------------------------------- STATE LAYER
+// 40dp circle centered on the box, hidden until hover / focus / press.
+input[type="checkbox"]::before {
+  content: "";
   position: absolute;
-  display: block;
-  width: var(--checkbox-size);
-  height: var(--checkbox-size);
-  border: 2px solid var(--md-sys-color-on-surface-variant);
-  border-radius: var(--checkbox-shape);
-  content: "";
-  // background: #fff;
+  top: 50%;
+  left: 50%;
+  width: var(--checkbox-state-layer-size);
+  height: var(--checkbox-state-layer-size);
+  transform: translate(-50%, -50%);
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: var(--checkbox-state-layer-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 }
 
-input[type="checkbox"]:after {
-  position: relative;
+input[type="checkbox"]:not(:disabled):hover::before {
+  opacity: var(--md-sys-state-hover-state-layer-opacity);
+}
+
+input[type="checkbox"]:not(:disabled):focus-visible::before {
+  opacity: var(--md-sys-state-focus-state-layer-opacity);
+}
+
+input[type="checkbox"]:not(:disabled):active::before {
+  opacity: var(--md-sys-state-pressed-state-layer-opacity);
+}
+
+// ----------------------------------------------------------------------- BOX
+// ::after is the 18dp box (border when unselected, fill + glyph when selected).
+input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: block;
-  // left: 2px;
-  // top: -11px;
+  box-sizing: border-box;
   width: var(--checkbox-size);
   height: var(--checkbox-size);
-  // border-width: 2px;
-  // border-style: solid;
-  // border-color: var(--md-sys-color-on-surface-variant);
-  content: "";
-  // background-image: linear-gradient(135deg, #B1B6BE 0%, #FFF 100%);
+  border: var(--checkbox-border-width) solid var(--md-sys-color-on-surface-variant);
   border-radius: var(--checkbox-shape);
+  background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
+  transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 }
 
-input[type="checkbox"]:checked:after {
+// ------------------------------------------------------------------- SELECTED
+// Selected: primary fill, no visible border, on-primary check glyph via clip.
+input[type="checkbox"]:checked::after {
+  border-color: var(--md-sys-color-primary);
   background-color: var(--md-sys-color-primary);
   clip-path: polygon(0 48%, 0 0, 56% 0, 74% 17%, 40% 64%, 23% 50%, 14% 61%, 42% 82%, 81% 31%, 32% 0, 100% 0, 100% 100%, 0 100%, 0 49%);
 }
 
-[type="checkbox"]:indeterminate:after {
+// The check glyph is rendered as the on-primary "hole" left by the clip-path;
+// keep the selected state layer tinted with primary.
+input[type="checkbox"]:checked {
+  --checkbox-state-layer-color: var(--md-sys-color-primary);
+}
+
+// -------------------------------------------------------------- INDETERMINATE
+// Indeterminate: primary fill + on-primary dash. Support the native
+// :indeterminate state and the JS-driven `.indeterminate-checkbox` class.
+input[type="checkbox"]:indeterminate::after,
+input[type="checkbox"].indeterminate-checkbox::after {
+  border-color: var(--md-sys-color-primary);
   background-color: var(--md-sys-color-primary);
   clip-path: polygon(0% 0%, 0% 100%, 18% 100%, 16% 43%, 83% 42%, 83% 63%, 16% 63%, 16% 100%, 100% 100%, 100% 0%);
 }
 
-// Disabled
-input[type="checkbox"]:disabled:before {
-  filter: opacity(0.2);
-}
-input[type="checkbox"]:disabled:after {
-  filter: opacity(0.2);
+input[type="checkbox"]:indeterminate,
+input[type="checkbox"].indeterminate-checkbox {
+  --checkbox-state-layer-color: var(--md-sys-color-primary);
 }
 
-// Hover
-input[type="checkbox"]:not(:disabled):checked:hover:after{
-  // background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAQAAABuW59YAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAB2SURBVHjaAGkAlv8A3QDyAP0A/QD+Dam3W+kCAAD8APYAAgTVZaZCGwwA5wr0AvcA+Dh+7UX/x24AqK3Wg/8nt6w4/5q71wAAVP9g/7rTXf9n/+9N+AAAtpJa/zf/S//DhP8H/wAA4gzWj2P4lsf0JP0A/wADAHB0Ngka6UmKAAAAAElFTkSuQmCC'), linear-gradient(135deg, #8BB0C2 0%,#FFF 100%);
-  background-color: var(--md-sys-color-primary);
+// -------------------------------------------------------------------- HOVER
+// M3: unselected hover darkens the outline toward on-surface; the fill/glyph
+// colors do not change on hover (that is conveyed by the state layer).
+input[type="checkbox"]:not(:disabled):not(:checked):not(:indeterminate):hover::after {
+  border-color: var(--md-sys-color-on-surface);
 }
 
-input[type="checkbox"]:not(:disabled):hover:after{
-  // background-image: linear-gradient(135deg, #8BB0C2 0%,#FFF 100%);
-  border-color: #85A9BB #92C2DA #92C2DA #85A9BB;  
+// ------------------------------------------------------------------- ERROR
+// Error state uses the `error` role for border, fill and state layer.
+input[type="checkbox"].error,
+input[type="checkbox"][aria-invalid="true"],
+.checkbox.error input[type="checkbox"] {
+  --checkbox-state-layer-color: var(--md-sys-color-error);
 }
 
-input[type="checkbox"]:not(:disabled):hover:before{
-  border-color: #3D7591;
+input[type="checkbox"].error::after,
+input[type="checkbox"][aria-invalid="true"]::after,
+.checkbox.error input[type="checkbox"]::after {
+  border-color: var(--md-sys-color-error);
 }
 
-/*
-// Checkbox Styles
-[type="checkbox"] {
-  // Text Label Style
-  + span:not(.lever) {
-    position: relative;
-    cursor: pointer;
-    display: inline-block;
-    height: var(--checkbox-size);
-    line-height: var(--checkbox-size);    
-    padding-left: var(--checkbox-size);    
-    // background-color: red;
-    font-size: 1rem;
-    user-select: none;
-  }
-
-  // checkbox aspect
-  + span:not(.lever):before,
-  &:not(.filled-in) + span:not(.lever):after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--checkbox-size);
-    height: var(--checkbox-size);
-    z-index: 0;
-    border: 2px solid var(--md-sys-color-on-surface-variant);
-    border-radius: 1px;
-    transition: .2s;
-  }
-
-  &:not(.filled-in) + span:not(.lever):after {
-    border: 0;
-    transform: scale(0);
-  }
-
-  &:not(:checked):disabled + span:not(.lever):before {
-    border-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-  }
-
-  &:disabled + span:not(.lever) {
-    color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-  }
-
-  // Focused styles
-  &.tabbed:focus + span:not(.lever):after {
-    transform: scale(1);
-    border: 0;
-    border-radius: 50%;
-    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.12);
-    background-color: rgba(0, 0, 0, 0.12);
-  }
+input[type="checkbox"].error:checked::after,
+input[type="checkbox"].error:indeterminate::after,
+input[type="checkbox"].error.indeterminate-checkbox::after,
+input[type="checkbox"][aria-invalid="true"]:checked::after,
+input[type="checkbox"][aria-invalid="true"]:indeterminate::after,
+.checkbox.error input[type="checkbox"]:checked::after,
+.checkbox.error input[type="checkbox"]:indeterminate::after {
+  border-color: var(--md-sys-color-error);
+  background-color: var(--md-sys-color-error);
 }
 
-[type="checkbox"]:checked {
-  + span:not(.lever):before {
-    top: -4px;
-    left: -5px;
-    width: 12px;
-    height: 22px;
-    border-top: 2px solid transparent;
-    border-left: 2px solid transparent;
-    border-right: 2px solid var(--md-sys-color-primary);
-    border-bottom: 2px solid var(--md-sys-color-primary);
-    transform: rotate(40deg);
-    backface-visibility: hidden;
-    transform-origin: 100% 100%;
-  }
-
-  &:disabled + span:before {
-    border-right: 2px solid color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-    border-bottom: 2px solid color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-  }
+// ----------------------------------------------------------------- DISABLED
+// M3: disabled uses on-surface at 38% opacity; no interaction / state layer.
+input[type="checkbox"]:disabled {
+  cursor: default;
+  pointer-events: none;
 }
 
-// Indeterminate checkbox
-[type="checkbox"]:indeterminate {
-  + span:not(.lever):before {
-    top: -11px;
-    left: -12px;
-    width: 10px;
-    height: 22px;
-    border-top: none;
-    border-left: none;
-    border-right: 2px solid var(--md-sys-color-primary);
-    border-bottom: none;
-    transform: rotate(90deg);
-    backface-visibility: hidden;
-    transform-origin: 100% 100%;
-  }
-
-  // Disabled indeterminate
-  &:disabled + span:not(.lever):before {
-    border-right: 2px solid color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-    background-color: transparent;
-  }
+input[type="checkbox"]:disabled::after {
+  border-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
 }
 
-// Filled in Style
-[type="checkbox"].filled-in {
-  // General
-  + span:not(.lever):after {
-    border-radius: 2px;
-  }
-
-  + span:not(.lever):before,
-  + span:not(.lever):after {
-    content: '';
-    left: 0;
-    position: absolute;
-    // .1s delay is for check animation
-    transition: border .25s, background-color .25s, width .20s .1s, height .20s .1s, top .20s .1s, left .20s .1s;
-    z-index: 1;
-  }
-
-  // Unchecked style
-  &:not(:checked) + span:not(.lever):before {
-    width: 0;
-    height: 0;
-    border: 3px solid transparent;
-    left: 6px;
-    top: 10px;
-    transform: rotateZ(37deg);
-    transform-origin: 100% 100%;
-  }
-
-  &:not(:checked) + span:not(.lever):after {
-    height: 20px;
-    width: 20px;
-    background-color: transparent;
-    border: 2px solid var(--md-sys-color-on-surface-variant);
-    top: 0px;
-    z-index: 0;
-  }
-
-  // Checked style
-  &:checked {
-    + span:not(.lever):before {
-      top: 0;
-      left: 1px;
-      width: 8px;
-      height: 13px;
-      border-top: 2px solid transparent;
-      border-left: 2px solid transparent;
-      border-right: 2px solid var(--md-sys-color-on-primary);
-      border-bottom: 2px solid var(--md-sys-color-on-primary);
-      transform: rotateZ(37deg);
-      transform-origin: 100% 100%;
-    }
-
-    + span:not(.lever):after {
-      top: 0;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--md-sys-color-primary);
-      background-color: var(--md-sys-color-primary);
-      z-index: 0;
-    }
-  }
-
-  // Focused styles
-  &.tabbed:focus + span:not(.lever):after {
-    border-radius: 2px;
-    border-color: var(--md-sys-color-on-surface-variant)r;
-    background-color: rgba(0, 0, 0, 0.12);
-  }
-
-  &.tabbed:checked:focus + span:not(.lever):after {
-    border-radius: 2px;
-    background-color: var(--md-sys-color-primary);
-    border-color: var(--md-sys-color-primary);
-  }
-
-  // Disabled style
-  &:disabled:not(:checked) + span:not(.lever):before {
-    background-color: transparent;
-    border: 2px solid transparent;
-  }
-
-  &:disabled:not(:checked) + span:not(.lever):after {
-    border-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-  }
-
-  &:disabled:checked + span:not(.lever):before {
-    background-color: transparent;
-  }
-
-  &:disabled:checked + span:not(.lever):after {
-    background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
-    border: none;
-  }
+input[type="checkbox"]:disabled:checked::after,
+input[type="checkbox"]:disabled:indeterminate::after,
+input[type="checkbox"]:disabled.indeterminate-checkbox::after {
+  border-color: transparent;
+  background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
 }
-*/
+
+input[type="checkbox"]:disabled::before {
+  opacity: 0;
+}
+
+// -------------------------------------------------------------- LABEL (span)
+// Compound form: `input[type=checkbox] + span` acts as the label text.
+input[type="checkbox"] + span:not(.lever) {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  line-height: var(--checkbox-size);
+  padding-left: 8px; // M3 gap between box and label
+  vertical-align: middle;
+  user-select: none;
+  color: var(--md-sys-color-on-surface);
+}
+
+input[type="checkbox"]:disabled + span:not(.lever) {
+  cursor: default;
+  color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface) 38%);
+}
+
+.checkbox.error input[type="checkbox"] + span:not(.lever),
+input[type="checkbox"].error + span:not(.lever),
+input[type="checkbox"][aria-invalid="true"] + span:not(.lever) {
+  color: var(--md-sys-color-error);
+}

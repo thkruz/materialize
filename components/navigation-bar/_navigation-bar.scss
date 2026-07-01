@@ -1,0 +1,140 @@
+// =====================================================================
+// Navigation bar (Material 3)
+// https://m3.material.io/components/navigation-bar/specs
+//
+// Bottom-fixed navigation bar with 3-5 evenly-spaced destinations. Each
+// destination stacks a 24dp icon above a label-medium label, with an
+// active-indicator pill (64x32dp, secondary-container) behind the active
+// destination's icon.
+//
+// Markup contract (BEM-ish):
+//   <nav class="navigation-bar">
+//     <a class="navigation-bar__item active">
+//       <span class="navigation-bar__indicator">
+//         <i class="navigation-bar__icon material-icons">home</i>
+//       </span>
+//       <span class="navigation-bar__label">Home</span>
+//     </a>
+//     <a class="navigation-bar__item"> ... </a>
+//   </nav>
+// =====================================================================
+
+@use '../../sass/mixins.module.scss' as *;
+
+.navigation-bar {
+  // Fixed to the bottom, spanning the full width.
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 1;
+
+  // M3: 80dp tall, full-width row of evenly-spaced destinations.
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px;
+
+  // Container color: surface-container, falling back to surface for themes
+  // that do not define the tonal surface roles.
+  background-color: var(--md-sys-color-surface, var(--md-sys-color-surface-container));
+  background-color: var(--md-sys-color-surface-container, var(--md-sys-color-surface));
+}
+
+.navigation-bar__item {
+  // Each destination fills an even share of the bar width (3-5 items).
+  flex: 1 1 0;
+
+  // Vertically stack the (indicator + icon) above the label.
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  height: 100%;
+  padding: 12px 0 16px;
+  box-sizing: border-box;
+
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // Inactive by default (label color role).
+  color: var(--md-sys-color-on-surface-variant);
+
+  // Guarantee the M3 minimum 48dp touch target.
+  @include min-touch-target(48px);
+
+  @include focus-visible();
+}
+
+// -------------------------------------------------------------- Indicator
+// The active-indicator pill sits behind the icon. It is always present so
+// the layout does not shift between states; only the active item paints its
+// secondary-container background.
+.navigation-bar__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // M3: 64dp wide x 32dp tall pill.
+  width: 64px;
+  height: 32px;
+
+  // M3: full / 16dp rounded shape.
+  border-radius: var(--md-sys-shape-corner-full);
+
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+
+  // State layer lives on the indicator area (on-surface-variant tint).
+  @include state-layer(var(--md-sys-color-on-surface-variant));
+}
+
+// ------------------------------------------------------------------- Icon
+.navigation-bar__icon {
+  // M3: 24dp icon.
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+
+  // Inactive icon color role.
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+// ------------------------------------------------------------------ Label
+.navigation-bar__label {
+  // M3 type role: label-medium.
+  font-family: var(--md-sys-typescale-label-medium-font-family-name);
+  font-weight: var(--md-sys-typescale-label-medium-font-weight);
+  font-size: var(--md-sys-typescale-label-medium-font-size);
+  line-height: var(--md-sys-typescale-label-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-label-medium-letter-spacing);
+
+  // Inactive label color role.
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+// ----------------------------------------------------------------- Active
+.navigation-bar__item.active {
+  // Active label color role.
+  color: var(--md-sys-color-on-surface);
+
+  .navigation-bar__indicator {
+    // Active-indicator pill background.
+    background-color: var(--md-sys-color-secondary-container);
+  }
+
+  .navigation-bar__icon {
+    // Active icon color role.
+    color: var(--md-sys-color-on-secondary-container);
+  }
+
+  .navigation-bar__label {
+    // Active label color role.
+    color: var(--md-sys-color-on-surface);
+  }
+}

@@ -183,17 +183,17 @@ export interface DatepickerOptions extends BaseOptions {
   /** Field used for internal calculations DO NOT CHANGE IT */
   maxMonth?: number;
   /** Field used for internal calculations DO NOT CHANGE IT */
-  startRange?: Date;
+  startRange?: Date | null;
   /** Field used for internal calculations DO NOT CHANGE IT */
-  endRange?: Date;
+  endRange?: Date | null;
   /**
    * Display plugin
    */
-  displayPlugin: string;
+  displayPlugin: string | null;
   /**
    * Configurable display plugin options
    */
-  displayPluginOptions: object;
+  displayPluginOptions: object | null;
 }
 
 const _defaults: DatepickerOptions = {
@@ -301,7 +301,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   declare el: HTMLInputElement;
   id: string;
   multiple: boolean = false;
-  calendarEl: HTMLElement;
+  calendarEl!: HTMLElement;
 
   /** CLEAR button instance. */
   // clearBtn: HTMLElement;
@@ -309,24 +309,24 @@ export class Datepicker extends Component<DatepickerOptions> {
   /*doneBtn: HTMLElement;
   cancelBtn: HTMLElement;*/
 
-  containerEl: HTMLElement;
-  yearTextEl: HTMLElement;
-  dateTextEl: HTMLElement;
-  endDateEl: HTMLInputElement;
-  dateEls: HTMLInputElement[];
+  containerEl!: HTMLElement;
+  yearTextEl!: HTMLElement;
+  dateTextEl!: HTMLElement;
+  endDateEl!: HTMLInputElement;
+  dateEls!: HTMLInputElement[];
   /** The selected Date. */
-  date: Date;
-  endDate: null | Date;
-  dates: Date[];
-  formats: object;
-  calendars: [{ month: number; year: number }];
-  private _y: number;
-  private _m: number;
-  private displayPlugin: DockedDisplayPlugin | ModalDisplayPlugin;
-  private footer: HTMLElement;
+  date!: Date;
+  endDate!: null | Date;
+  dates!: Date[];
+  formats!: { [key: string]: (date: Date) => string | number };
+  calendars!: [{ month: number; year: number }];
+  private _y!: number;
+  private _m!: number;
+  private displayPlugin!: DockedDisplayPlugin | ModalDisplayPlugin;
+  private footer!: HTMLElement;
   static _template: string;
 
-  constructor(el: HTMLInputElement, options: Partial<DatepickerOptions>) {
+  constructor(el: HTMLElement, options: Partial<DatepickerOptions>) {
     super(el, options, Datepicker);
     this.el['M_Datepicker'] = this;
 
@@ -384,11 +384,11 @@ export class Datepicker extends Component<DatepickerOptions> {
     return super.init(els, options, Datepicker);
   }
 
-  static _isDate(obj) {
-    return /Date/.test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
+  static _isDate(obj: unknown): obj is Date {
+    return /Date/.test(Object.prototype.toString.call(obj)) && !isNaN((obj as Date).getTime());
   }
 
-  static _isWeekend(date) {
+  static _isWeekend(date: Date) {
     const day = date.getDay();
     return day === 0 || day === 6;
   }
@@ -396,22 +396,22 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * @deprecated as this function has no effect without any return statement or global parameter setter.
    */
-  static _setToStartOfDay(date) {
+  static _setToStartOfDay(date: Date) {
     if (Datepicker._isDate(date)) date.setHours(0, 0, 0, 0);
   }
 
-  static _getDaysInMonth(year, month) {
+  static _getDaysInMonth(year: number, month: number) {
     return [31, Datepicker._isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][
       month
     ];
   }
 
-  static _isLeapYear(year) {
+  static _isLeapYear(year: number) {
     // solution by Matti Virkkunen: http://stackoverflow.com/a/4881951
     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   }
 
-  static _compareDates(a, b) {
+  static _compareDates(a: Date, b: Date) {
     // weak date comparison (use setToStartOfDay(date) to ensure correct result)
     return a.getTime() === b.getTime();
   }
@@ -452,7 +452,7 @@ export class Datepicker extends Component<DatepickerOptions> {
       this.el.classList.add('datepicker-date-input');
     }
 
-    if (!this.el.parentElement.querySelector('.datepicker-format') === null) {
+    if (!this.el.parentElement!.querySelector('.datepicker-format') === null) {
       this._renderDateInputFormat(this.el);
     }
 
@@ -467,7 +467,7 @@ export class Datepicker extends Component<DatepickerOptions> {
         console.warn('Specified date range end input element in dateRangeEndEl not found');
       } else {
         this.endDateEl = document.querySelector(this.options.dateRangeEndEl) as HTMLInputElement;
-        if (!this.endDateEl.parentElement.querySelector('.datepicker-format') === null) {
+        if (!this.endDateEl.parentElement!.querySelector('.datepicker-format') === null) {
           this._renderDateInputFormat(this.endDateEl);
         }
       }
@@ -475,7 +475,7 @@ export class Datepicker extends Component<DatepickerOptions> {
 
     Utils.createButton(
       this.footer,
-      this.options.i18n.clear,
+      this.options.i18n.clear!,
       ['datepicker-clear'],
       this.options.showClearBtn,
       this._handleClearClick
@@ -484,8 +484,8 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (!this.options.autoSubmit) {
       Utils.createConfirmationContainer(
         this.footer,
-        this.options.i18n.done,
-        this.options.i18n.cancel,
+        this.options.i18n.done!,
+        this.options.i18n.cancel!,
         this._confirm,
         this._cancel
       );
@@ -498,7 +498,7 @@ export class Datepicker extends Component<DatepickerOptions> {
       this.options.container.append(this.containerEl);
     } else {
       const appendTo = !this.endDateEl ? this.el : this.endDateEl;
-      appendTo.parentElement.after(this.containerEl);
+      appendTo.parentElement!.after(this.containerEl);
     }
   }
 
@@ -506,13 +506,13 @@ export class Datepicker extends Component<DatepickerOptions> {
    * Renders the date input format
    */
   _renderDateInputFormat(el: HTMLInputElement) {
-    el.parentElement.querySelector('.datepicker-format').innerHTML = this.options.format.toString();
+    el.parentElement!.querySelector('.datepicker-format')!.innerHTML = this.options.format.toString();
   }
 
   /**
    * Gets a string representation of the given date.
    */
-  toString(date: Date = this.date, format: string | ((d: Date) => string) = null): string {
+  toString(date: Date = this.date, format: string | ((d: Date) => string) | null = null): string {
     format = format || this.options.format;
     if (typeof format === 'function') return format(date);
     if (!Datepicker._isDate(date)) return '';
@@ -546,7 +546,7 @@ export class Datepicker extends Component<DatepickerOptions> {
    * @param fromUserInput
    */
   setDate(
-    date: Date = null,
+    date: Date | null = null,
     preventOnSelect: boolean = false,
     isEndDate: boolean = false,
     fromUserInput: boolean = false
@@ -564,7 +564,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
   }
 
-  validateDate(date: Date) {
+  validateDate(date: Date | null) {
     if (!date) {
       this._renderDateDisplay(date);
       return this.draw();
@@ -617,7 +617,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Sets the data-date attribute on the date input field
    */
-  setDataDate(el, date) {
+  setDataDate(el: HTMLInputElement, date: Date) {
     el.setAttribute('data-date', this.toString(date));
   }
 
@@ -628,7 +628,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (!this.options?.isMultipleSelection) {
       this.setInputValue(this.el, this.date);
       if (this.options?.isDateRange) {
-        this.setInputValue(this.endDateEl, this.endDate);
+        this.setInputValue(this.endDateEl, this.endDate!);
       }
       return;
     }
@@ -657,7 +657,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Sets given date as the input value on the given element.
    */
-  setInputValue(el, date) {
+  setInputValue(el: HTMLInputElement, date: Date) {
     if (el.type == 'date') {
       this.setDataDate(el, date);
       el.value = this.formatDate(date, 'yyyy-mm-dd');
@@ -682,13 +682,13 @@ export class Datepicker extends Component<DatepickerOptions> {
       ...this.options.displayPluginOptions,
       ...{
         onOpen: () => {
-          document.querySelectorAll('.select-dropdown').forEach((e: HTMLInputElement) => {
-            e.tabIndex = 0;
+          document.querySelectorAll('.select-dropdown').forEach((e) => {
+            (e as HTMLElement).tabIndex = 0;
           });
         },
         onClose: () => {
-          document.querySelectorAll('.select-dropdown').forEach((e: HTMLInputElement) => {
-            e.tabIndex = -1;
+          document.querySelectorAll('.select-dropdown').forEach((e) => {
+            (e as HTMLElement).tabIndex = -1;
           });
         }
       }
@@ -714,7 +714,7 @@ export class Datepicker extends Component<DatepickerOptions> {
   /**
    * Renders the date in the modal head section.
    */
-  _renderDateDisplay(date: Date, endDate: Date = null) {
+  _renderDateDisplay(date: Date | null, endDate: Date | null = null) {
     const displayDate = Datepicker._isDate(date) ? date : new Date();
     // this.yearTextEl.innerHTML = displayDate.getFullYear().toString();
     // @todo should we include an option for date formatting by component options?
@@ -733,7 +733,7 @@ export class Datepicker extends Component<DatepickerOptions> {
    * Change date view to a specific date on the datepicker.
    * @param date Date to show on the datepicker.
    */
-  gotoDate(date: Date) {
+  gotoDate(date: Date | null) {
     let newCalendar = true;
     if (!Datepicker._isDate(date)) {
       return;
@@ -768,7 +768,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     this.draw();
   }
 
-  adjustCalendar(calendar) {
+  adjustCalendar(calendar: { month: number; year: number }) {
     if (calendar.month < 0) {
       calendar.year -= Math.ceil(Math.abs(calendar.month) / 12);
       calendar.month += 12;
@@ -790,7 +790,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     this.adjustCalendars();
   }
 
-  render(year, month, randId) {
+  render(year: number, month: number, randId: string) {
     const now = new Date(),
       days = Datepicker._getDaysInMonth(year, month),
       data = [];
@@ -906,7 +906,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     return this.renderTable(this.options, data, randId);
   }
 
-  renderDay(opts) {
+  renderDay(opts: Record<string, unknown>) {
     const classMap = {
         isDisabled: 'is-disabled',
         isToday: 'is-today',
@@ -948,7 +948,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     );
   }
 
-  renderRow(days, isRTL, isRowSelected) {
+  renderRow(days: string[], isRTL: boolean, isRowSelected: boolean) {
     return (
       '<tr class="datepicker-row' +
       (isRowSelected ? ' is-selected' : '') +
@@ -958,7 +958,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     );
   }
 
-  renderTable(opts, data, randId) {
+  renderTable(opts: DatepickerOptions, data: string[], randId: string) {
     return (
       '<div class="datepicker-table-wrapper"><table cellpadding="0" cellspacing="0" class="datepicker-table" role="grid" aria-labelledby="' +
       randId +
@@ -969,7 +969,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     );
   }
 
-  renderHead(opts) {
+  renderHead(opts: DatepickerOptions) {
     const arr = [];
     let i;
     for (i = 0; i < 7; i++) {
@@ -984,11 +984,11 @@ export class Datepicker extends Component<DatepickerOptions> {
     return '<thead><tr>' + (opts.isRTL ? arr.reverse() : arr).join('') + '</tr></thead>';
   }
 
-  renderBody(rows) {
+  renderBody(rows: string[]) {
     return '<tbody>' + rows.join('') + '</tbody>';
   }
 
-  renderTitle(instance, c, year, month, refYear, randId) {
+  renderTitle(instance: Datepicker, c: number, year: number, month: number, refYear: number, randId: string) {
     const opts = this.options,
       isMinYear = year === opts.minYear,
       isMaxYear = year === opts.maxYear;
@@ -1008,11 +1008,11 @@ export class Datepicker extends Component<DatepickerOptions> {
           (year === refYear ? i - c : 12 + i - c) +
           '"' +
           (i === month ? ' selected="selected"' : '') +
-          ((isMinYear && i < opts.minMonth) || (isMaxYear && i > opts.maxMonth)
+          ((isMinYear && i < opts.minMonth!) || (isMaxYear && i > opts.maxMonth!)
             ? 'disabled="disabled"'
             : '') +
           '>' +
-          opts.i18n.months[i] +
+          opts.i18n.months![i] +
           '</option>'
       );
     }
@@ -1030,8 +1030,8 @@ export class Datepicker extends Component<DatepickerOptions> {
       j = 1 + year + opts.yearRange;
     }
 
-    for (arr = []; i < j && i <= opts.maxYear; i++) {
-      if (i >= opts.minYear) {
+    for (arr = []; i < j && i <= opts.maxYear!; i++) {
+      if (i >= opts.minYear!) {
         arr.push(`<option value="${i}" ${i === year ? 'selected="selected"' : ''}>${i}</option>`);
       }
     }
@@ -1056,11 +1056,11 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
     html += '</div>';
 
-    if (isMinYear && (month === 0 || opts.minMonth >= month)) {
+    if (isMinYear && (month === 0 || opts.minMonth! >= month)) {
       prev = false;
     }
 
-    if (isMaxYear && (month === 11 || opts.maxMonth <= month)) {
+    if (isMaxYear && (month === 11 || opts.maxMonth! <= month)) {
       next = false;
     }
 
@@ -1083,16 +1083,16 @@ export class Datepicker extends Component<DatepickerOptions> {
       maxMonth = opts.maxMonth;
     let html = '';
 
-    if (this._y <= minYear) {
-      this._y = minYear;
-      if (!isNaN(minMonth) && this._m < minMonth) {
-        this._m = minMonth;
+    if (this._y <= minYear!) {
+      this._y = minYear!;
+      if (!isNaN(minMonth!) && this._m < minMonth!) {
+        this._m = minMonth!;
       }
     }
-    if (this._y >= maxYear) {
-      this._y = maxYear;
-      if (!isNaN(maxMonth) && this._m > maxMonth) {
-        this._m = maxMonth;
+    if (this._y >= maxYear!) {
+      this._y = maxYear!;
+      if (!isNaN(maxMonth!) && this._m > maxMonth!) {
+        this._m = maxMonth!;
       }
     }
 
@@ -1159,10 +1159,10 @@ export class Datepicker extends Component<DatepickerOptions> {
 
     this.containerEl = <HTMLElement>template.content.firstChild;
 
-    this.calendarEl = this.containerEl.querySelector('.datepicker-calendar');
-    this.yearTextEl = this.containerEl.querySelector('.year-text');
-    this.dateTextEl = this.containerEl.querySelector('.date-text');
-    this.footer = this.containerEl.querySelector('.datepicker-footer');
+    this.calendarEl = this.containerEl.querySelector('.datepicker-calendar')!;
+    this.yearTextEl = this.containerEl.querySelector('.year-text')!;
+    this.dateTextEl = this.containerEl.querySelector('.date-text')!;
+    this.footer = this.containerEl.querySelector('.datepicker-footer')!;
 
     this.formats = {
       d: (date: Date) => {
@@ -1173,10 +1173,10 @@ export class Datepicker extends Component<DatepickerOptions> {
         return (d < 10 ? '0' : '') + d;
       },
       ddd: (date: Date) => {
-        return this.options.i18n.weekdaysShort[date.getDay()];
+        return this.options.i18n.weekdaysShort![date.getDay()];
       },
       dddd: (date: Date) => {
-        return this.options.i18n.weekdays[date.getDay()];
+        return this.options.i18n.weekdays![date.getDay()];
       },
       m: (date: Date) => {
         return date.getMonth() + 1;
@@ -1186,10 +1186,10 @@ export class Datepicker extends Component<DatepickerOptions> {
         return (m < 10 ? '0' : '') + m;
       },
       mmm: (date: Date) => {
-        return this.options.i18n.monthsShort[date.getMonth()];
+        return this.options.i18n.monthsShort![date.getMonth()];
       },
       mmmm: (date: Date) => {
-        return this.options.i18n.months[date.getMonth()];
+        return this.options.i18n.months![date.getMonth()];
       },
       yy: (date: Date) => {
         return ('' + date.getFullYear()).slice(2);
@@ -1248,7 +1248,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
   }
 
-  _handleInputClick = (e) => {
+  _handleInputClick = (e: MouseEvent) => {
     // Prevents default browser datepicker modal rendering
     if (e.type == 'date') {
       e.preventDefault();
@@ -1270,18 +1270,20 @@ export class Datepicker extends Component<DatepickerOptions> {
     }
   };
 
-  _handleCalendarClick = (e) => {
+  _handleCalendarClick = (e: Event) => {
     const target = <HTMLElement>e.target;
     if (!target.classList.contains('is-disabled')) {
       if (
         target.classList.contains('datepicker-day-button') &&
         !target.classList.contains('is-empty') &&
-        !target.parentElement.classList.contains('is-disabled')
+        !target.parentElement!.classList.contains('is-disabled')
       ) {
+        // getAttribute returns string values which the Date constructor coerces;
+        // cast to satisfy the numeric Date overload without altering runtime behavior.
         const selectedDate = new Date(
-          e.target.getAttribute('data-year'),
-          e.target.getAttribute('data-month'),
-          e.target.getAttribute('data-day')
+          target.getAttribute('data-year') as unknown as number,
+          target.getAttribute('data-month') as unknown as number,
+          target.getAttribute('data-day') as unknown as number
         );
 
         if (!this.multiple || (this.multiple && this.options.isMultipleSelection)) {
@@ -1326,30 +1328,30 @@ export class Datepicker extends Component<DatepickerOptions> {
   };
 
   _clearDates = () => {
-    this.date = null;
+    this.date = null!;
     this.endDate = null;
     this.draw();
   };
 
-  _handleMonthChange = (e) => {
-    this.gotoMonth(e.target.value);
+  _handleMonthChange = (e: Event) => {
+    this.gotoMonth((e.target as HTMLSelectElement).value);
   };
 
-  _handleYearChange = (e) => {
-    this.gotoYear(e.target.value);
+  _handleYearChange = (e: Event) => {
+    this.gotoYear((e.target as HTMLSelectElement).value);
   };
 
   // change view to a specific month (zero-index, e.g. 0: January)
-  gotoMonth(month) {
-    if (!isNaN(month)) {
+  gotoMonth(month: string) {
+    if (!isNaN(month as unknown as number)) {
       this.calendars[0].month = parseInt(month, 10);
       this.adjustCalendars();
     }
   }
 
   // change view to a specific full year (e.g. "2012")
-  gotoYear(year) {
-    if (!isNaN(year)) {
+  gotoYear(year: string) {
+    if (!isNaN(year as unknown as number)) {
       this.calendars[0].year = parseInt(year, 10);
       this.adjustCalendars();
     }
@@ -1359,7 +1361,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     let date;
     const el = e.target as HTMLElement;
     // Prevent change event from being fired when triggered by the plugin
-    if (e['detail']?.firedBy === this) return;
+    if ((e as CustomEvent)['detail']?.firedBy === this) return;
     // Prevent change event from being fired if an end date is set without a start date
     if (el == this.endDateEl && !this.date) return;
     if (this.options.parse) {
@@ -1375,18 +1377,18 @@ export class Datepicker extends Component<DatepickerOptions> {
     if (Datepicker._isDate(date)) {
       this.setDate(date, false, el == this.endDateEl, true);
       if (e.type == 'date') {
-        this.setDataDate(e, date);
+        this.setDataDate(e as unknown as HTMLInputElement, date);
         this.setInputValues();
       }
     }
   };
 
-  renderDayName(opts, day, abbr: boolean = false) {
+  renderDayName(opts: DatepickerOptions, day: number, abbr: boolean = false) {
     day += opts.firstDay;
     while (day >= 7) {
       day -= 7;
     }
-    return abbr ? opts.i18n.weekdaysAbbrev[day] : opts.i18n.weekdays[day];
+    return abbr ? opts.i18n.weekdaysAbbrev![day] : opts.i18n.weekdays![day];
   }
 
   createDateInput() {
@@ -1394,7 +1396,7 @@ export class Datepicker extends Component<DatepickerOptions> {
     dateInput.addEventListener('click', this._handleInputClick);
     dateInput.addEventListener('keypress', this._handleInputKeydown);
     dateInput.addEventListener('change', this._handleInputChange);
-    this.el.parentElement.appendChild(dateInput);
+    this.el.parentElement!.appendChild(dateInput);
     return dateInput;
   }
 

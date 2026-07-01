@@ -90,6 +90,35 @@ export const FilledIn: StoryObj = {
   }
 };
 
+export const ErrorState: StoryObj = {
+  name: 'Error',
+  render() {
+    return `
+<form action="#">
+  <p>Error state uses the M3 <code>error</code> role for border, fill and label.</p>
+  <p>
+    <label>
+      <input type="checkbox" class="error" />
+      <span>Error unchecked</span>
+    </label>
+  </p>
+  <p>
+    <label>
+      <input type="checkbox" class="error" checked="checked" />
+      <span>Error checked</span>
+    </label>
+  </p>
+  <p>
+    <label>
+      <input type="checkbox" class="filled-in error" checked="checked" />
+      <span>Error filled-in checked</span>
+    </label>
+  </p>
+</form>
+    `;
+  }
+};
+
 export const Indeterminate: StoryObj = {
   render() {
     return `

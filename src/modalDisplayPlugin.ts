@@ -28,10 +28,10 @@ export class ModalDisplayPlugin {
   private readonly el: HTMLElement;
   private readonly container: HTMLDialogElement;
   private options: Partial<ModalDisplayPluginOptions>;
-  private visible: boolean;
+  private visible!: boolean;
   footer: HTMLElement;
 
-  constructor(el: HTMLElement, container: HTMLElement, options: Partial<ModalDisplayPluginOptions>) {
+  constructor(el: HTMLElement, container: HTMLElement, options: Partial<ModalDisplayPluginOptions> = {}) {
     this.el = el;
     this.options = {
       ..._defaults,
@@ -39,7 +39,7 @@ export class ModalDisplayPlugin {
     };
 
     this.container = document.createElement('dialog');
-    this.container.classList.add('modal', 'display-modal', this.options.classList.join(' '));
+    this.container.classList.add('modal', 'display-modal', this.options.classList!.join(' '));
 
     if(options.title) {
       const modalHeader = document.createElement('div');

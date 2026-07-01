@@ -7,10 +7,10 @@ interface ModalOptions extends BaseOptions {
   inDuration: number;
   outDuration: number;
   preventScrolling: boolean;
-  onOpenStart: (this: Modal, el: HTMLElement) => void;
-  onOpenEnd: (this: Modal, el: HTMLElement) => void;
-  onCloseStart: (el: HTMLElement) => void;
-  onCloseEnd: (el: HTMLElement) => void;
+  onOpenStart: ((this: Modal, el: HTMLElement) => void) | null;
+  onOpenEnd: ((this: Modal, el: HTMLElement) => void) | null;
+  onCloseStart: ((el: HTMLElement) => void) | null;
+  onCloseEnd: ((el: HTMLElement) => void) | null;
   dismissible: boolean;
   startingTop: string;
   endingTop: string;
@@ -92,7 +92,7 @@ class Modal extends Component<ModalOptions> {
     return dialog;
   }
 
-  static create(config) {
+  static create(config: ModalCreateConfig) {
     const isServer = false;
     if (isServer) return this.#createHtml(config);
     return this.#createHtmlElement(config);

@@ -48,3 +48,13 @@
 @forward '../components/textfield/select';
 @forward '../components/textfield/file-input';
 @forward '../components/textfield/formfields.css';
+
+// M3 additions (new/standalone component partials)
+@forward '../components/navigation-bar/navigation-bar';
+@forward '../components/navigation-rail/navigation-rail';
+@forward '../components/icon-button/icon-button';
+@forward '../components/segmented-button/segmented-button';
+@forward '../components/search/search';
+@forward '../components/divider/divider';
+@forward '../components/bottom-sheet/bottom-sheet';
+@forward '../components/side-sheet/side-sheet';

@@ -17,8 +17,8 @@ export class Parallax extends Component<ParallaxOptions> {
   private _enabled: boolean;
   private _img: HTMLImageElement;
   static _parallaxes: Parallax[] = [];
-  static _handleScrollThrottled: () => Utils;
-  static _handleWindowResizeThrottled: () => Utils;
+  static _handleScrollThrottled: (...args: unknown[]) => unknown;
+  static _handleWindowResizeThrottled: (...args: unknown[]) => unknown;
 
   constructor(el: HTMLElement, options: Partial<ParallaxOptions>) {
     super(el, options, Parallax);
@@ -30,7 +30,7 @@ export class Parallax extends Component<ParallaxOptions> {
     };
 
     this._enabled = window.innerWidth > this.options.responsiveThreshold;
-    this._img = this.el.querySelector('img');
+    this._img = this.el.querySelector('img')!;
     this._updateParallax();
     this._setupEventHandlers();
     this._setupStyles();
@@ -131,7 +131,7 @@ export class Parallax extends Component<ParallaxOptions> {
 
   _updateParallax() {
     const containerHeight =
-      this.el.getBoundingClientRect().height > 0 ? this.el.parentElement.offsetHeight : 500;
+      this.el.getBoundingClientRect().height > 0 ? this.el.parentElement!.offsetHeight : 500;
     const imgHeight = this._img.offsetHeight;
     const parallaxDist = imgHeight - containerHeight;
     const bottom = this._offset(this.el).top + containerHeight;

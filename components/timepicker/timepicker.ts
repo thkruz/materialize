@@ -76,7 +76,7 @@ export interface TimepickerOptions extends BaseOptions {
    * Callback function when a time is selected.
    * @default null
    */
-  onSelect: (hour: number, minute: number) => void;
+  onSelect: ((hour: number, minute: number) => void) | null;
   /**
    * Callback function for interaction with input field.
    * @default null
@@ -95,11 +95,11 @@ export interface TimepickerOptions extends BaseOptions {
   /**
    * Display plugin
    */
-  displayPlugin: string;
+  displayPlugin: string | null;
   /**
    * Configurable display plugin options
    */
-  displayPluginOptions: object;
+  displayPluginOptions: object | null;
 }
 
 const _defaults: TimepickerOptions = {
@@ -138,49 +138,49 @@ type Point = {
 export class Timepicker extends Component<TimepickerOptions> {
   declare el: HTMLInputElement;
   id: string;
-  containerEl: HTMLElement;
-  plate: HTMLElement;
-  digitalClock: HTMLElement;
-  inputHours: HTMLInputElement;
-  inputMinutes: HTMLInputElement;
-  x0: number;
-  y0: number;
-  moved: boolean;
-  dx: number;
-  dy: number;
+  containerEl!: HTMLElement;
+  plate!: HTMLElement;
+  digitalClock!: HTMLElement;
+  inputHours!: HTMLInputElement;
+  inputMinutes!: HTMLInputElement;
+  x0!: number;
+  y0!: number;
+  moved!: boolean;
+  dx!: number;
+  dy!: number;
   /**
    * Current view on the timepicker.
    * @default 'hours'
    */
-  currentView: Views;
-  hand: SVGElement;
-  minutesView: HTMLElement;
-  hours: number;
-  minutes: number;
+  currentView!: Views;
+  hand!: SVGElement;
+  minutesView!: HTMLElement;
+  hours!: number;
+  minutes!: number;
   /** The selected time. */
-  time: string;
+  time!: string;
   /**
    * If the time is AM or PM on twelve-hour clock.
    * @default 'PM'
    */
-  amOrPm: 'AM' | 'PM';
-  static _template;
+  amOrPm!: 'AM' | 'PM';
+  static _template: string;
   /** Vibrate device when dragging clock hand. */
-  vibrate: 'vibrate' | 'webkitVibrate' | null;
-  _canvas: HTMLElement;
-  hoursView: HTMLElement;
-  spanAmPm: HTMLSpanElement;
-  footer: HTMLElement;
-  private _amBtn: HTMLElement;
-  private _pmBtn: HTMLElement;
-  bg: Element;
-  bearing: Element;
-  g: Element;
-  toggleViewTimer: string | number | NodeJS.Timeout;
-  vibrateTimer: NodeJS.Timeout | number;
-  private displayPlugin: DockedDisplayPlugin | ModalDisplayPlugin;
+  vibrate!: 'vibrate' | 'webkitVibrate' | null;
+  _canvas!: HTMLElement;
+  hoursView!: HTMLElement;
+  spanAmPm!: HTMLSpanElement;
+  footer!: HTMLElement;
+  private _amBtn!: HTMLElement;
+  private _pmBtn!: HTMLElement;
+  bg!: Element;
+  bearing!: Element;
+  g!: Element;
+  toggleViewTimer!: string | number | NodeJS.Timeout;
+  vibrateTimer!: NodeJS.Timeout | number | null;
+  private displayPlugin!: DockedDisplayPlugin | ModalDisplayPlugin;
 
-  constructor(el: HTMLInputElement, options: Partial<TimepickerOptions>) {
+  constructor(el: HTMLElement, options: Partial<TimepickerOptions>) {
     super(el, options, Timepicker);
     this.el['M_Timepicker'] = this;
     this.options = {
@@ -299,7 +299,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }
   };
 
-  _handleClockClickStart = (e) => {
+  _handleClockClickStart = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     const clockPlateBR = this.plate.getBoundingClientRect();
     const offset = { x: clockPlateBR.left, y: clockPlateBR.top };
@@ -321,7 +321,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     document.addEventListener('touchend', this._handleDocumentClickEnd);
   };
 
-  _handleDocumentClickMove = (e) => {
+  _handleDocumentClickMove = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     const clickPos = Timepicker._Pos(e);
     const x = clickPos.x - this.x0;
@@ -330,7 +330,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     this.setHand(x, y, false);
   };
 
-  _handleDocumentClickEnd = (e) => {
+  _handleDocumentClickEnd = (e: MouseEvent | TouchEvent) => {
     e.preventDefault();
     document.removeEventListener('mouseup', this._handleDocumentClickEnd);
     document.removeEventListener('touchend', this._handleDocumentClickEnd);
@@ -368,31 +368,41 @@ export class Timepicker extends Component<TimepickerOptions> {
 
     // Append popover to input by default
     const optEl = this.options.container;
-    const containerEl = optEl instanceof HTMLElement ? optEl : document.querySelector(optEl);
+    let containerEl: Element | null = null;
+    if (optEl instanceof HTMLElement) {
+      containerEl = optEl;
+    } else if (optEl) {
+      containerEl = document.querySelector(optEl);
+    }
 
     if (this.options.container && !!containerEl) {
       containerEl.append(this.containerEl);
     } else {
-      this.el.parentElement.appendChild(this.containerEl);
+      this.el.parentElement!.appendChild(this.containerEl);
     }
   }
 
   _setupVariables() {
     this.currentView = 'hours';
-    this.vibrate = navigator.vibrate
-      ? 'vibrate'
-      : navigator['webkitVibrate']
-        ? 'webkitVibrate'
-        : null;
-    this._canvas = this.containerEl.querySelector('.timepicker-canvas');
-    this.plate = this.containerEl.querySelector('.timepicker-plate');
-    this.digitalClock = this.containerEl.querySelector('.timepicker-display-column');
-    this.hoursView = this.containerEl.querySelector('.timepicker-hours');
-    this.minutesView = this.containerEl.querySelector('.timepicker-minutes');
-    this.inputHours = this.containerEl.querySelector('.timepicker-input-hours');
-    this.inputMinutes = this.containerEl.querySelector('.timepicker-input-minutes');
-    this.spanAmPm = this.containerEl.querySelector('.timepicker-span-am-pm');
-    this.footer = this.containerEl.querySelector('.timepicker-footer');
+    // navigator may not expose vibrate (and webkitVibrate is non-standard),
+    // so index via an untyped view to preserve the original feature detection.
+    const nav = navigator as unknown as Record<string, unknown>;
+    if (nav['vibrate']) {
+      this.vibrate = 'vibrate';
+    } else if (nav['webkitVibrate']) {
+      this.vibrate = 'webkitVibrate';
+    } else {
+      this.vibrate = null;
+    }
+    this._canvas = this.containerEl.querySelector('.timepicker-canvas')!;
+    this.plate = this.containerEl.querySelector('.timepicker-plate')!;
+    this.digitalClock = this.containerEl.querySelector('.timepicker-display-column')!;
+    this.hoursView = this.containerEl.querySelector('.timepicker-hours')!;
+    this.minutesView = this.containerEl.querySelector('.timepicker-minutes')!;
+    this.inputHours = this.containerEl.querySelector('.timepicker-input-hours')!;
+    this.inputMinutes = this.containerEl.querySelector('.timepicker-input-minutes')!;
+    this.spanAmPm = this.containerEl.querySelector('.timepicker-span-am-pm')!;
+    this.footer = this.containerEl.querySelector('.timepicker-footer')!;
     this.amOrPm = 'PM';
   }
 
@@ -413,7 +423,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     if (this.options.showClearBtn) {
       Utils.createButton(
         this.footer,
-        this.options.i18n.clear,
+        this.options.i18n.clear!,
         ['timepicker-clear'],
         true,
         this.clear
@@ -436,8 +446,8 @@ export class Timepicker extends Component<TimepickerOptions> {
     confirmationBtnsContainer.appendChild(doneButton);*/
       Utils.createConfirmationContainer(
         this.footer,
-        this.options.i18n.done,
-        this.options.i18n.cancel,
+        this.options.i18n.done!,
+        this.options.i18n.cancel!,
         this.confirm,
         this.cancel
       );
@@ -452,7 +462,7 @@ export class Timepicker extends Component<TimepickerOptions> {
       this.displayPlugin = DockedDisplayPlugin.init(
         this.el,
         this.containerEl,
-        this.options.displayPluginOptions
+        this.options.displayPluginOptions ?? undefined
       );
     if (this.options.displayPlugin === 'modal') {
       this.displayPlugin = ModalDisplayPlugin.init(this.el, this.containerEl, {
@@ -634,7 +644,7 @@ export class Timepicker extends Component<TimepickerOptions> {
    * @param view The name of the view you want to switch to, 'hours' or 'minutes'.
    * @param delay
    */
-  showView = (view: Views, delay: number = null) => {
+  showView = (view: Views, delay: number | null = null) => {
     if (view === 'minutes' && getComputedStyle(this.hoursView).visibility === 'visible') {
       // raiseCallback(this.options.beforeHourSelect);
     }
@@ -666,7 +676,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }, this.options.duration);
   };
 
-  resetClock(delay) {
+  resetClock(delay: number | null) {
     const view = this.currentView,
       value = this[view],
       isHours = view === 'hours',
@@ -710,7 +720,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     }
   };
 
-  drawClockFromTimeInput(value, isHours) {
+  drawClockFromTimeInput(value: number, isHours: boolean) {
     const unit = Math.PI / (isHours ? 6 : 30);
     const radian = value * unit;
     let radius;
@@ -723,7 +733,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     this.setClockAttributes(radian, radius);
   }
 
-  setHand(x, y, roundBy5: boolean = false) {
+  setHand(x: number, y: number, roundBy5: boolean = false) {
     const isHours = this.currentView === 'hours',
       unit = Math.PI / (isHours || roundBy5 ? 6 : 30),
       z = Math.sqrt(x * x + y * y),
@@ -775,7 +785,8 @@ export class Timepicker extends Component<TimepickerOptions> {
       if (this.vibrate && this.options.vibrate) {
         // Do not vibrate too frequently
         if (!this.vibrateTimer) {
-          navigator[this.vibrate](10);
+          // this.vibrate is 'vibrate' | 'webkitVibrate'; webkitVibrate is non-standard.
+          (navigator as unknown as Record<string, (pattern: number) => void>)[this.vibrate](10);
           this.vibrateTimer = setTimeout(() => {
             this.vibrateTimer = null;
           }, 100);
@@ -820,7 +831,7 @@ export class Timepicker extends Component<TimepickerOptions> {
     this.inputHours.value = (this.hours % (this.options.twelveHour ? 12 : 24)).toString();
   }
 
-  done = (clearValue = null) => {
+  done = (clearValue: boolean | null = null) => {
     // Set input value
     const last = this.el.value;
     let value = clearValue

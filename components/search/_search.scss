@@ -1,0 +1,265 @@
+// =====================================================================
+// Search (Material 3)
+// https://m3.material.io/components/search/specs
+//
+// Two surfaces:
+//   1. Search bar   - a resting, fully-rounded (corner `full`) 56dp-tall
+//                     input container on `surface-container-high`.
+//   2. Search view  - the results surface shown when the bar is active. The
+//                     docked variant uses corner `extra-large` (28dp) and
+//                     elevation level 2.
+//
+// This partial also re-skins the existing Materialize autocomplete dropdown
+// (`.autocomplete-content`) to the M3 search-view treatment so the legacy
+// autocomplete component reads as M3 out of the box.
+//
+// Markup contract (BEM-ish):
+//   <div class="search-bar">
+//     <i class="search-bar__icon material-icons">search</i>
+//     <input class="search-bar__input" placeholder="Search">
+//     <i class="search-bar__trailing material-icons">mic</i>
+//   </div>
+//
+//   <div class="search-view search-view--docked">
+//     <input class="search-view__input" placeholder="Search">
+//     <ul class="search-view__results">
+//       <li class="search-view__item"> ... </li>
+//     </ul>
+//   </div>
+// =====================================================================
+
+@use '../../sass/mixins.module.scss' as *;
+
+// ---------------------------------------------------------------- Search bar
+.search-bar {
+  // M3: 56dp tall, fully-rounded pill.
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  height: 56px;
+  padding: 0 16px;
+  width: 100%;
+
+  // Container: surface-container-high, corner `full`, elevation level 0.
+  background-color: var(--md-sys-color-surface-container-high);
+  @include shape(full);
+  @include elevation(0);
+
+  cursor: text;
+  transition:
+    box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+
+  // Optional: raise to level 1 while hovered / active.
+  &:hover,
+  &.active,
+  &:focus-within {
+    @include elevation(1);
+  }
+
+  // Leading search icon: 24dp, on-surface-variant.
+  .search-bar__icon {
+    flex: 0 0 auto;
+    font-size: 24px;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  // Input text: body-large, on-surface. Placeholder: on-surface-variant.
+  .search-bar__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-body-large-font-family-name);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    font-weight: var(--md-sys-typescale-body-large-font-weight);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+
+    &::placeholder {
+      color: var(--md-sys-color-on-surface-variant);
+      opacity: 1;
+    }
+  }
+
+  // Supporting text (mirrors placeholder colour).
+  .search-bar__supporting {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  // Optional trailing element (avatar / icon), 24dp on-surface-variant.
+  .search-bar__trailing {
+    flex: 0 0 auto;
+    font-size: 24px;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .search-bar__avatar {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--md-sys-shape-corner-full);
+    object-fit: cover;
+  }
+}
+
+// --------------------------------------------------------------- Search view
+.search-view {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+
+  // Container: surface-container-high.
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+
+  // Full-screen variant is the default: no corner, no elevation.
+  @include shape(none);
+  @include elevation(0);
+
+  // Header row holding the input.
+  .search-view__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  .search-view__icon {
+    flex: 0 0 auto;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  // Input text: body-large, on-surface.
+  .search-view__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-body-large-font-family-name);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    font-weight: var(--md-sys-typescale-body-large-font-weight);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+
+    &::placeholder {
+      color: var(--md-sys-color-on-surface-variant);
+      opacity: 1;
+    }
+  }
+
+  // Optional divider between input and results.
+  .search-view__divider {
+    height: 1px;
+    border: none;
+    margin: 0;
+    background-color: var(--md-sys-color-outline);
+  }
+
+  // Result list.
+  .search-view__results {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    overflow-y: auto;
+  }
+
+  .search-view__item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 56px;
+    padding: 8px 16px;
+    color: var(--md-sys-color-on-surface);
+
+    // M3 state layer on hover / focus / press.
+    @include state-layer(var(--md-sys-color-on-surface));
+
+    font-family: var(--md-sys-typescale-body-large-font-family-name);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+    cursor: pointer;
+  }
+}
+
+// Docked search view: floats over content with corner `extra-large` (28dp)
+// and elevation level 2.
+.search-view--docked {
+  @include shape(extra-large);
+  @include elevation(2);
+
+  max-height: 480px;
+  overflow: hidden;
+}
+
+// -------------------------------------------- Legacy autocomplete → M3 view
+// Re-skin the existing Materialize autocomplete dropdown as an M3 docked
+// search view: surface-container-high container, corner extra-large,
+// elevation level 2.
+.autocomplete-content {
+  &.dropdown-content,
+  & {
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    @include shape(extra-large);
+    @include elevation(2);
+    padding: 8px 0;
+    overflow-y: auto;
+  }
+
+  li {
+    // body-large text, comfortable list-item metrics.
+    min-height: 48px;
+    color: var(--md-sys-color-on-surface);
+    background-color: transparent;
+
+    @include state-layer(var(--md-sys-color-on-surface));
+
+    font-family: var(--md-sys-typescale-body-large-font-family-name);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+
+    &.active,
+    &:hover {
+      // State layer handles the tint; keep the base transparent.
+      background-color: transparent;
+    }
+
+    .highlight {
+      color: var(--md-sys-color-on-surface-variant);
+      font-weight: 500;
+    }
+
+    img.circle {
+      border-radius: var(--md-sys-shape-corner-full);
+    }
+  }
+}

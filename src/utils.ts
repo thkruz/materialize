@@ -161,10 +161,10 @@ export class Utils {
       right: true,
       bottom: true,
       left: true,
-      spaceOnTop: null,
-      spaceOnRight: null,
-      spaceOnBottom: null,
-      spaceOnLeft: null
+      spaceOnTop: 0,
+      spaceOnRight: 0,
+      spaceOnBottom: 0,
+      spaceOnLeft: 0
     };
 
     const containerAllowsOverflow = getComputedStyle(container).overflow === 'visible';
@@ -222,7 +222,7 @@ export class Utils {
   static getIdFromTrigger(trigger: HTMLElement): string {
     let id = trigger.dataset.target;
     if (!id) {
-      id = trigger.getAttribute('href');
+      id = trigger.getAttribute('href')!;
       return id ? id.slice(1) : '';
     }
     return id;
@@ -249,29 +249,29 @@ export class Utils {
    * @param options Additional options.
    */
   static throttle(
-    func: (Function: object) => void,
+    func: (...args: unknown[]) => unknown,
     wait: number,
     options: Partial<{ leading: boolean; trailing: boolean }> = {}
   ) {
-    let context: object,
-      args: IArguments,
-      result,
-      timeout = null,
+    let context: unknown,
+      args: unknown,
+      result: unknown,
+      timeout: ReturnType<typeof setTimeout> | null = null,
       previous = 0;
 
     const later = () => {
       previous = options.leading === false ? 0 : new Date().getTime();
       timeout = null;
-      result = func.apply(context, args);
+      result = func.apply(context, args as unknown[]);
       context = args = null;
     };
 
-    return (...args) => {
+    return (...args: unknown[]) => {
       const now = new Date().getTime();
       if (!previous && options.leading === false) previous = now;
       const remaining = wait - (now - previous);
       if (remaining <= 0) {
-        clearTimeout(timeout);
+        if (timeout) clearTimeout(timeout);
         timeout = null;
         previous = now;
         result = func.apply(this, args);
@@ -308,7 +308,7 @@ export class Utils {
     text: string,
     className: string[] = [],
     visibility: boolean = true,
-    callback: (Function: object) => void = null
+    callback: ((Function: object) => void) | null = null
   ): void {
     className = className.concat(['btn', 'waves-effect', 'text']);
     const button = document.createElement('button');
@@ -317,10 +317,12 @@ export class Utils {
     button.type = 'button';
     button.tabIndex = !!visibility ? 0 : -1;
     button.innerText = text;
-    button.addEventListener('click', callback);
-    button.addEventListener('keypress', (e) => {
-      if (Utils.keys.ENTER.includes(e.key)) callback(e);
-    });
+    if (callback) {
+      button.addEventListener('click', callback);
+      button.addEventListener('keypress', (e) => {
+        if (Utils.keys.ENTER.includes(e.key)) callback(e);
+      });
+    }
     container.append(button);
   }
 
@@ -402,7 +404,7 @@ export class Utils {
       width: width,
       height: height
     };
-    let offset: number;
+    let offset = 0;
     if (align === 'left' || align == 'center') {
       offset = margin + transitionMovement;
     } else if (align === 'right') {

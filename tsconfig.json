@@ -20,6 +20,10 @@
     "src/**/*",
     "components",
     "components/**/*",
-    "rollup.config.ts"
-  ]
+    "vite.config.ts"
+  ],
+  // Jasmine browser specs are TypeScript but are checked separately via
+  // tsconfig.spec.json (relaxed null-checks for DOM-heavy test code) and are
+  // excluded here so the library typecheck stays focused on shipped source.
+  "exclude": ["**/*Spec.ts", "spec"]
 }

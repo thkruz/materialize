@@ -1,20 +1,31 @@
 @use '../../sass/variables' as *;
 @use '../../sass/global' as *;
+@use '../../sass/mixins.module.scss' as *;
 
 [popover] {
   outline: none;
   padding: 0;
   border: none;
+  background: transparent;
 }
 
+// M3 Menu container.
+// https://m3.material.io/components/menus/specs
+// surface-container bg, extra-small (4dp) corners, elevation level 2,
+// min-width 112dp, max-width 280dp, 8dp vertical padding.
 .dropdown-content {
+  padding-top: 8px;
+  padding-bottom: 8px;
   padding-left: 0;
+  padding-right: 0;
   list-style-type: none;
-  @extend .z-depth-1;
-  background-color: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  box-shadow: var(--md-sys-elevation-level2);
   margin: 0;
   display: none;
-  min-width: 100px;
+  min-width: 112px;
+  max-width: 280px;
   overflow-y: auto;
   opacity: 0;
   position: absolute;
@@ -24,54 +35,88 @@
   transform-origin: 0 0;
   user-select: none;
   white-space: nowrap;
-  
+
   li {
     clear: both;
-    color: var(--md-sys-color-on-background);
+    color: var(--md-sys-color-on-surface);
     cursor: pointer;
-    min-height: $dropdown-item-height;
+    min-height: 48px; // M3 list item min-height 48dp
     line-height: 1.5rem;
     width: 100%;
     text-align: left;
+    // State layer painted by a ::before pseudo-element (see @include state-layer).
+    // on-surface tint at hover 8% / focus 10% / press 10%.
+    @include state-layer(var(--md-sys-color-on-surface));
 
     &.divider {
       min-height: 0;
       height: 1px;
+      background-color: var(--md-sys-color-outline-variant);
+      // A divider is not an interactive item: suppress its state layer.
+      &::before {
+        content: none;
+      }
     }
-    & > a, & > span {
-      font-size: 16px;
-      color: var(--md-sys-color-primary);
-      display: block;
-      line-height: 22px;
-      padding: (($dropdown-item-height - 22) * 0.5) 16px;
+    & > a,
+    & > span {
+      // M3 list item: label-large type, on-surface color, 12dp horizontal
+      // padding, vertically centered within the 48dp min-height.
+      font-family: var(--md-sys-typescale-label-large-font-family-name);
+      font-size: var(--md-sys-typescale-label-large-font-size);
+      font-weight: var(--md-sys-typescale-label-large-font-weight);
+      line-height: var(--md-sys-typescale-label-large-line-height);
+      letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+      color: var(--md-sys-color-on-surface);
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      box-sizing: border-box;
+      padding: 0 12px;
     }
     & > span > label {
       top: 1px;
       left: 0;
       height: 18px;
     }
-    // Icon alignment override
-    & > a > i {
-      height: inherit;
-      line-height: inherit;
-      float: left;
-      margin: 0 24px 0 0;
+    // Leading/trailing icon: 24dp, on-surface-variant.
+    & > a > i,
+    & > span > i {
+      height: 24px;
       width: 24px;
+      font-size: 24px;
+      line-height: 24px;
+      margin: 0 12px 0 0;
+      color: var(--md-sys-color-on-surface-variant);
+      flex: 0 0 auto;
+    }
+    // Disabled item: on-surface at 38% opacity, no interaction.
+    &.disabled,
+    &[disabled] {
+      cursor: default;
+      pointer-events: none;
+      & > a,
+      & > span {
+        opacity: 0.38;
+        color: var(--md-sys-color-on-surface);
+      }
+      &::before {
+        content: none;
+      }
     }
   }
-  li:not(.disabled):hover, li.active {
-    background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-on-surface) 8%);
-  }
-}
-
-body.keyboard-focused {
-  .dropdown-content li:focus {
-    background-color: rgba(0, 0, 0, 0.12);
+  // Keep the persistent selected/keyboard-active tint in line with the M3
+  // hover-state-layer opacity so it reads as a highlighted item.
+  li:not(.disabled).active {
+    background-color: color-mix(
+      in srgb,
+      var(--md-sys-color-surface-container),
+      var(--md-sys-color-on-surface) 8%
+    );
   }
 }
 
 // Input field specificity bugfix
-.input-field.col .dropdown-content [type="checkbox"] + label {
+.input-field.col .dropdown-content [type='checkbox'] + label {
   top: 1px;
   left: 0;
   height: 18px;

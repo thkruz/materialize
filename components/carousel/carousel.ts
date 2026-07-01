@@ -46,7 +46,7 @@ export interface CarouselOptions extends BaseOptions {
    * Callback for when a new slide is cycled to.
    * @default null
    */
-  onCycleTo: (current: Element, dragged: boolean) => void;
+  onCycleTo: ((current: Element, dragged: boolean) => void) | null;
 }
 
 const _defaults: CarouselOptions = {
@@ -78,19 +78,19 @@ export class Carousel extends Component<CarouselOptions> {
   _indicators: HTMLUListElement;
   count: number;
   xform: string;
-  verticalDragged: boolean;
-  reference: number;
-  referenceY: number;
-  velocity: number;
-  frame: number;
-  timestamp: number;
-  ticker: string | number | NodeJS.Timeout;
-  amplitude: number;
+  verticalDragged!: boolean;
+  reference!: number;
+  referenceY!: number;
+  velocity!: number;
+  frame!: number;
+  timestamp!: number;
+  ticker!: string | number | NodeJS.Timeout;
+  amplitude!: number;
   /** The index of the center carousel item. */
   center: number = 0;
-  imageHeight: number;
-  scrollingTimeout: number | NodeJS.Timeout;
-  oneTimeCallback: (current: Element, dragged: boolean) => void | null;
+  imageHeight!: number;
+  scrollingTimeout!: number | NodeJS.Timeout;
+  oneTimeCallback!: ((current: Element, dragged: boolean) => void) | null;
 
   constructor(el: HTMLElement, options: Partial<CarouselOptions>) {
     super(el, options, Carousel);
@@ -109,8 +109,8 @@ export class Carousel extends Component<CarouselOptions> {
     this.dragged = false;
     this.offset = this.target = 0;
     this.images = [];
-    this.itemWidth = this.el.querySelector('.carousel-item').clientWidth;
-    this.itemHeight = this.el.querySelector('.carousel-item').clientHeight;
+    this.itemWidth = this.el.querySelector('.carousel-item')!.clientWidth;
+    this.itemHeight = this.el.querySelector('.carousel-item')!.clientHeight;
     this.dim = this.itemWidth * 2 + this.options.padding || 1; // Make sure dim is non zero for divisions.
 
     // Full Width carousel setup
@@ -128,8 +128,8 @@ export class Carousel extends Component<CarouselOptions> {
     this._indicators = document.createElement('ul');
     this._indicators.classList.add('indicators');
 
-    this.el.querySelectorAll('.carousel-item').forEach((item: HTMLElement, i) => {
-      this.images.push(item);
+    this.el.querySelectorAll('.carousel-item').forEach((item: Element, i) => {
+      this.images.push(item as HTMLElement);
       if (this.showIndicators) {
         const indicator = document.createElement('li');
         indicator.classList.add('indicator-item');
@@ -152,7 +152,7 @@ export class Carousel extends Component<CarouselOptions> {
     this.xform = 'transform';
     ['webkit', 'Moz', 'O', 'ms'].every((prefix) => {
       const e = prefix + 'Transform';
-      if (typeof document.body.style[e] !== 'undefined') {
+      if (typeof document.body.style[e as keyof CSSStyleDeclaration] !== 'undefined') {
         this.xform = e;
         return false;
       }
@@ -214,7 +214,7 @@ export class Carousel extends Component<CarouselOptions> {
     if (this.showIndicators && this._indicators) {
       this._indicators.querySelectorAll('.indicator-item').forEach((el) => {
         el.addEventListener('click', this._handleIndicatorClick);
-        el.addEventListener('keypress', this._handleIndicatorKeyPress);
+        el.addEventListener('keypress', this._handleIndicatorKeyPress as EventListener);
       });
     }
     // Resize
@@ -240,7 +240,9 @@ export class Carousel extends Component<CarouselOptions> {
     window.removeEventListener('resize', this._handleThrottledResize);
   }
 
-  _handleThrottledResize = (): void => Utils.throttle(this._handleResize, 200, null).bind(this);
+  _handleThrottledResize = (): void => {
+    Utils.throttle(this._handleResize, 200).bind(this);
+  };
 
   _handleCarouselTap = (e: MouseEvent | TouchEvent) => {
     // Fixes firefox draggable image bug
@@ -332,7 +334,7 @@ export class Carousel extends Component<CarouselOptions> {
     } else if (!this.options.fullWidth) {
       const clickedElem = (<HTMLElement>e.target).closest('.carousel-item');
       if (!clickedElem) return;
-      const clickedIndex = [...clickedElem.parentNode.children].indexOf(clickedElem);
+      const clickedIndex = [...clickedElem.parentNode!.children].indexOf(clickedElem);
       const diff = this._wrap(this.center) - clickedIndex;
       // Disable clicks if carousel was shifted by click
       if (diff !== 0) {
@@ -371,15 +373,15 @@ export class Carousel extends Component<CarouselOptions> {
   _handleIndicatorInteraction = (e: Event) => {
     const indicator = (<HTMLElement>e.target).closest('.indicator-item');
     if (indicator) {
-      const index = [...indicator.parentNode.children].indexOf(indicator);
+      const index = [...indicator.parentNode!.children].indexOf(indicator);
       this._cycleTo(index);
     }
   };
 
   _handleResize = () => {
     if (this.options.fullWidth) {
-      this.itemWidth = this.el.querySelector('.carousel-item').clientWidth;
-      this.imageHeight = this.el.querySelector('.carousel-item.active').clientHeight;
+      this.itemWidth = this.el.querySelector('.carousel-item')!.clientWidth;
+      this.imageHeight = this.el.querySelector('.carousel-item.active')!.clientHeight;
       this.dim = this.itemWidth * 2 + this.options.padding;
       this.offset = this.center * 2 * this.itemWidth;
       this.target = this.offset;
@@ -394,7 +396,7 @@ export class Carousel extends Component<CarouselOptions> {
       ? this.el.querySelector('.carousel-item.active')
       : this.el.querySelector('.carousel-item');
 
-    const firstImage = firstSlide.querySelector('img');
+    const firstImage = firstSlide!.querySelector('img');
     if (firstImage) {
       if (firstImage.complete) {
         // If image won't trigger the load event
@@ -415,7 +417,7 @@ export class Carousel extends Component<CarouselOptions> {
         });
       }
     } else if (!imageOnly) {
-      const slideHeight = firstSlide.clientHeight;
+      const slideHeight = firstSlide!.clientHeight;
       this.el.style.height = slideHeight + 'px';
     }
   }
@@ -438,7 +440,7 @@ export class Carousel extends Component<CarouselOptions> {
     return (e as MouseEvent).clientY;
   }
 
-  _wrap(x: number) {
+  _wrap(x: number): number {
     return x >= this.count ? x % this.count : x < 0 ? this._wrap(this.count + (x % this.count)) : x;
   }
 
@@ -519,11 +521,11 @@ export class Carousel extends Component<CarouselOptions> {
     if (this.showIndicators) {
       const diff = this.center % this.count;
       const activeIndicator = this._indicators.querySelector('.indicator-item.active');
-      const activeIndicatorIndex = [...activeIndicator.parentNode.children].indexOf(
-        activeIndicator
+      const activeIndicatorIndex = [...activeIndicator!.parentNode!.children].indexOf(
+        activeIndicator!
       );
       if (activeIndicatorIndex !== diff) {
-        activeIndicator.classList.remove('active');
+        activeIndicator!.classList.remove('active');
         const pos = diff < 0 ? this.count + diff : diff;
         this._indicators.querySelectorAll('.indicator-item')[pos].classList.add('active');
       }
@@ -536,12 +538,12 @@ export class Carousel extends Component<CarouselOptions> {
 
       // Add active class to center item.
       if (!el.classList.contains('active')) {
-        this.el.querySelector('.carousel-item').classList.remove('active');
+        this.el.querySelector('.carousel-item')!.classList.remove('active');
         el.classList.add('active');
       }
 
       const transformString = `${alignment} translateX(${-delta / 2}px) translateX(${
-        dir * this.options.shift * tween * i
+        dir * this.options.shift * tween * i!
       }px) translateZ(${this.options.dist * tween}px)`;
       this._updateItemStyle(el, centerTweenedOpacity, 0, transformString);
     }
@@ -603,7 +605,7 @@ export class Carousel extends Component<CarouselOptions> {
   }
 
   _updateItemStyle(el: HTMLElement, opacity: number, zIndex: number, transform: string) {
-    el.style[this.xform] = transform;
+    (el.style as unknown as Record<string, string>)[this.xform] = transform;
     el.style.zIndex = zIndex.toString();
     el.style.opacity = opacity.toString();
     el.style.visibility = 'visible';

@@ -1,12 +1,24 @@
+// =====================================================================
+// M3 Switch
+// Spec: https://m3.material.io/components/switch
+//   - Track 52x32dp, fully rounded, 2dp outline border when unselected.
+//   - Unselected: track surface-container-highest, handle 16dp `outline`.
+//   - Selected:   track primary, handle 24dp `on-primary`.
+//   - Handle grows to 28dp while pressed; a 40dp state layer sits behind it.
+// Markup contract (unchanged): .switch > label > input[type=checkbox] + .lever
+// =====================================================================
+
 .switch {
   --track-height: 32px;
   --track-width: 52px;
   --border-width: 2px;
-  --size-off: 16px;
-  --size-on: 24px;
+  --handle-size-off: 16px;
+  --handle-size-on: 24px;
+  --handle-size-pressed: 28px;
   --icon-size: 16px;
-  --gap-on: calc(((var(--track-height) - var(--size-on)) / 2) - var(--border-width));
-  --gap-off: calc(((var(--track-height) - var(--size-off)) / 2) - var(--border-width));
+  // Handle inset from the track edge (accounts for the 2dp border).
+  --gap-on: calc(((var(--track-height) - var(--handle-size-on)) / 2) - var(--border-width));
+  --gap-off: calc(((var(--track-height) - var(--handle-size-off)) / 2) - var(--border-width));
 }
 
 .switch,
@@ -17,6 +29,8 @@
 
 .switch label {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
 }
 
 .switch label input[type=checkbox] {
@@ -24,22 +38,25 @@
   width: 0;
   height: 0;
 
-  // CHECKED
-  // Track
-  &:checked + .lever{
-    background-color: var(--md-sys-color-primary);
-    border-color:  var(--md-sys-color-primary);
-  }
-  // Dot
+  // ---------------------------------------------------------------- CHECKED
   &:checked + .lever {
-    &:before, &:after {
+    background-color: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+
+    // Handle: slide to the trailing edge, grow to 24dp, recolor on-primary.
+    &::after {
       top: var(--gap-on);
-      left: calc(var(--track-width) - var(--size-on) - var(--gap-on) - 2 * var(--border-width));
-      width: var(--size-on);
-      height: var(--size-on);
+      left: calc(var(--track-width) - var(--handle-size-on) - var(--gap-on) - 2 * var(--border-width));
+      width: var(--handle-size-on);
+      height: var(--handle-size-on);
+      background-color: var(--md-sys-color-on-primary);
     }
-    &:after {
-      background-color: var(--md-sys-color-surface);
+
+    // State layer follows the selected handle and tints with primary.
+    &::before {
+      top: calc(var(--gap-on) + var(--handle-size-on) / 2);
+      left: calc(var(--track-width) - var(--handle-size-on) / 2 - var(--gap-on) - 2 * var(--border-width));
+      background-color: var(--md-sys-color-primary);
     }
   }
 }
@@ -51,71 +68,82 @@
   width: var(--track-width);
   height: var(--track-height);
   border-style: solid;
-  border-width: 2px;
+  border-width: var(--border-width);
   border-color: var(--md-sys-color-outline);
-
-  //@extend .surface-variant;
-  background-color: var(--md-sys-color-surface-variant);
-
-  border-radius: 15px;
-  margin-right: 10px;
-  transition: background 0.3s ease;
-  vertical-align: middle;
+  background-color: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-full);
   margin: 0 16px;
+  vertical-align: middle;
+  transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 
-  // DOT
-  &:before, &:after {
+  // STATE LAYER (::before) — a 40dp circle behind the handle, hidden until
+  // hover / focus / press.
+  &::before {
     content: "";
     position: absolute;
     display: inline-block;
-    width: var(--size-off);
-    height: var(--size-off);
-    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--md-sys-shape-corner-full);
+    top: calc(var(--gap-off) + var(--handle-size-off) / 2);
+    left: calc(var(--gap-off) + var(--handle-size-off) / 2);
+    transform: translate(-50%, -50%);
+    background-color: var(--md-sys-color-on-surface);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+      top var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized),
+      left var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized);
+  }
 
+  // HANDLE (::after) — unselected: 16dp `outline`.
+  &::after {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: var(--handle-size-off);
+    height: var(--handle-size-off);
+    border-radius: var(--md-sys-shape-corner-full);
     left: var(--gap-off);
     top: var(--gap-off);
-
-    transition: left 0.3s ease, background .3s ease, box-shadow 0.1s ease, transform .1s ease;
-  }
-
-  // NOT CHECKED [DOT]
-  &:after {
     background-color: var(--md-sys-color-outline);
-    height: var(--size-off);
-    width: var(--size-off);
-    //@extend .surface-variant;
-    //box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    transition: left var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized),
+      width var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+      height var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard),
+      background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   }
 }
 
-input[type=checkbox]:not(:disabled) ~ .lever:active:before,
-input[type=checkbox]:not(:disabled).tabbed:focus ~ .lever::before,
+// -------------------------------------------------------------- STATE LAYERS
+// Unselected handle tints on-surface; selected handle tints primary (set above).
 input[type=checkbox]:not(:disabled) ~ .lever:hover::before {
-    transform: scale(2.4);
+  opacity: var(--md-sys-state-hover-state-layer-opacity);
 }
 
-input[type=checkbox]:checked:not(:disabled) ~ .lever:hover::before {
-  background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 6%);
-}
-
-// Switch active style
-input[type=checkbox]:checked:not(:disabled) ~ .lever:active::before,
-input[type=checkbox]:checked:not(:disabled).tabbed:focus ~ .lever::before {
-  background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 18%);
-}
-
-input[type=checkbox]:not(:disabled) ~ .lever:hover::before {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
-input[type=checkbox]:not(:disabled) ~ .lever:active:before,
+input[type=checkbox]:not(:disabled) ~ .lever:active::before,
 input[type=checkbox]:not(:disabled).tabbed:focus ~ .lever::before {
-  background-color: rgba(0, 0, 0, 0.12);
+  opacity: var(--md-sys-state-pressed-state-layer-opacity);
 }
 
-// Disabled Styles
+// Modern keyboard focus (M3 focus state layer) — mirrors checkbox/radio.
+input[type=checkbox]:not(:disabled):focus-visible ~ .lever::before {
+  opacity: var(--md-sys-state-focus-state-layer-opacity);
+}
+
+// Pressed handle grows to 28dp (both states).
+input[type=checkbox]:not(:disabled) ~ .lever:active::after {
+  width: var(--handle-size-pressed);
+  height: var(--handle-size-pressed);
+  top: calc(((var(--track-height) - var(--handle-size-pressed)) / 2) - var(--border-width));
+}
+
+input[type=checkbox]:checked:not(:disabled) ~ .lever:active::after {
+  left: calc(var(--track-width) - var(--handle-size-pressed) - ((var(--track-height) - var(--handle-size-pressed)) / 2) - var(--border-width));
+}
+
+// ------------------------------------------------------------------ DISABLED
 .switch input[type=checkbox][disabled] + .lever {
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.38;
 }
-

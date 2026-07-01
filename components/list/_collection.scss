@@ -1,86 +1,196 @@
 @use '../../sass/variables' as *;
 
+// =====================================================================
+// M3 List (Materialize "collection")
+// Spec: https://m3.material.io/components/lists/specs
+//   - Container: `surface`.
+//   - Line heights: 1-line 56dp, 2-line 72dp, 3-line 88dp.
+//   - Headline: body-large / on-surface.
+//   - Supporting text: body-medium / on-surface-variant.
+//   - Trailing supporting text: label-small / on-surface-variant.
+//   - Leading: icon 24dp / avatar 40dp / image 56dp (icons on-surface-variant).
+//   - Horizontal padding 16dp, 16dp gap between leading/trailing and text.
+//   - Divider: 1dp outline-variant.
+//   - Interactive items carry an on-surface state layer (hover 8%, focus/press 10%).
+// Markup contract (unchanged): .collection > .collection-item,
+//   .collection-item.avatar, .secondary-content, a.collection-item,
+//   .collection.with-header > .collection-header, .active.
+// =====================================================================
+
 .collection {
+  // ---- M3 list tokens -----------------------------------------------------
+  --list-item-padding-inline: 16px;
+  --list-item-gap: 16px;
+  --list-item-height-one-line: 56px;
+  --list-item-height-two-line: 72px;
+  --list-item-height-three-line: 88px;
+  --list-leading-icon-size: 24px;
+  --list-leading-avatar-size: 40px;
+  --list-leading-image-size: 56px;
+
   padding-left: 0;
   list-style-type: none;
   margin: $element-top-margin 0 $element-bottom-margin 0;
+  // Container role: surface.
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 2px;
   overflow: hidden;
   position: relative;
 
   .collection-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background-color: transparent;
-    line-height: 1.5rem;
-    padding: 10px 20px;
+    // 1-line list item is 56dp tall.
+    min-height: var(--list-item-height-one-line);
     margin: 0;
+    padding: 8px var(--list-item-padding-inline);
+    // Headline: body-large / on-surface.
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-body-large-font-family-name);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    font-weight: var(--md-sys-typescale-body-large-font-weight);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+    // Divider: 1dp outline-variant.
     border-bottom: 1px solid var(--md-sys-color-outline-variant);
 
-    // Avatar Collection
+    // Supporting text: body-medium / on-surface-variant.
+    p {
+      margin: 0;
+      color: var(--md-sys-color-on-surface-variant);
+      font-family: var(--md-sys-typescale-body-medium-font-family-name);
+      font-size: var(--md-sys-typescale-body-medium-font-size);
+      font-weight: var(--md-sys-typescale-body-medium-font-weight);
+      line-height: var(--md-sys-typescale-body-medium-line-height);
+      letter-spacing: var(--md-sys-typescale-body-medium-letter-spacing);
+    }
+
+    // ---- Avatar list item (2-line) --------------------------------------
     &.avatar {
-      min-height: 84px;
-      padding-left: 72px;
-      position: relative;
+      // 2-line list item is 72dp tall.
+      min-height: var(--list-item-height-two-line);
+      // Reserve room for the 40dp leading avatar plus the 16dp gap.
+      padding-left: calc(
+        var(--list-item-padding-inline) + var(--list-leading-avatar-size) +
+          var(--list-item-gap)
+      );
 
       // Don't style circles inside preloader classes.
       &:not(.circle-clipper) > .circle,
       :not(.circle-clipper) > .circle {
         position: absolute;
-        width: 42px;
-        height: 42px;
+        // Leading avatar: 40dp.
+        width: var(--list-leading-avatar-size);
+        height: var(--list-leading-avatar-size);
         overflow: hidden;
-        left: 15px;
+        top: 50%;
+        left: var(--list-item-padding-inline);
+        transform: translateY(-50%);
         display: inline-block;
         vertical-align: middle;
+        border-radius: var(--md-sys-shape-corner-full);
       }
 
       i.circle {
-        font-size: 18px;
-        line-height: 42px;
-        color: #fff;
-        background-color: var(--md-sys-color-shadow-light);
+        // Leading icon inside the avatar: on-surface-variant on a variant tint.
+        font-size: var(--list-leading-icon-size);
+        line-height: var(--list-leading-avatar-size);
+        color: var(--md-sys-color-on-surface-variant);
+        background-color: var(--md-sys-color-surface-variant);
         text-align: center;
       }
 
+      // Leading image: 56dp.
+      &.image {
+        padding-left: calc(
+          var(--list-item-padding-inline) + var(--list-leading-image-size) +
+            var(--list-item-gap)
+        );
 
-      .title {
-        font-size: 16px;
+        &:not(.circle-clipper) > .circle,
+        :not(.circle-clipper) > .circle {
+          width: var(--list-leading-image-size);
+          height: var(--list-leading-image-size);
+        }
       }
 
-      p {
-        margin: 0;
+      .title {
+        // Headline stays body-large / on-surface.
+        font-family: var(--md-sys-typescale-body-large-font-family-name);
+        font-size: var(--md-sys-typescale-body-large-font-size);
+        font-weight: var(--md-sys-typescale-body-large-font-weight);
+        line-height: var(--md-sys-typescale-body-large-line-height);
+        letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+        color: var(--md-sys-color-on-surface);
       }
 
       .secondary-content {
         position: absolute;
-        top: 16px;
-        right: 16px;
+        top: 50%;
+        right: var(--list-item-padding-inline);
+        transform: translateY(-50%);
       }
+    }
+
+    // 3-line list item is 88dp tall.
+    &.three-line {
+      min-height: var(--list-item-height-three-line);
     }
 
     &:last-child {
       border-bottom: none;
     }
 
+    // Selected item: primary container tint / on-primary content.
     &.active {
       background-color: var(--md-sys-color-primary);
-      color:  var(--md-sys-color-on-primary);
+      color: var(--md-sys-color-on-primary);
 
       .secondary-content {
-        color:  var(--md-sys-color-on-primary);
+        color: var(--md-sys-color-on-primary);
       }
     }
   }
 
+  // ---- Interactive item + state layer -----------------------------------
   a.collection-item {
-    display: block;
-    transition: .25s;
+    display: flex;
     color: var(--md-sys-color-primary);
+    transition: background-color var(--md-sys-motion-duration-short4)
+      var(--md-sys-motion-easing-standard);
 
-    &:not(.active) {
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.04);
-      }
+    // STATE LAYER (::before) — on-surface tint, hidden until hover/focus/press.
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: var(--md-sys-color-on-surface);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--md-sys-motion-duration-short2)
+        var(--md-sys-motion-easing-standard);
+    }
+
+    &:hover::before {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
+    }
+
+    &:focus::before {
+      opacity: var(--md-sys-state-focus-state-layer-opacity);
+    }
+
+    &:active::before {
+      opacity: var(--md-sys-state-pressed-state-layer-opacity);
+    }
+
+    // On the selected item the state layer tints with on-primary instead.
+    &.active::before {
+      background-color: var(--md-sys-color-on-primary);
     }
   }
 
@@ -88,24 +198,39 @@
     .collection-header {
       background-color: transparent;
       border-bottom: 1px solid var(--md-sys-color-outline-variant);
-      padding: 10px 20px;
+      padding: 8px var(--list-item-padding-inline);
+      color: var(--md-sys-color-on-surface);
     }
 
     .collection-item {
-      padding-left: 30px;
+      padding-left: var(--list-item-padding-inline);
     }
 
     .collection-item.avatar {
-      padding-left: 72px;
+      padding-left: calc(
+        var(--list-item-padding-inline) + var(--list-leading-avatar-size) +
+          var(--list-item-gap)
+      );
     }
   }
-
 }
 
-// Made less specific to allow easier overriding
+// Made less specific to allow easier overriding.
+// Trailing supporting text: label-small / on-surface-variant.
 .secondary-content {
   float: right;
-  color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--md-sys-typescale-label-small-font-family-name);
+  font-size: var(--md-sys-typescale-label-small-font-size);
+  font-weight: var(--md-sys-typescale-label-small-font-weight);
+  line-height: var(--md-sys-typescale-label-small-line-height);
+  letter-spacing: var(--md-sys-typescale-label-small-letter-spacing);
+
+  // Trailing icon uses the on-surface-variant icon color.
+  i {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--list-leading-icon-size, 24px);
+  }
 }
 
 .collapsible .collection {

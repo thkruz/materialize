@@ -21,7 +21,7 @@ export interface DropdownOptions extends BaseOptions {
    * Provide an element that will be the bounding container of the dropdown.
    * @default null
    */
-  container: Element;
+  container: Element | null;
   /**
    * If false, the dropdown will show below the trigger.
    * @default true
@@ -51,27 +51,27 @@ export interface DropdownOptions extends BaseOptions {
    * Function called when dropdown starts entering.
    * @default null
    */
-  onOpenStart: (el: HTMLElement) => void;
+  onOpenStart: ((el: HTMLElement) => void) | null;
   /**
    * Function called when dropdown finishes entering.
    * @default null
    */
-  onOpenEnd: (el: HTMLElement) => void;
+  onOpenEnd: ((el: HTMLElement) => void) | null;
   /**
    * Function called when dropdown starts exiting.
    * @default null
    */
-  onCloseStart: (el: HTMLElement) => void;
+  onCloseStart: ((el: HTMLElement) => void) | null;
   /**
    * Function called when dropdown finishes exiting.
    * @default null
    */
-  onCloseEnd: (el: HTMLElement) => void;
+  onCloseEnd: ((el: HTMLElement) => void) | null;
   /**
    * Function called when item is clicked.
    * @default null
    */
-  onItemClick: (el: HTMLLIElement) => void;
+  onItemClick: ((el: HTMLLIElement) => void) | null;
 }
 
 const _defaults: DropdownOptions = {
@@ -105,7 +105,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
   /** The index of the item focused. */
   focusedIndex: number;
   filterQuery: string[];
-  filterTimeout: NodeJS.Timeout | number;
+  filterTimeout!: NodeJS.Timeout | number;
 
   constructor(el: HTMLElement, options: Partial<DropdownOptions>) {
     super(el, options, Dropdown);
@@ -113,7 +113,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
 
     Dropdown._dropdowns.push(this);
     this.id = Utils.getIdFromTrigger(el);
-    this.dropdownEl = document.getElementById(this.id);
+    this.dropdownEl = document.getElementById(this.id)!;
 
     this.options = {
       ...Dropdown.defaults,
@@ -281,7 +281,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
     // onItemClick callback
     if (typeof this.options.onItemClick === 'function') {
       const itemEl = (<HTMLElement>e.target).closest('li');
-      this.options.onItemClick.call(this, itemEl);
+      this.options.onItemClick.call(this, itemEl!);
     }
   };
 
@@ -354,7 +354,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
         (el) => el.innerText.toLowerCase().indexOf(string) === 0
       );
       if (newOptionEl) {
-        this.focusedIndex = [...newOptionEl.parentNode.children].indexOf(newOptionEl);
+        this.focusedIndex = [...newOptionEl.parentNode!.children].indexOf(newOptionEl);
         this._focusFocusedItem();
       }
     }
@@ -388,7 +388,7 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
     this.dropdownEl.style.transformOrigin = '';
   }
 
-  _moveDropdownToElement(containerEl: HTMLElement = null) {
+  _moveDropdownToElement(containerEl: HTMLElement | null = null) {
     if (this.options.container) {
       this.options.container.append(this.dropdownEl);
       return;
@@ -551,20 +551,23 @@ export class Dropdown extends Component<DropdownOptions> implements Openable {
     }, duration);
   }
 
-  private _getClosestAncestor(el: HTMLElement, condition: (Function) => boolean): HTMLElement {
-    let ancestor = el.parentNode;
+  private _getClosestAncestor(
+    el: HTMLElement,
+    condition: (ancestor: HTMLElement) => boolean
+  ): HTMLElement | null {
+    let ancestor: HTMLElement | Node | null = el.parentNode;
     while (ancestor !== null && ancestor !== document) {
-      if (condition(ancestor)) {
+      if (condition(<HTMLElement>ancestor)) {
         return <HTMLElement>ancestor;
       }
-      ancestor = ancestor.parentElement;
+      ancestor = (<HTMLElement>ancestor).parentElement;
     }
     return null;
   }
 
   _placeDropdown() {
     // Container here will be closest ancestor with overflow: hidden
-    let closestOverflowParent: HTMLElement = this._getClosestAncestor(
+    let closestOverflowParent: HTMLElement | null = this._getClosestAncestor(
       this.dropdownEl,
       (ancestor: HTMLElement) => {
         return (

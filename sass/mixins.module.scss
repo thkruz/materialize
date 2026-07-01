@@ -14,6 +14,7 @@
   padding-right: $padding-right;
   font-size: $font-size;
   font-weight: 500;
+  letter-spacing: 0.1px; // M3 label-large tracking
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -24,10 +25,6 @@
   outline: 0;
   user-select: none;
   transition: background-color .2s ease-out;
-
-  &:focus {
-    background-color: var(--md-sys-color-primary-container);
-  }
 }
 
 @mixin btn-filled {
@@ -35,18 +32,24 @@
   background-color: var(--md-sys-color-primary);
 
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     color: var(--md-sys-color-on-primary);
   }
 
   &:hover {
     @extend .z-depth-1;
-    background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 16%);
+    background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
   }
 
   &:focus {
     @extend .z-depth-0;
-    background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 20%);
+    background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 10%);
+  }
+
+  &:active {
+    @extend .z-depth-0;
+    background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 10%);
   }
 
   @include focus-visible();
@@ -57,41 +60,54 @@
   background-color: var(--md-sys-color-secondary-container);
 
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     color: var(--md-sys-color-on-secondary-container);
   }
 
   &:hover {
     @extend .z-depth-1;
-    background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 16%);
+    background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 8%);
   }
 
   &:focus {
     @extend .z-depth-0;
-    background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 20%);
+    background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 10%);
+  }
+
+  &:active {
+    @extend .z-depth-0;
+    background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 10%);
   }
 
   @include focus-visible();
 }
 
 @mixin btn-elevated {
-  //color: var(--md-sys-color-on-secondary-container);
-  //background-color: var(--md-sys-color-secondary-container);
+  // M3 elevated button: surface-container-low bg + primary label.
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-container-low);
   @extend .z-depth-1;
 
   &:hover,
-  &:focus {
-    //color: var(--md-sys-color-primary);
+  &:focus,
+  &:active {
+    color: var(--md-sys-color-primary);
   }
 
   &:hover {
     @extend .z-depth-2;
-    //background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 16%);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 8%);
   }
 
   &:focus {
     @extend .z-depth-1;
-    //background-color: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-primary) 20%);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 10%);
+  }
+
+  &:active {
+    @extend .z-depth-1;
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low), var(--md-sys-color-primary) 10%);
   }
 
   @include focus-visible();
@@ -103,17 +119,22 @@
   border: 1px solid var(--md-sys-color-outline);
 
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     color: var(--md-sys-color-primary);
   }
 
   &:hover {
-    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 16%);
+    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 8%);
   }
 
   &:focus {
-    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 20%);
+    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 10%);
     border: 1px solid var(--md-sys-color-primary);
+  }
+
+  &:active {
+    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 10%);
   }
 
   &.disabled {
@@ -130,16 +151,21 @@
   background-color: transparent;
 
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     color: var(--md-sys-color-primary);
   }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--md-sys-color-primary) 16%, transparent);
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);
   }
 
   &:focus {
-    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 20%);
+    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 10%);
+  }
+
+  &:active {
+    background-color: color-mix(in srgb, transparent, var(--md-sys-color-primary) 10%);
   }
 
   &.disabled {
@@ -164,5 +190,67 @@
     outline: 3px solid var(--md-sys-color-secondary);
     outline-offset: 2px;
   }
+}
+
+// =====================================================================
+// Reusable M3 primitives (Phase 0 foundation)
+// =====================================================================
+
+// State layer — the M3 hover/focus/pressed tint overlaid on an element.
+// Renders as a ::before pseudo-element so it composites over the element's
+// own background at the correct opacity without changing layout. Pass the
+// "on-" color that should tint the surface (defaults to on-surface).
+@mixin state-layer($color: var(--md-sys-color-on-surface)) {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: $color;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  }
+
+  &:hover::before {
+    opacity: var(--md-sys-state-hover-state-layer-opacity);
+  }
+
+  &:focus-visible::before {
+    opacity: var(--md-sys-state-focus-state-layer-opacity);
+  }
+
+  &:active::before {
+    opacity: var(--md-sys-state-pressed-state-layer-opacity);
+  }
+}
+
+// Guarantee the M3 minimum 48x48dp touch target while keeping the visible
+// element any size. Uses a centered, non-layout-affecting pseudo-element.
+@mixin min-touch-target($size: 48px) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: max(100%, #{$size});
+    width: max(100%, #{$size});
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Apply an M3 elevation level (0-5) by token.
+@mixin elevation($level: 1) {
+  box-shadow: var(--md-sys-elevation-level#{$level});
+}
+
+// Apply an M3 shape-scale corner by name (none / extra-small / small /
+// medium / large / extra-large / full).
+@mixin shape($corner: medium) {
+  border-radius: var(--md-sys-shape-corner-#{$corner});
 }
 

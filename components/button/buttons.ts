@@ -37,9 +37,9 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
   isOpen: boolean;
   offsetY: number;
   offsetX: number;
-  btnBottom: number;
-  btnLeft: number;
-  btnWidth: number;
+  btnBottom!: number;
+  btnLeft!: number;
+  btnWidth!: number;
 
   constructor(el: HTMLElement, options: Partial<FloatingActionButtonOptions>) {
     super(el, options, FloatingActionButton);
@@ -51,7 +51,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     };
 
     this.isOpen = false;
-    this.#anchor = this.el.querySelector('a');
+    this.#anchor = this.el.querySelector('a')!;
     this.#menu = this.el.querySelector('ul');
     this.#floatingBtns = Array.from(this.el.querySelectorAll('ul .btn-floating'));
     this.#floatingBtnsReverse = this.#floatingBtns.reverse();
@@ -60,7 +60,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
 
     this.el.classList.add(`direction-${this.options.direction}`);
     this.#anchor.tabIndex = 0;
-    this.#menu.ariaExpanded = 'false';
+    this.#menu!.ariaExpanded = 'false';
     if (this.options.direction === 'top') this.offsetY = 40;
     else if (this.options.direction === 'right') this.offsetX = -40;
     else if (this.options.direction === 'bottom') this.offsetY = -40;
@@ -135,7 +135,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     this.#handleFABToggle();
   };
 
-  #handleFABKeyPress = (e) => {
+  #handleFABKeyPress = (e: KeyboardEvent) => {
     if (Utils.keys.ENTER.includes(e.key)) {
       this.#handleFABToggle();
     }
@@ -180,7 +180,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
 
   #animateInFAB() {
     this.el.classList.add('active');
-    this.#menu.ariaExpanded = 'true';
+    this.#menu!.ariaExpanded = 'true';
     const delayIncrement = 40;
     const duration = 275;
 
@@ -208,7 +208,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     const duration = 175;
     setTimeout(() => {
       this.el.classList.remove('active');
-      this.#menu.ariaExpanded = 'false';
+      this.#menu!.ariaExpanded = 'false';
     }, duration);
     this.#floatingBtnsReverse.forEach((el) => {
       el.style.transition = `opacity ${duration}ms ease, transform ${duration}ms ease`;
@@ -225,11 +225,13 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     const btnRect = this.el.getBoundingClientRect();
 
     const backdrop = document.createElement('div'),
-      scaleFactor = windowWidth / backdrop[0].clientWidth,
       fabColor = getComputedStyle(this.#anchor).backgroundColor; // css('background-color');
     backdrop.classList.add('fab-backdrop'); //  $('<div class="fab-backdrop"></div>');
     backdrop.style.backgroundColor = fabColor;
     this.#anchor.append(backdrop);
+
+    // Measure after the backdrop is in the DOM so clientWidth reflects its rendered size.
+    const scaleFactor = windowWidth / backdrop.clientWidth;
 
     this.offsetX = btnRect.left - windowWidth / 2 + btnRect.width / 2;
     this.offsetY = windowHeight - btnRect.bottom;
@@ -245,7 +247,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
     this.el.style.left = '0';
     this.el.style.transform = 'translateX(' + this.offsetX + 'px)';
     this.el.style.transition = 'none';
-    this.#menu.ariaExpanded = 'true';
+    this.#menu!.ariaExpanded = 'true';
 
     this.#anchor.style.transform = `translateY(${this.offsetY}px`;
     this.#anchor.style.transition = 'none';
@@ -266,7 +268,7 @@ class FloatingActionButton extends Component<FloatingActionButtonOptions> implem
         backdrop.style.transform = 'scale(' + scaleFactor + ')';
         backdrop.style.transition = 'transform .2s cubic-bezier(0.550, 0.055, 0.675, 0.190)';
 
-        this.#menu.querySelectorAll('li > a').forEach((a: HTMLAnchorElement) => {
+        this.#menu!.querySelectorAll<HTMLAnchorElement>('li > a').forEach((a) => {
           a.style.opacity = '1';
           a.tabIndex = 0;
         });

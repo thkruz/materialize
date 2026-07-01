@@ -1,12 +1,37 @@
+// =====================================================================
+// M3 Navigation drawer  (Materialize calls it "sidenav")
+// Spec: https://m3.material.io/components/navigation-drawer/specs
+//   - Two types: standard (inline, no scrim)  &  modal (scrim + elevation).
+//       * Materialize `.sidenav`            -> modal   (overlay + elevation)
+//       * Materialize `.sidenav.sidenav-fixed` -> standard (inline, no scrim)
+//   - Width 360dp.
+//   - Container: modal = surface-container-low + elevation level 1;
+//                standard = surface.
+//   - Drawer items: 56dp tall, full/28dp rounded, 16dp horizontal padding,
+//                   12dp gap between icon and label, label-large type.
+//   - Active item: secondary-container active indicator (full/28dp shape),
+//                  label + icon on-secondary-container.
+//   - Inactive item: transparent bg, label + icon on-surface-variant.
+//   - State layers (hover/focus/press) tint with on-surface-variant.
+//   - Section headers: title-small, on-surface-variant.
+//   - Dividers: 1dp outline-variant.
+//   - Modal scrim: scrim color at ~32%.
+// Markup contract (unchanged): .sidenav, .sidenav li, .sidenav li > a,
+//   .sidenav li.active, .sidenav-overlay, .sidenav.sidenav-fixed, .drag-target
+// =====================================================================
+
 @use '../../sass/variables' as *;
 @use '../../sass/global' as *;
 
 .sidenav {
-  --sidenav-width: 300px;
-  --sidenav-font-size: 14px;
+  // 360dp is the M3 drawer width.
+  --sidenav-width: 360px;
   --sidenav-padding: 16px;
-  --sidenav-item-height: 48px;
+  // M3 drawer items are 56dp tall.
+  --sidenav-item-height: 56px;
   --sidenav-line-height: var(--sidenav-item-height);
+  // 12dp gap between a leading icon and its label.
+  --sidenav-icon-gap: 12px;
 
   position: fixed;
   width: var(--sidenav-width);
@@ -15,17 +40,23 @@
   margin: 0;
   transform: translateX(-100%);
   height: 100vh;
-  padding: 0;
+  padding: 8px;
   z-index: 999;
   overflow-y: auto;
   will-change: transform;
   backface-visibility: hidden;
-  transform: translateX(-105%); 
+  transform: translateX(-105%);
   user-select: none;
-  
-  color: var(--md-sys-color-on-secondary-container);
-  background-color: var(--md-sys-color-surface);
-  @extend .z-depth-1;
+
+  // Modal drawer: surface-container-low container + elevation level 1.
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level1);
+  // label-large is the drawer item label type.
+  font-family: var(--md-sys-typescale-label-large-font-family-name);
+  font-size: var(--md-sys-typescale-label-large-font-size);
+  font-weight: var(--md-sys-typescale-label-large-font-weight);
+  letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
 
   // Right Align
   &.right-aligned {
@@ -39,84 +70,154 @@
     margin: 0;
   }
 
-  /* Hover only on top row */
-  /*a:hover {
-    //color: red;
-    //background-color: var(--md-sys-color-on-secondary-container);
-    //md.sys.color.on-secondary-container
-  }*/
-  a:focus {
-    background-color: rgba(0, 0, 0, 0.12);
-  }
-
-  li.active > a:not(.collapsible-header):not(.btn):not(.btn-large):not(.btn-small):not(.btn-flat):not(.btn-large):not(.btn-floating)  {
-    //color: var(--md-sys-color-on-secondary-container); //var(--md-sys-color-on-secondary-container);
-    //background-color: var(--md-sys-color-secondary-container);
-    background-color: color-mix(in srgb, var(--md-sys-color-secondary) 10%, transparent);
-  }
-
-  .collapsible-body > ul { padding-left: 10px; }
-
-  li {    
+  li {
     list-style: none;
     display: grid;
     align-content: center;
   }
+
   li > a {
-    /* https://stackoverflow.com/questions/5848090/full-width-hover-background-for-nested-lists */
-    //padding-left: calc(100% + var(--sidenav-padding));
-    //margin-left: -100%;
-    margin: 0 12px;
+    margin: 0;
     padding: 0 var(--sidenav-padding);
-    //padding-left: var(--sidenav-padding);
-    // Truncate too long text
-    /*
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    */
     display: flex;
     height: var(--sidenav-item-height);
-    font-size: var(--sidenav-font-size);
-    font-weight: 500;
+    font-family: inherit;
+    font-size: var(--md-sys-typescale-label-large-font-size);
+    font-weight: var(--md-sys-typescale-label-large-font-weight);
+    letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+    line-height: var(--md-sys-typescale-label-large-line-height);
     align-items: center;
     overflow: hidden;
-    border-radius: 100px;
+    // full/28dp rounded active-indicator shape.
+    border-radius: var(--md-sys-shape-corner-full);
+    transition: background-color var(--md-sys-motion-duration-short4, 200ms)
+      var(--md-sys-motion-easing-standard, ease);
 
-    &:not(.btn):not(.btn-flat):not(.btn-large):not(.btn-floating) {
-      color: var(--md-sys-color-on-secondary-container);
+    // Inactive drawer item: transparent bg, on-surface-variant label + icon.
+    &:not(.btn):not(.btn-large):not(.btn-flat):not(.btn-floating) {
+      color: var(--md-sys-color-on-surface-variant);
+      background-color: transparent;
+
+      // Hover state layer: on-surface-variant tint at the hover opacity.
       &:hover {
-        //color: var(--md-sys-color-on-secondary-container);
-        //md.sys.color.on-secondary-container
-        background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-on-surface-variant)
+            calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+          transparent
+        );
+      }
+
+      // Focus state layer.
+      &:focus {
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-on-surface-variant)
+            calc(var(--md-sys-state-focus-state-layer-opacity) * 100%),
+          transparent
+        );
+      }
+
+      // Press state layer.
+      &:active {
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-on-surface-variant)
+            calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%),
+          transparent
+        );
       }
     }
 
-    &.btn, &.btn-large, &.btn-flat, &.btn-floating {
+    &.btn,
+    &.btn-large,
+    &.btn-flat,
+    &.btn-floating {
       margin: 10px 15px;
     }
 
-    /* TODO: Use special class in future like "mw-icon" */
-    & > .material-icons, & > .material-symbols-outlined,
-    & > .material-symbols-rounded, & > .material-symbols-sharp {
+    /* Leading icon: 12dp gap to the label. */
+    & > .material-icons,
+    & > .material-symbols-outlined,
+    & > .material-symbols-rounded,
+    & > .material-symbols-sharp {
       display: inline-flex;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: var(--sidenav-icon-gap);
+      color: inherit;
     }
   }
 
-  .divider {
-    margin: calc(var(--sidenav-padding) * 0.5) 0 0 0;
+  // Active drawer item: secondary-container active indicator with full/28dp
+  // shape, on-secondary-container label + icon.
+  li.active
+    > a:not(.collapsible-header):not(.btn):not(.btn-large):not(.btn-small):not(.btn-flat):not(.btn-floating) {
+    color: var(--md-sys-color-on-secondary-container);
+    background-color: var(--md-sys-color-secondary-container);
+    border-radius: var(--md-sys-shape-corner-full);
+
+    & > .material-icons,
+    & > .material-symbols-outlined,
+    & > .material-symbols-rounded,
+    & > .material-symbols-sharp {
+      color: var(--md-sys-color-on-secondary-container);
+    }
+
+    // Keep the active indicator legible under hover/focus/press by tinting
+    // with on-secondary-container over the secondary-container base.
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--md-sys-color-on-secondary-container)
+          calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+        var(--md-sys-color-secondary-container)
+      );
+    }
+    &:focus {
+      background-color: color-mix(
+        in srgb,
+        var(--md-sys-color-on-secondary-container)
+          calc(var(--md-sys-state-focus-state-layer-opacity) * 100%),
+        var(--md-sys-color-secondary-container)
+      );
+    }
+    &:active {
+      background-color: color-mix(
+        in srgb,
+        var(--md-sys-color-on-secondary-container)
+          calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%),
+        var(--md-sys-color-secondary-container)
+      );
+    }
   }
 
+  .collapsible-body > ul {
+    padding-left: 10px;
+  }
+
+  // Dividers: 1dp outline-variant.
+  .divider {
+    height: 1px;
+    margin: 8px 0;
+    background-color: var(--md-sys-color-outline-variant);
+    border: none;
+  }
+
+  // Section headers: title-small type, on-surface-variant.
   .subheader {
     cursor: initial;
     pointer-events: none;
-    color: red;
-    font-size: var(--sidenav-font-size);
-    font-weight: 500;
-    line-height: var(--sidenav-line-height);
+    display: flex;
+    align-items: center;
+    height: var(--sidenav-item-height);
+    padding: 0 var(--sidenav-padding);
+    color: var(--md-sys-color-on-surface-variant);
+    background-color: transparent;
+    font-family: var(--md-sys-typescale-title-small-font-family-name);
+    font-size: var(--md-sys-typescale-title-small-font-size);
+    font-weight: var(--md-sys-typescale-title-small-font-weight);
+    letter-spacing: var(--md-sys-typescale-title-small-letter-spacing);
+    line-height: var(--md-sys-typescale-title-small-line-height);
   }
 
   // Remove this? is very custom
@@ -144,7 +245,9 @@
       z-index: -1;
     }
 
-    .circle, .name, .email {
+    .circle,
+    .name,
+    .email {
       display: block;
     }
 
@@ -155,7 +258,7 @@
 
     .name,
     .email {
-      font-size: var(--sidenav-font-size);
+      font-size: var(--md-sys-typescale-label-large-font-size);
       line-height: calc(var(--sidenav-line-height) * 0.5);
     }
 
@@ -184,11 +287,14 @@
   }
 }
 
-// Fixed Sidenav shown
+// Fixed / standard drawer: inline, no scrim, surface container, no elevation.
 .sidenav.sidenav-fixed {
   left: 0;
   transform: translateX(0);
   position: fixed;
+  // Standard drawer container is `surface` with no elevation.
+  background-color: var(--md-sys-color-surface);
+  box-shadow: none;
 
   &.right-aligned {
     right: 0;
@@ -201,6 +307,9 @@
   .sidenav {
     &.sidenav-fixed {
       transform: translateX(-105%);
+      // When collapsed on small screens it behaves as a modal drawer again.
+      background-color: var(--md-sys-color-surface-container-low);
+      box-shadow: var(--md-sys-elevation-level1);
 
       &.right-aligned {
         transform: translateX(105%);
@@ -219,6 +328,7 @@
   padding: 0;
 }
 
+// Modal scrim: scrim color at ~32%.
 .sidenav-overlay {
   position: fixed;
   top: 0;
@@ -226,7 +336,7 @@
   right: 0;
   opacity: 0;
   height: 120vh;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent);
   z-index: 997;
   display: none;
 }

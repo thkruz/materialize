@@ -1,0 +1,87 @@
+// =====================================================================
+// Bottom sheet (Material 3)
+// https://m3.material.io/components/bottom-sheets/specs
+//
+// A surface anchored to the bottom edge that slides up to reveal
+// supplementary content. Two configurations:
+//   - standard  (.bottom-sheet)           — no scrim, coexists with content
+//   - modal     (.bottom-sheet--modal)    — dimming scrim, blocks content
+//
+// Markup contract:
+//   <div class="bottom-sheet__scrim"></div>          <!-- modal only -->
+//   <div class="bottom-sheet bottom-sheet--modal open">
+//     <div class="bottom-sheet__handle"></div>       <!-- optional drag handle -->
+//     ...content...
+//   </div>
+//
+// Visibility is driven by the `.open` class (add/remove from script or a
+// framework). The sheet animates in/out with the emphasized easing set.
+// =====================================================================
+
+.bottom-sheet {
+  // Anchored to the bottom edge, centered, up to a 640dp max width.
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 2;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 640px;
+  max-height: 100%;
+  box-sizing: border-box;
+
+  // M3 container: surface-container-low, extra-large (28dp) TOP corners only.
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+  box-shadow: var(--md-sys-elevation-level1);
+  color: var(--md-sys-color-on-surface);
+
+  padding: 0 16px 24px;
+  overflow-y: auto;
+
+  // Hidden below the viewport until `.open`.
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized),
+    visibility 0s linear var(--md-sys-motion-duration-medium4);
+
+  &.open {
+    transform: translateY(0);
+    visibility: visible;
+    transition:
+      transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate),
+      visibility 0s;
+  }
+}
+
+// ------------------------------------------------------------- Drag handle
+// M3: 32dp wide x 4dp tall, on-surface-variant at 40%, centered near the top.
+.bottom-sheet__handle {
+  width: 32px;
+  height: 4px;
+  margin: 22px auto 16px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: color-mix(in srgb, transparent, var(--md-sys-color-on-surface-variant) 40%);
+  cursor: grab;
+}
+
+// -------------------------------------------------------------------- Scrim
+// Modal bottom sheets dim the rest of the screen with the M3 scrim at 32%.
+.bottom-sheet__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-color: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent);
+
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    visibility 0s linear var(--md-sys-motion-duration-medium2);
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+  }
+}

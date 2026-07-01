@@ -10,10 +10,10 @@ const _defaults: RangeOptions = {};
 export class Range extends Component<RangeOptions> {
   declare el: HTMLInputElement;
   private _mousedown: boolean;
-  value: HTMLElement;
-  thumb: HTMLElement;
+  value!: HTMLElement;
+  thumb!: HTMLElement;
 
-  constructor(el: HTMLInputElement, options: Partial<RangeOptions>) {
+  constructor(el: HTMLElement, options: Partial<RangeOptions>) {
     super(el, options, Range);
     this.el['M_Range'] = this;
 
@@ -178,7 +178,7 @@ export class Range extends Component<RangeOptions> {
   }
 
   _showRangeBubble() {
-    const paddingLeft = parseInt(getComputedStyle(this.thumb.parentElement).paddingLeft);
+    const paddingLeft = parseInt(getComputedStyle(this.thumb.parentElement!).paddingLeft);
     const marginLeftText = -7 + paddingLeft + 'px'; // TODO: fix magic number?
     const duration = 300;
     // easeOutQuint
@@ -197,8 +197,8 @@ export class Range extends Component<RangeOptions> {
 
   _calcRangeOffset(): number {
     const width = this.el.getBoundingClientRect().width - 15;
-    const max = parseFloat(this.el.getAttribute('max')) || 100; // Range default max
-    const min = parseFloat(this.el.getAttribute('min')) || 0; // Range default min
+    const max = parseFloat(this.el.getAttribute('max')!) || 100; // Range default max
+    const min = parseFloat(this.el.getAttribute('min')!) || 0; // Range default min
     const percent = (parseFloat(this.el.value) - min) / (max - min);
     return percent * width;
   }

@@ -2,8 +2,8 @@ import { Utils } from '../../src/utils';
 import { Component, BaseOptions, InitElements, MElement, Openable } from '../../src/component';
 
 interface CardsOptions extends BaseOptions {
-  onOpen: (el: Element) => void;
-  onClose: (el: Element) => void;
+  onOpen: ((el: Element) => void) | null;
+  onClose: ((el: Element) => void) | null;
   inDuration: number;
   outDuration: number;
 }
@@ -17,9 +17,9 @@ const _defaults: CardsOptions = {
 
 class Cards extends Component<CardsOptions> implements Openable {
   readonly #cardReveal: HTMLElement | null;
-  readonly #initialOverflow: string;
+  readonly #initialOverflow!: string;
   #activators: HTMLElement[] | null;
-  #cardRevealClose: HTMLElement | null;
+  #cardRevealClose!: HTMLElement | null;
   isOpen: boolean = false;
 
   constructor(el: HTMLElement, options: Partial<CardsOptions>) {
@@ -67,7 +67,7 @@ class Cards extends Component<CardsOptions> implements Openable {
    */
   static init(
     els: HTMLElement | InitElements<MElement>,
-    options?: Partial<CardsOptions>
+    options: Partial<CardsOptions> = {}
   ): Cards | Cards[] {
     return super.init(els, options, Cards);
   }
@@ -85,14 +85,14 @@ class Cards extends Component<CardsOptions> implements Openable {
   }
 
   #setupEventHandlers = () => {
-    this.#activators.forEach((el: HTMLElement) => {
+    this.#activators!.forEach((el: HTMLElement) => {
       el.addEventListener('click', this.#handleClickInteraction);
       el.addEventListener('keypress', this.#handleKeypressEvent);
     });
   };
 
   #removeEventHandlers = () => {
-    this.#activators.forEach((el: HTMLElement) => {
+    this.#activators!.forEach((el: HTMLElement) => {
       el.removeEventListener('click', this.#handleClickInteraction);
       el.removeEventListener('keypress', this.#handleKeypressEvent);
     });
@@ -109,18 +109,18 @@ class Cards extends Component<CardsOptions> implements Openable {
   };
 
   #handleRevealEvent = () => {
-    this.#activators.forEach((el: HTMLElement) => (el.tabIndex = -1)); // Reveal Card
+    this.#activators!.forEach((el: HTMLElement) => (el.tabIndex = -1)); // Reveal Card
     this.open();
   };
 
   #setupRevealCloseEventHandlers = () => {
-    this.#cardRevealClose.addEventListener('click', this.close);
-    this.#cardRevealClose.addEventListener('keypress', this.#handleKeypressCloseEvent);
+    this.#cardRevealClose!.addEventListener('click', this.close);
+    this.#cardRevealClose!.addEventListener('keypress', this.#handleKeypressCloseEvent);
   };
 
   #removeRevealCloseEventHandlers = () => {
-    this.#cardRevealClose.addEventListener('click', this.close);
-    this.#cardRevealClose.addEventListener('keypress', this.#handleKeypressCloseEvent);
+    this.#cardRevealClose!.addEventListener('click', this.close);
+    this.#cardRevealClose!.addEventListener('keypress', this.#handleKeypressCloseEvent);
   };
 
   #handleKeypressCloseEvent: (e: KeyboardEvent) => void = (e: KeyboardEvent) => {
@@ -136,15 +136,15 @@ class Cards extends Component<CardsOptions> implements Openable {
     if (this.isOpen) return;
     this.isOpen = true;
     this.el.style.overflow = 'hidden';
-    this.#cardReveal.style.display = 'block';
-    this.#cardReveal.ariaExpanded = 'true';
-    this.#cardRevealClose.tabIndex = 0;
+    this.#cardReveal!.style.display = 'block';
+    this.#cardReveal!.ariaExpanded = 'true';
+    this.#cardRevealClose!.tabIndex = 0;
     setTimeout(() => {
-      this.#cardReveal.style.transition = `transform ${this.options.outDuration}ms ease`; //easeInOutQuad
-      this.#cardReveal.style.transform = 'translateY(-100%)';
+      this.#cardReveal!.style.transition = `transform ${this.options.outDuration}ms ease`; //easeInOutQuad
+      this.#cardReveal!.style.transform = 'translateY(-100%)';
     }, 1);
     if (typeof this.options.onOpen === 'function') {
-      this.options.onOpen.call(this);
+      this.options.onOpen.call(this, this.el);
     }
     this.#setupRevealCloseEventHandlers();
   };
@@ -155,17 +155,17 @@ class Cards extends Component<CardsOptions> implements Openable {
   close: () => void = () => {
     if (!this.isOpen) return;
     this.isOpen = false;
-    this.#cardReveal.style.transition = `transform ${this.options.inDuration}ms ease`; //easeInOutQuad
-    this.#cardReveal.style.transform = 'translateY(0)';
+    this.#cardReveal!.style.transition = `transform ${this.options.inDuration}ms ease`; //easeInOutQuad
+    this.#cardReveal!.style.transform = 'translateY(0)';
     setTimeout(() => {
-      this.#cardReveal.style.display = 'none';
-      this.#cardReveal.ariaExpanded = 'false';
-      this.#activators.forEach((el: HTMLElement) => (el.tabIndex = 0));
-      this.#cardRevealClose.tabIndex = -1;
+      this.#cardReveal!.style.display = 'none';
+      this.#cardReveal!.ariaExpanded = 'false';
+      this.#activators!.forEach((el: HTMLElement) => (el.tabIndex = 0));
+      this.#cardRevealClose!.tabIndex = -1;
       this.el.style.overflow = this.#initialOverflow;
     }, this.options.inDuration);
     if (typeof this.options.onClose === 'function') {
-      this.options.onClose.call(this);
+      this.options.onClose.call(this, this.el);
     }
     this.#removeRevealCloseEventHandlers();
   };

@@ -45,12 +45,12 @@ export class DockedDisplayPlugin {
   private readonly el: HTMLElement;
   private readonly container: HTMLDivElement;
   private options: Partial<DockedDisplayPluginOptions>;
-  private visible: boolean;
+  private visible!: boolean;
 
   constructor(
     el: HTMLElement,
     container: HTMLElement,
-    options: Partial<DockedDisplayPluginOptions>
+    options: Partial<DockedDisplayPluginOptions> = {}
   ) {
     this.el = el;
     this.options = {
@@ -61,7 +61,7 @@ export class DockedDisplayPlugin {
     this.container = document.createElement('div');
     this.container.classList.add('display-docked');
     this.container.append(container);
-    el.parentElement.append(this.container);
+    el.parentElement!.append(this.container);
 
     document.addEventListener('click', (e) => {
       if (
@@ -95,8 +95,8 @@ export class DockedDisplayPlugin {
       this.el,
       this.container,
       'bottom',
-      this.options.margin,
-      this.options.transition,
+      this.options.margin!,
+      this.options.transition!,
       this.options.align
     );
 

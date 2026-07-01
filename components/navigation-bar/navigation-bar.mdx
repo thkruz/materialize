@@ -5,16 +5,19 @@ import * as stories from './navigation-bar.stories';
 
 # Navigation Bar
 
-There are 2 main parts of the navbar. A logo or brand link, and the navigations links. You can align these links to the left or right.
+The navigation bar is a bottom-fixed bar with 3-5 evenly-spaced destinations, following the
+[Material 3 spec](https://m3.material.io/components/navigation-bar/specs). Each destination stacks
+a 24dp icon above a label, with an active-indicator pill behind the active destination's icon.
+Mark the current destination with the `active` class on its `navigation-bar__item`.
 
-## Right Aligned Links
+## Three Destinations
 
-To right align your navbar links, just add a `right` class to the `ul` that contains them.
+<Story of={stories.ThreeDestinations} />
+<Source of={stories.ThreeDestinations} format="dedent"/>
 
-<Story of={stories.RightAligned} />
-<Source of={stories.RightAligned} format="dedent"/>
+## Five Destinations
 
-## Left Aligned Links
+Five is the maximum number of destinations. For more, consider a navigation drawer or rail.
 
-<Story of={stories.LeftAligned} />
-<Source of={stories.LeftAligned} format="dedent"/>
+<Story of={stories.FiveDestinations} />
+<Source of={stories.FiveDestinations} format="dedent"/>

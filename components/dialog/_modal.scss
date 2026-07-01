@@ -1,23 +1,41 @@
 @use '../../sass/variables' as *;
 @use '../../sass/global' as *;
 
+// Material 3 Dialog (basic + full-screen)
+// https://m3.material.io/components/dialogs/specs
+//
+// Markup contract (do NOT rename): the M3 dialog is a native <dialog> element
+// carrying `.modal`, with `.modal-header`, `.modal-content` and `.modal-footer`
+// children. The scrim is drawn on the native `::backdrop` pseudo-element.
+//
 // use with dialog html element
 .modal {
   --modal-footer-divider-height: 1px;
-  --modal-border-radius: 28px;
+  // M3 basic dialog uses the extra-large (28dp) corner shape.
+  --modal-border-radius: var(--md-sys-shape-corner-extra-large);
   --modal-padding: 24px;
   --modal-padding-bottom: 16px;
-  --modal-background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-surface-tint) 17%);
+  // M3 container color role for dialogs.
+  --modal-background-color: var(--md-sys-color-surface-container-high);
+  // M3 scrim: the scrim color at 32% opacity over the rest of the screen.
+  --modal-scrim-color: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent);
 
-  @extend .z-depth-5;
   border: none;
   outline: none;
   padding: 0;
+  color: var(--md-sys-color-on-surface);
+  // M3 basic dialog sizing: min 280dp, max 560dp.
+  min-width: 280px;
+  max-width: 560px;
   max-height: 70%;
   width: 55%;
   border-radius: var(--modal-border-radius);
   will-change: top, opacity;
   background-color: var(--modal-background-color);
+  // M3 elevation level 3 for dialogs.
+  box-shadow: var(--md-sys-elevation-level3);
+  transition: opacity var(--md-sys-motion-duration-medium2)
+    var(--md-sys-motion-easing-emphasized);
 
   // Dialog open
   &[open] {
@@ -29,8 +47,9 @@
     width: 80%;
   }
 
-  // custom backdrop blur
+  // M3 scrim over the rest of the screen.
   &::backdrop {
+    background-color: var(--modal-scrim-color);
     backdrop-filter: blur(1px);
   }
 
@@ -45,27 +64,93 @@
   }
   .modal-content {
     padding: 0 var(--modal-padding);
+    // M3 supporting text: body-medium, on-surface-variant.
+    font-family: var(--md-sys-typescale-body-medium-font-family-name);
+    font-size: var(--md-sys-typescale-body-medium-font-size);
+    font-weight: var(--md-sys-typescale-body-medium-font-weight);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-body-medium-letter-spacing);
+    color: var(--md-sys-color-on-surface-variant);
   }
   .modal-footer {
     display: flex;
     border-radius: 0 0 var(--modal-border-radius) var(--modal-border-radius);
     padding: var(--modal-padding);
+    // M3 actions align to the trailing (right) edge with an 8dp gap.
     text-align: right;
     flex-shrink: 0;
     position: sticky;
     bottom: 0;
     // disabled since background color inheritance from parent element
     // background-color: var(--modal-background-color);
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 8px;
   }
 
   .modal-close {
     cursor: pointer;
   }
 
+  // Optional M3 dialog icon: 24dp, centered horizontally, color `secondary`.
+  .modal-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    line-height: 24px;
+    margin: 0 auto 16px;
+    text-align: center;
+    color: var(--md-sys-color-secondary);
+  }
+
+  // M3 headline: headline-small type, color on-surface.
+  // Left-aligned normally; centered when the optional icon is present.
+  .modal-header h1,
+  .modal-header h2,
+  .modal-header h3,
+  .modal-header h4,
+  .modal-header h5,
+  .modal-header h6,
+  .modal-headline {
+    margin: 0;
+    font-family: var(--md-sys-typescale-headline-small-font-family-name);
+    font-size: var(--md-sys-typescale-headline-small-font-size);
+    font-weight: var(--md-sys-typescale-headline-small-font-weight);
+    line-height: var(--md-sys-typescale-headline-small-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-small-letter-spacing);
+    color: var(--md-sys-color-on-surface);
+  }
+
+  // When an icon is present the headline is centered per M3.
+  .modal-icon + .modal-headline,
+  &.has-icon .modal-header {
+    text-align: center;
+  }
+
   // todo: remove maybe
   h1,h2,h3,h4,h5,h6 {
     margin: 0;
+  }
+}
+
+// M3 full-screen dialog: fills the screen with no corner radius.
+.modal.fullscreen {
+  --modal-border-radius: var(--md-sys-shape-corner-none);
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  border-radius: var(--modal-border-radius);
+
+  .modal-footer {
+    border-radius: 0;
+  }
+
+  // Optional divider under the top app bar / header.
+  .modal-header {
+    border-bottom: var(--modal-footer-divider-height) solid
+      var(--md-sys-color-outline-variant);
   }
 }
 

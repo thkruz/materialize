@@ -6,12 +6,12 @@ export interface TapTargetOptions extends BaseOptions {
    * Callback function called when Tap Target is opened.
    * @default null
    */
-  onOpen: (origin: HTMLElement) => void;
+  onOpen: ((origin: HTMLElement) => void) | null;
   /**
    * Callback function called when Tap Target is closed.
    * @default null
    */
-  onClose: (origin: HTMLElement) => void;
+  onClose: ((origin: HTMLElement) => void) | null;
 }
 
 const _defaults: TapTargetOptions = {
@@ -26,11 +26,11 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
   isOpen: boolean;
 
   static _taptargets: TapTarget[];
-  private wrapper: HTMLElement;
+  private wrapper!: HTMLElement;
   // private _origin: HTMLElement;
   private originEl: HTMLElement;
-  private waveEl: HTMLElement & Element & Node;
-  private contentEl: HTMLElement;
+  private waveEl!: HTMLElement & Element & Node;
+  private contentEl!: HTMLElement;
 
   constructor(el: HTMLElement, options: Partial<TapTargetOptions>) {
     super(el, options, TapTarget);
@@ -43,7 +43,7 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
 
     this.isOpen = false;
     // setup
-    this.originEl = document.querySelector(`#${el.dataset.target}`);
+    this.originEl = document.querySelector(`#${el.dataset.target}`)!;
     this.originEl.tabIndex = 0;
 
     this._setup();
@@ -109,7 +109,9 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
     window.removeEventListener('resize', this._handleThrottledResize);
   }
 
-  _handleThrottledResize = (): void => Utils.throttle(this._handleResize, 200).bind(this);
+  _handleThrottledResize = (): void => {
+    Utils.throttle(this._handleResize, 200).bind(this);
+  };
 
   _handleKeyboardInteraction = (e: KeyboardEvent) => {
     if (Utils.keys.ENTER.includes(e.key)) {
@@ -143,12 +145,12 @@ export class TapTarget extends Component<TapTargetOptions> implements Openable {
 
   _setup() {
     // Creating tap target
-    this.wrapper = this.el.parentElement;
-    this.waveEl = this.wrapper.querySelector('.tap-target-wave');
-    this.el.parentElement.ariaExpanded = 'false';
+    this.wrapper = this.el.parentElement!;
+    this.waveEl = this.wrapper.querySelector('.tap-target-wave')!;
+    this.el.parentElement!.ariaExpanded = 'false';
     this.originEl.style.zIndex = '1002';
     // this.originEl = this.wrapper.querySelector('.tap-target-origin');
-    this.contentEl = this.el.querySelector('.tap-target-content');
+    this.contentEl = this.el.querySelector('.tap-target-content')!;
     // Creating wrapper
     if (!this.wrapper.classList.contains('.tap-target-wrapper')) {
       this.wrapper = document.createElement('div');

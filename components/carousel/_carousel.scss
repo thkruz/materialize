@@ -1,3 +1,18 @@
+@use '../../sass/mixins.module.scss' as *;
+
+// =====================================================================
+// Carousel — aligned to Material 3
+// https://m3.material.io/components/carousel/specs
+//
+// The class / markup contract is driven by carousel.ts and must not
+// change: `.carousel`, `.carousel.carousel-slider`, `.carousel-item`,
+// `.carousel-fixed-item`, `.indicators` / `.indicator-item`, plus the
+// runtime `.active` / `.scrolling` states. carousel.ts sets inline
+// width/height/transform/opacity/visibility on items at runtime, so
+// this file only styles shape, color and motion — never layout metrics
+// the JS owns.
+// =====================================================================
+
 .carousel {
   --carousel-height: 400px;
 
@@ -8,6 +23,8 @@
   perspective: 500px;
   transform-style: preserve-3d;
   transform-origin: 0% 50%;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 
   &.carousel-slider {
     top: 0;
@@ -32,6 +49,8 @@
       position: absolute;
       top: 0;
       left: 0;
+      // Full-width slider items span the viewport, so no rounded corners.
+      border-radius: 0;
 
       h2 {
         font-size: 24px;
@@ -52,9 +71,56 @@
     position: absolute;
     top: 0;
     left: 0;
+    // M3: carousel items use the `large` (16dp) corner shape.
+    border-radius: var(--md-sys-shape-corner-large);
+    overflow: hidden;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    // State layer tints on hover/focus/press. carousel.ts owns transform,
+    // opacity and visibility inline, so the transition here only covers
+    // the properties this stylesheet is responsible for.
+    transition:
+      border-radius var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+      box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 
     & > img {
       width: 100%;
+    }
+
+    // M3 focus/hover/press state layer painted over the item image.
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-color: var(--md-sys-color-on-surface);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+    }
+
+    &:hover::before {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
+    }
+
+    &:focus-visible::before {
+      opacity: var(--md-sys-state-focus-state-layer-opacity);
+    }
+
+    &:active::before {
+      opacity: var(--md-sys-state-pressed-state-layer-opacity);
+    }
+
+    // Text overlays sit on a scrim per M3 so on-surface text stays legible
+    // over the item image.
+    .carousel-caption,
+    .carousel-overlay {
+      color: var(--md-sys-color-on-surface);
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--md-sys-color-scrim) 60%, transparent),
+        transparent
+      );
     }
   }
 
@@ -75,13 +141,51 @@
       height: 8px;
       width: 8px;
       margin: 24px 4px;
-      background-color: rgba(255, 255, 255, 0.45);
-      transition: background-color .3s;
-      border-radius: 50%;
+      background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+      transition: background-color var(--md-sys-motion-duration-short4)
+        var(--md-sys-motion-easing-standard);
+      border-radius: var(--md-sys-shape-corner-full);
 
       &.active {
-        background-color: var(--md-ref-palette-primary100);
+        background-color: var(--md-sys-color-primary);
       }
+    }
+  }
+
+  // -------------------------------------------------------------------
+  // M3 layout variants (https://m3.material.io/components/carousel/specs)
+  // These are opt-in modifier classes; carousel.ts does not depend on
+  // them, so they only tune shape / emphasis and are safe to add.
+  // -------------------------------------------------------------------
+
+  // Multi-browse: a large focused item alongside several smaller items,
+  // all using the `large` (16dp) corner.
+  &.multi-browse .carousel-item {
+    border-radius: var(--md-sys-shape-corner-large);
+  }
+
+  // Uncontained: items scroll edge-to-edge; keep the `large` corner.
+  &.uncontained .carousel-item {
+    border-radius: var(--md-sys-shape-corner-large);
+  }
+
+  // Hero: one large focused item with a small preview item; the active
+  // item is emphasized with elevation.
+  &.hero .carousel-item {
+    border-radius: var(--md-sys-shape-corner-large);
+
+    &.active {
+      box-shadow: var(--md-sys-elevation-level1);
+    }
+  }
+
+  // Full-screen: vertically stacked items that fill the viewport and use
+  // the `extra-large` (28dp) corner per M3.
+  &.full-screen {
+    .carousel-item {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--md-sys-shape-corner-extra-large);
     }
   }
 
