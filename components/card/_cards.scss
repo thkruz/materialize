@@ -2,12 +2,13 @@
 @use '../../sass/mixins.module.scss' as *;
 
 .card-panel {
-  transition: box-shadow .25s;
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   padding: 24px;
   margin: $element-top-margin 0 $element-bottom-margin 0;
-  border-radius: 12px;
-  @extend .z-depth-1;
+  border-radius: var(--md-sys-shape-corner-medium);
+  @include elevation(1);
   background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 
 .card {
@@ -16,9 +17,58 @@
   position: relative;
   //margin: $element-top-margin 0 $element-bottom-margin 0;
   background-color: var(--background-color);
-  transition: box-shadow .25s;
-  border-radius: 12px;
-  @extend .z-depth-1;
+  color: var(--md-sys-color-on-surface);
+  // M3: medium corner = 12dp for every card variant.
+  border-radius: var(--md-sys-shape-corner-medium);
+  // M3: elevation/shape transitions ride the motion tokens (no ad-hoc easing).
+  transition:
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  // Default (untyped) card keeps its historical level-1 elevation via the
+  // elevation token. Variant classes below override the container + elevation.
+  @include elevation(1);
+
+  // ==================================================================
+  // M3 card variants
+  // ==================================================================
+
+  // Elevated: surface-container-low container at elevation level 1.
+  &.elevated {
+    background-color: var(--md-sys-color-surface-container-low);
+    @include elevation(1);
+  }
+
+  // Filled: surface-container-highest container at elevation level 0.
+  &.filled {
+    background-color: var(--md-sys-color-surface-container-highest);
+    @include elevation(0);
+  }
+
+  // Outlined: plain surface, level 0, 1dp outline-variant border.
+  &.outlined {
+    background-color: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    @include elevation(0);
+  }
+
+  // Interactive raise-on-hover per M3 (only when the card opts in as an
+  // actionable surface via `.clickable` or a reveal activator).
+  &.clickable,
+  &.reveal {
+    cursor: pointer;
+
+    &.elevated:hover {
+      @include elevation(2);
+    }
+
+    &.filled:hover {
+      @include elevation(1);
+    }
+
+    &.outlined:hover {
+      @include elevation(1);
+    }
+  }
 
   .card-title {
     font-size: 24px;
@@ -154,6 +204,8 @@
   .card-content {
     padding: 24px;
     border-radius: 0 0 2px 2px;
+    // M3: supporting body text uses the on-surface-variant role.
+    color: var(--md-sys-color-on-surface-variant);
 
     p {
       margin: 0;
