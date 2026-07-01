@@ -109,9 +109,9 @@ export class Autocomplete extends Component<AutocompleteOptions> {
   private oldVal: string;
   private $active: HTMLElement | null;
   private _mousedown: boolean;
-  container: HTMLElement;
+  container!: HTMLElement;
   /** Instance of the dropdown plugin for this autocomplete. */
-  dropdown: Dropdown;
+  dropdown!: Dropdown;
   static _keydown: boolean;
   selectedValues: AutocompleteData[];
   menuItems: AutocompleteData[];
@@ -226,7 +226,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
     });
 
     // ! Issue in Component Dropdown: _placeDropdown moves dom-position
-    this.el.parentElement.appendChild(this.container);
+    this.el.parentElement!.appendChild(this.container);
 
     // Initialize dropdown
     const dropdownOptions = {
@@ -248,7 +248,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
 
     // ! Workaround for Label: move label up again
     // TODO: Just use PopperJS in future!
-    const label = this.el.parentElement.querySelector('label');
+    const label = this.el.parentElement!.querySelector('label');
     if (label) this.el.after(label);
 
     // Sketchy removal of dropdown click handler
@@ -265,13 +265,13 @@ export class Autocomplete extends Component<AutocompleteOptions> {
     const div = document.createElement('div');
     div.classList.add('status-info');
     div.setAttribute('style', 'position: absolute;right:0;top:0;');
-    this.el.parentElement.appendChild(div);
+    this.el.parentElement!.appendChild(div);
     this._updateSelectedInfo();
   }
 
   _removeDropdown() {
     this.container.ariaExpanded = 'false';
-    this.container.parentNode.removeChild(this.container);
+    this.container.parentNode!.removeChild(this.container);
   }
 
   _handleInputBlur = () => {
@@ -435,7 +435,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
     itemText.classList.add('item-text');
     itemText.setAttribute('style', 'padding:5px;overflow:hidden;');
     item.appendChild(itemText);
-    item.querySelector('.item-text').appendChild(div);
+    item.querySelector('.item-text')!.appendChild(div);
     // Description
     if (
       typeof entry.description === 'string' ||
@@ -447,7 +447,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
         'line-height:1.3;color:grey;white-space:nowrap;text-overflow:ellipsis;display:block;width:90%;overflow:hidden;'
       );
       description.innerText = entry.description;
-      item.querySelector('.item-text').appendChild(description);
+      item.querySelector('.item-text')!.appendChild(description);
     }
     // Set Grid
     const getGridConfig = () => {
@@ -475,9 +475,9 @@ export class Autocomplete extends Component<AutocompleteOptions> {
   }
 
   _setStatusLoading() {
-    this.el.parentElement.querySelector(
+    this.el.parentElement!.querySelector(
       '.status-info'
-    ).innerHTML = `<div style="height:100%;width:50px;"><svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+    )!.innerHTML = `<div style="height:100%;width:50px;"><svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
     <circle fill="#888c" stroke="none" cx="6" cy="50" r="6"><animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1"/></circle>
     <circle fill="#888c" stroke="none" cx="26" cy="50" r="6"><animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2"/></circle>
     <circle fill="#888c" stroke="none" cx="46" cy="50" r="6"><animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite"  begin="0.3"/></circle>
@@ -485,7 +485,7 @@ export class Autocomplete extends Component<AutocompleteOptions> {
   }
 
   _updateSelectedInfo() {
-    const statusElement = this.el.parentElement.querySelector('.status-info');
+    const statusElement = this.el.parentElement!.querySelector('.status-info');
     if (statusElement) {
       if (this.options.isMultiSelect)
         statusElement.innerHTML = this.selectedValues.length.toString();
