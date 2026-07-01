@@ -40,8 +40,6 @@ export const Basic: StoryObj = {
 </div>`,
     (root) => {
       Slider.init(root.querySelector<HTMLElement>('.slider')!, {
-        interval: 100,
-        duration: 0,
         pauseOnFocus: true,
         indicatorLabelFunc: (idx) => 'Slide ' + idx
       });
