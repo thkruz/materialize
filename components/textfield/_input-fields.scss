@@ -43,23 +43,36 @@
 }
 
 .input-field {
+  // md.sys.color.primary is the active/focused indicator + label color.
   --input-color: var(--md-sys-color-primary);
 
   position: relative;
   clear: both;
 
-  // Default
+  // Default (behaves like the M3 "filled" variant)
 
   input, textarea {
     box-sizing: border-box; /* https://stackoverflow.com/questions/1377719/padding-within-inputs-breaks-width-100*/
     padding: 0 16px;
     padding-top: 20px;
-    //background-color: transparent; //background-color: var(--md-sys-color-surface);
+    // md.sys.typescale.body-large — input text
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+    // md.sys.color.on-surface — input text color
+    color: var(--md-sys-color-on-surface);
+    // md.sys.color.surface-container-highest — filled container
+    background-color: var(--md-sys-color-surface-container-highest);
     border: none; // reset
-    border-radius: 4px; // md.sys.shape.corner.extra-small.top
+    // md.sys.shape.corner.extra-small.top — 4dp top corners, square bottom
+    border-radius: var(--md-sys-shape-corner-extra-small-top);
+    // Active indicator: 1dp on-surface-variant, becomes 2dp primary on focus
     border-bottom: 1px solid var(--md-sys-color-on-surface-variant);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    transition:
+      border-bottom-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+      border-bottom-width var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 
     &:focus:not([readonly]) {
       border-bottom: 2px solid var(--input-color);
@@ -79,6 +92,7 @@
     &:focus:not([readonly]) + label,
     &:not([placeholder=' ']) + label,
     &:not(:placeholder-shown) + label {
+      // md.sys.typescale.body-small — floated label shrinks from body-large
       //font-size: 12px; // md.sys.typescale.body-small.size
       // https://stackoverflow.com/questions/34717492/css-transition-font-size-avoid-jittering-wiggling
       transform: scale(calc(12 / 16));
@@ -115,45 +129,63 @@
   }
 
   & > label {
+    // md.sys.color.on-surface-variant — resting label color
     color: var(--md-sys-color-on-surface-variant);
     user-select: none;
-    font-size: 16px;
+    // md.sys.typescale.body-large — resting label size
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
     position: absolute;
     left: 16px;
     top: 16px;
     cursor: text;
     transform-origin: top left;
     transition:
-      left 0.2s ease-out,
-      top 0.2s ease-out,
-      transform 0.2s ease-out
+      left var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+      top var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+      transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+      color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard)
     ;
   }
 
   // Sub-Infos
 
+  // md.sys.color.on-surface-variant + md.sys.typescale.body-small — supporting text
   .supporting-text {
     color: var(--md-sys-color-on-surface-variant);
-    font-size: 12px;
+    font-size: var(--md-sys-typescale-body-small-font-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-letter-spacing);
     padding: 0 16px;
     margin-top: 4px;
   }
 
   .character-counter {
     color: var(--md-sys-color-on-surface-variant);
-    font-size: 12px;
+    font-size: var(--md-sys-typescale-body-small-font-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-letter-spacing);
     float: right;
     padding: 0 16px;
     margin-top: 4px;
   }
 
+  // Leading / trailing icons: 24dp glyph inside a 48dp touch target,
+  // colored md.sys.color.on-surface-variant.
   .prefix {
     position: absolute;
     left: 12px;
     top: 16px;
     user-select: none;
     display: flex;
+    align-items: center;
+    justify-content: center;
     align-self: center;
+    color: var(--md-sys-color-on-surface-variant);
+    width: 48px;
+    height: 48px;
+    font-size: 24px; // 24dp icon
   }
 
   .suffix {
@@ -161,6 +193,13 @@
     right: 12px;
     top: 16px;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-sys-color-on-surface-variant);
+    width: 48px;
+    height: 48px;
+    font-size: 24px; // 24dp icon
   }
 
   .prefix ~ input, .prefix ~ textarea {
@@ -173,20 +212,51 @@
     left: calc(12px + 24px + 16px);
   }
 
+  // Filled (explicit variant — mirrors the default with M3 filled tokens)
+  //
+  // md.sys.color.surface-container-highest container, 4dp top corners with a
+  // square bottom, and a bottom active indicator (1dp on-surface-variant that
+  // grows to 2dp primary on focus).
+  &.filled {
+
+    input, textarea {
+      background-color: var(--md-sys-color-surface-container-highest);
+      border: none;
+      border-radius: var(--md-sys-shape-corner-extra-small-top); // 4px 4px 0 0
+      border-bottom: 1px solid var(--md-sys-color-on-surface-variant);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &:focus:not([readonly]) {
+        border-bottom: 2px solid var(--input-color); // primary active indicator
+      }
+
+      &:focus:not([readonly]) + label {
+        color: var(--input-color);
+      }
+    }
+  }
+
   // Outlined
 
   // todo: use this approach for floating labels with outline
   // https://dev.to/icyjoseph/use-more-html-elements-floating-from-field-37o9
-
+  //
+  // 1dp md.sys.color.outline border on all sides, 4dp corners everywhere,
+  // becoming a 2dp md.sys.color.primary border on focus. The label sits in a
+  // notch in the top border.
   &.outlined {
 
     input, textarea {
       padding-top: 0;
       background-color: transparent; //(--md-sys-color-background);
-      border: 1px solid var(--md-sys-color-on-surface-variant);
-      border-radius: 4px; // md.sys.shape.corner.extra-small
+      // md.sys.color.outline — 1dp border on all sides
+      border: 1px solid var(--md-sys-color-outline);
+      // md.sys.shape.corner.extra-small — 4dp corners everywhere
+      border-radius: var(--md-sys-shape-corner-extra-small);
 
       &:focus:not([readonly]) {
+        // 2dp md.sys.color.primary border on focus
         border: 2px solid var(--input-color);
         padding-top: 0;
         margin-left: -1px; // subtract border-width
@@ -204,7 +274,9 @@
         left: 16px;
         margin-left: -4px;
         padding: 0 4px;
-        background-color: transparent; //var(--md-sys-color-background);
+        // Notch: paint the field surface behind the floated label so it
+        // punches through the top border.
+        background-color: var(--md-sys-color-surface);
       }
 
       &:disabled, &[readonly="readonly"] {
@@ -214,7 +286,8 @@
     }
   }
 
-  // Error
+  // Error — active indicator/border, label, supporting text and trailing icon
+  // all switch to md.sys.color.error.
   &.error {
     input, textarea {
       border-color: var(--md-sys-color-error);
@@ -229,6 +302,9 @@
       color: var(--md-sys-color-error);
     }
     .supporting-text {
+      color: var(--md-sys-color-error);
+    }
+    .prefix {
       color: var(--md-sys-color-error);
     }
     .suffix {
